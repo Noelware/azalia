@@ -105,12 +105,13 @@ impl<S: Subscriber + for<'l> LookupSpan<'l>> Layer<S> for WriteLayer {
 
     fn on_event(&self, event: &Event<'_>, ctx: tracing_subscriber::layer::Context<'_, S>) {
         #[cfg(feature = "log")]
-        let metadata = {
-            use tracing_log::NormalizeEvent;
+        use tracing_log::NormalizeEvent;
 
-            let mt = event.normalized_metadata();
-            mt.as_ref().unwrap_or_else(|| event.metadata());
-        };
+        #[cfg(feature = "log")]
+        let metadata = event.normalized_metadata();
+
+        #[cfg(feature = "log")]
+        let metadata = metadata.as_ref().unwrap_or_else(|| event.metadata());
 
         #[cfg(not(feature = "log"))]
         let metadata = event.metadata();
