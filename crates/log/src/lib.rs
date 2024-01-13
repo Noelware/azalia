@@ -28,9 +28,11 @@
 pub mod writers;
 
 #[cfg(not(feature = "writers"))]
+#[cfg_attr(docsrs, doc(cfg(not(feature = "writers"))))]
 mod writers;
 
 #[cfg(not(feature = "writers"))]
+#[cfg_attr(docsrs, doc(cfg(not(feature = "writers"))))]
 pub use writers::JsonVisitor;
 
 use serde_json::{json, Value};

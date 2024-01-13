@@ -19,6 +19,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+//! Represents a curated list of [`WriteFn`]s and a default JSON visitor that can be collected
+//! from a [`BTreeMap`] structure.
+
 #[cfg(feature = "writers")]
 mod r#impl;
 
@@ -30,7 +33,7 @@ use std::{collections::BTreeMap, fmt::Debug};
 use tracing::field::{Field, Visit};
 
 /// Reprensets a [`Visit`] implementation for recording [`tracing::Value`]s into JSON values.
-pub struct JsonVisitor<'b>(pub(crate) &'b mut BTreeMap<String, Value>);
+pub struct JsonVisitor<'b>(pub &'b mut BTreeMap<String, Value>);
 
 macro_rules! impl_visitor_instructions {
     ($($name:ident => $ty:ty),*) => {
