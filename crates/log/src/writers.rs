@@ -19,7 +19,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-//! Represents a curated list of [`WriteFn`]s and a default JSON visitor that can be collected
+//! Represents a curated list of [`WriteFn`](crate::WriteFn)s and a default JSON visitor that can be collected
 //! from a [`BTreeMap`] structure.
 
 #[cfg(feature = "writers")]

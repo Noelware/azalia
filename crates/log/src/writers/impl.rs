@@ -66,7 +66,7 @@ impl<'s> Visit for DefaultVisitor<'s> {
     }
 }
 
-/// Provides a default [`WriteFn`] that is soothing to see in your terminal.
+/// Provides a default [`WriteFn`](crate::WriteFn) that is soothing to see in your terminal.
 pub fn default(event: &Event, metadata: &Metadata, _spans: Vec<Value>) -> String {
     let mut buf = String::new();
     let now = Local::now().format("[%B %d, %G - %H:%M:%S %p]");
@@ -133,7 +133,7 @@ pub fn default(event: &Event, metadata: &Metadata, _spans: Vec<Value>) -> String
     buf
 }
 
-/// Provides a Logstash-style [`WriteFn`] implementation as a stringified JSON object.
+/// Provides a Logstash-style [`WriteFn`](crate::WriteFn) implementation as a stringified JSON object.
 pub fn json(event: &Event, metadata: &Metadata, spans: Vec<Value>) -> String {
     let now = Local::now();
     let thread = std::thread::current();
