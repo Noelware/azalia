@@ -60,7 +60,7 @@ pub fn serialize<S: Serializer>(filter: &Level, serializer: S) -> Result<S::Ok, 
 /// #
 /// #[derive(Deserialize)]
 /// pub struct MyStruct {
-///     #[serde(deserialize_with = "noelware_serde::tracing::deserialize_level")]
+///     #[serde(deserialize_with = "noelware_serde::tracing::deserialize")]
 ///     level: Level,
 /// }
 /// ```

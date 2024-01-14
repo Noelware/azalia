@@ -19,16 +19,26 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-[workspace]
-resolver = "2"
-members = ["crates/*"]
+[package]
+name = "noelware-config-derive"
+description = "🐻‍❄️🪚 Derive macro for `noelware-config`, this crate shouldn't be imported directly."
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+homepage.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
 
-[workspace.package]
-version = "0.1.0"
-authors = ["Noel Towa <cutie@floofy.dev>"]
-edition = "2021"
-homepage = "https://cargo.noelware.cloud"
-license = "MIT"
-publish = ["noelware"]
-repository = "https://github.com/Noelware/core-rs"
-rust-version = "1.71"
+[lib]
+proc-macro = true
+
+[dependencies]
+proc-macro-error = "1.0.4"
+proc-macro2 = "1.0.76"
+quote = "1.0.35"
+syn = "2.0.48"
+
+[dev-dependencies]
+noelware-config = { path = "../config" }
+trybuild = "1.0.89"

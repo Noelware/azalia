@@ -9,6 +9,8 @@
 ## Why aren't you publishing these crates to crates.io?
 Because, it felt unneccessary to upload and pollute crates.io with Rust crates that are the scope of Noelware's software projects itself, while you're free to use them and grab the code for library-facing code (with the license attached), since this repository is released under the **MIT License**.
 
+If you don't wish to import from `cargo.noelware.cloud`, then you can just use a Git import instead of the commit hash you need. We don't mind!
+
 ## Are you going to do this to your public crates already on `crates.io`?
 No. We don't plan on moving our public-facing crates like [`remi-rs`](https://github.com/Noelware/remi-rs) to our Cargo registry.
 

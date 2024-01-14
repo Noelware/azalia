@@ -56,9 +56,9 @@ pub mod region {
     /// ## Example
     /// ```no_run
     /// # use aws_types::region::Region;
-    /// # use serde::Serialize;
+    /// # use serde::Deserialize;
     /// #
-    /// #[derive(Serialize)]
+    /// #[derive(Deserialize)]
     /// pub struct MyStruct {
     ///     #[serde(deserialize_with = "noelware_serde::aws::region::deserialize")]
     ///     region: Region,

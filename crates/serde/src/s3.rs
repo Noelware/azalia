@@ -32,12 +32,12 @@ macro_rules! impl_methods {
             ///
             /// ## Example
             /// ```no_run
-            #[doc = concat!("   #[serde(serialize_with = noelware_serde::s3::", stringify!($mod), "::serialize)]")]
             #[doc = concat!(" # use aws_sdk_s3::types::", stringify!($name), ";")]
             /// # use serde::Serialize;
             /// #
             /// #[derive(Serialize)]
             /// pub struct MyStruct {
+            #[doc = concat!("   #[serde(serialize_with = \"noelware_serde::s3::", stringify!($mod), "::serialize\")]")]
             #[doc = concat!("   acl: ", stringify!($name), ",")]
             /// }
             /// ```
@@ -59,7 +59,7 @@ macro_rules! impl_methods {
             /// #
             /// #[derive(Deserialize)]
             /// pub struct MyStruct {
-            #[doc = concat!("   #[serde(deserialize_with = noelware_serde::s3::", stringify!($mod), "::deserialize)]")]
+            #[doc = concat!("   #[serde(deserialize_with = \"noelware_serde::s3::", stringify!($mod), "::deserialize\")]")]
             #[doc = concat!("   acl: ", stringify!($name), ",")]
             /// }
             /// ```
