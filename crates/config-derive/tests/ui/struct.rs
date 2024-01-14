@@ -36,5 +36,5 @@ fn main() {
     };
 
     a.merge(b);
-    dbg!(a);
+    assert_eq!(a.a, "heck");
 }
