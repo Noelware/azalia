@@ -72,8 +72,8 @@ pub fn default(event: &Event, metadata: &Metadata, _spans: Vec<Value>) -> String
     let mut buf = String::new();
     let now = Local::now().format("%B %d, %G - %H:%M:%S %p");
     let (b1, b2) = (
-        "[".if_supports_color(Stream::Stdout, gray_fg),
-        "]".if_supports_color(Stream::Stdout, gray_fg),
+        "«".if_supports_color(Stream::Stdout, gray_fg),
+        "»".if_supports_color(Stream::Stdout, gray_fg),
     );
 
     let _ = write!(
@@ -111,9 +111,15 @@ pub fn default(event: &Event, metadata: &Metadata, _spans: Vec<Value>) -> String
     let _ = write!(
         buf,
         "{} {}{}{}: ",
-        metadata.module_path().unwrap_or("«unknown»"),
+        metadata
+            .module_path()
+            .unwrap_or("unknown")
+            .if_supports_color(Stream::Stdout, |x| x.fg_rgb::<72, 61, 139>()),
         b1,
-        thread::current().name().unwrap_or("main"),
+        thread::current()
+            .name()
+            .unwrap_or("main")
+            .if_supports_color(Stream::Stdout, |x| x.fg_rgb::<244, 181, 213>()),
         b2
     );
 
