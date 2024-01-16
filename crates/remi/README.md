@@ -38,7 +38,7 @@ Enables the use to detect JSON files when resolving content types. This implicit
 Enables the use to detect YAML files when resolving content types. This implicitilly enables the `serde_yaml` feature in [`remi-fs`](https://docs.rs/remi-fs).
 
 ### `tracing` (disabled by default)
-Enables the use of [`tracing`](https://docs.rs/tracing) for logging and instrumentation. This will add spans to each method on the [`StorageService`](https://docs.rs/remi) trait when enabled. This implicitilly enables the `tracing` feature in [`remi-fs`](https://docs.rs/remi-fs), [`remi-s3`](https://docs.rs/remi-s3), [`remi-gcs`](https://docs.rs/remi-gcs), [`remi-gridfs`](https://docs.rs/remi-gridfs), and [`remi-azure`](https://docs.rs/remi-azure) crates.
+Enables the use of [`tracing`](https://docs.rs/tracing) for logging and instrumentation. This will add spans to each method on the [`StorageService`](https://docs.rs/remi) trait when enabled. This implicitilly enables the `tracing` feature in [`remi-fs`](https://docs.rs/remi-fs), [`remi-s3`](https://docs.rs/remi-s3), [`remi-gridfs`](https://docs.rs/remi-gridfs), and [`remi-azure`](https://docs.rs/remi-azure) crates.
 
 ### `gridfs` (disabled by default)
 Enables [`remi-gridfs`](https://docs.rs/remi-gridfs) in the `StorageService` enum of this crate.
@@ -47,16 +47,13 @@ Enables [`remi-gridfs`](https://docs.rs/remi-gridfs) in the `StorageService` enu
 Enables [`remi-azure`](https://docs.rs/remi-azure) in the `StorageService` enum of this crate.
 
 ### `serde` (disabled by default)
-Enables the use of [`serde`](https://docs.rs/serde) to serialize and deserialize configuration structs that each Remi-based crate. This will enable the use of `serde` on the `Config` enum of this crate and implicitilly enable the `serde` feature in [`remi-fs`](https://docs.rs/remi-fs), [`remi-s3`](https://docs.rs/remi-s3), [`remi-gcs`](https://docs.rs/remi-gcs), [`remi-gridfs`](https://docs.rs/remi-gridfs), and [`remi-azure`](https://docs.rs/remi-azure) crates.
+Enables the use of [`serde`](https://docs.rs/serde) to serialize and deserialize configuration structs that each Remi-based crate. This will enable the use of `serde` on the `Config` enum of this crate and implicitilly enable the `serde` feature in [`remi-fs`](https://docs.rs/remi-fs), [`remi-s3`](https://docs.rs/remi-s3), [`remi-gridfs`](https://docs.rs/remi-gridfs), and [`remi-azure`](https://docs.rs/remi-azure) crates.
 
 ### `log` (disabled by default)
-Enables the use of [`log`](https://docs.rs/log) to provide logging statements that might be useful. This will implicitilly enable the `log` feature in [`remi-fs`](https://docs.rs/remi-fs), [`remi-s3`](https://docs.rs/remi-s3), [`remi-gcs`](https://docs.rs/remi-gcs), [`remi-gridfs`](https://docs.rs/remi-gridfs), and [`remi-azure`](https://docs.rs/remi-azure) crates.
+Enables the use of [`log`](https://docs.rs/log) to provide logging statements that might be useful. This will implicitilly enable the `log` feature in [`remi-fs`](https://docs.rs/remi-fs), [`remi-s3`](https://docs.rs/remi-s3), [`remi-gridfs`](https://docs.rs/remi-gridfs), and [`remi-azure`](https://docs.rs/remi-azure) crates.
 
 ### `all` (disabled by default)
 Enables the `gridfs`, `azure`, `gcs`, `s3`, and `fs` features.
-
-### `gcs` (disabled by default)
-Enables [`remi-gcs`](https://docs.rs/remi-gcs) in the `StorageService` enum of this crate.
 
 ### `s3` (disabled by default)
 Enables [`remi-s3`](https://docs.rs/remi-s3) in the `StorageService` enum of this crate.

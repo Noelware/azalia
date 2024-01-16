@@ -24,11 +24,15 @@
 #![cfg_attr(docsrs, feature(doc_cfg))]
 #![allow(deprecated)] // all #[deprecated] are all the non exhaustive types
 
-pub use remi_core as remi;
+pub use remi;
 
 #[cfg(feature = "gridfs")]
 #[cfg_attr(docsrs, doc(cfg(feature = "gridfs")))]
 pub use remi_gridfs as gridfs;
+
+#[cfg(feature = "azure")]
+#[cfg_attr(docsrs, doc(cfg(feature = "azure")))]
+pub use remi_azure as azure;
 
 #[cfg(feature = "s3")]
 #[cfg_attr(docsrs, doc(cfg(feature = "s3")))]
@@ -38,10 +42,8 @@ pub use remi_s3 as s3;
 #[cfg_attr(docsrs, doc(cfg(feature = "fs")))]
 pub use remi_fs as fs;
 
-use bytes::Bytes;
-
 #[allow(unused)]
-use remi_core::{async_trait, Blob, ListBlobsRequest, StorageService as _, UploadRequest};
+use remi::{async_trait, Blob, Bytes, ListBlobsRequest, StorageService as _, UploadRequest};
 use std::{io::Result, path::Path};
 
 /// Union-like enum for [`StorageService`].
@@ -55,6 +57,9 @@ pub enum StorageService {
     #[cfg(feature = "gridfs")]
     GridFS(remi_gridfs::GridfsStorageService),
 
+    #[cfg(feature = "azure")]
+    Azure(remi_azure::StorageService),
+
     #[cfg(feature = "s3")]
     S3(remi_s3::S3StorageService),
 
@@ -65,21 +70,8 @@ pub enum StorageService {
 
 #[async_trait]
 #[allow(unused)]
-impl remi_core::StorageService for StorageService {
-    fn name(self) -> &'static str {
-        match self {
-            #[cfg(feature = "fs")]
-            Self::Filesystem(fs) => fs.name(),
-
-            #[cfg(feature = "gridfs")]
-            Self::GridFS(gridfs) => gridfs.name(),
-
-            #[cfg(feature = "s3")]
-            Self::S3(s3) => s3.name(),
-
-            _ => "remi:disabled",
-        }
-    }
+impl remi::StorageService for StorageService {
+    const NAME: &'static str = "noelware:remi";
 
     async fn init(&self) -> Result<()> {
         match self {
@@ -89,6 +81,9 @@ impl remi_core::StorageService for StorageService {
             #[cfg(feature = "gridfs")]
             Self::GridFS(gridfs) => gridfs.init().await,
 
+            #[cfg(feature = "azure")]
+            Self::Azure(azure) => azure.init().await,
+
             #[cfg(feature = "s3")]
             Self::S3(s3) => s3.init().await,
 
@@ -96,13 +91,16 @@ impl remi_core::StorageService for StorageService {
         }
     }
 
-    async fn open(&self, path: impl AsRef<Path> + Send) -> Result<Option<Bytes>> {
+    async fn open<P: AsRef<Path> + Send>(&self, path: P) -> Result<Option<Bytes>> {
         match self {
             #[cfg(feature = "fs")]
             Self::Filesystem(fs) => fs.open(path).await,
 
             #[cfg(feature = "gridfs")]
             Self::GridFS(gridfs) => gridfs.open(path).await,
+
+            #[cfg(feature = "azure")]
+            Self::Azure(azure) => azure.open(path).await,
 
             #[cfg(feature = "s3")]
             Self::S3(s3) => s3.open(path).await,
@@ -111,13 +109,16 @@ impl remi_core::StorageService for StorageService {
         }
     }
 
-    async fn blob(&self, path: impl AsRef<Path> + Send) -> Result<Option<Blob>> {
+    async fn blob<P: AsRef<Path> + Send>(&self, path: P) -> Result<Option<Blob>> {
         match self {
             #[cfg(feature = "fs")]
             Self::Filesystem(fs) => fs.blob(path).await,
 
             #[cfg(feature = "gridfs")]
             Self::GridFS(gridfs) => gridfs.blob(path).await,
+
+            #[cfg(feature = "azure")]
+            Self::Azure(azure) => azure.blob(path).await,
 
             #[cfg(feature = "s3")]
             Self::S3(s3) => s3.blob(path).await,
@@ -126,9 +127,9 @@ impl remi_core::StorageService for StorageService {
         }
     }
 
-    async fn blobs(
+    async fn blobs<P: AsRef<Path> + Send>(
         &self,
-        path: Option<impl AsRef<Path> + Send>,
+        path: Option<P>,
         options: Option<ListBlobsRequest>,
     ) -> Result<Vec<Blob>> {
         match self {
@@ -138,6 +139,9 @@ impl remi_core::StorageService for StorageService {
             #[cfg(feature = "gridfs")]
             Self::GridFS(gridfs) => gridfs.blobs(path, options).await,
 
+            #[cfg(feature = "azure")]
+            Self::Azure(azure) => azure.blobs(path, options).await,
+
             #[cfg(feature = "s3")]
             Self::S3(s3) => s3.blobs(path, options).await,
 
@@ -145,13 +149,16 @@ impl remi_core::StorageService for StorageService {
         }
     }
 
-    async fn delete(&self, path: impl AsRef<Path> + Send) -> Result<()> {
+    async fn delete<P: AsRef<Path> + Send>(&self, path: P) -> Result<()> {
         match self {
             #[cfg(feature = "fs")]
             Self::Filesystem(fs) => fs.delete(path).await,
 
             #[cfg(feature = "gridfs")]
             Self::GridFS(gridfs) => gridfs.delete(path).await,
+
+            #[cfg(feature = "azure")]
+            Self::Azure(azure) => azure.delete(path).await,
 
             #[cfg(feature = "s3")]
             Self::S3(s3) => s3.delete(path).await,
@@ -160,13 +167,16 @@ impl remi_core::StorageService for StorageService {
         }
     }
 
-    async fn exists(&self, path: impl AsRef<Path> + Send) -> Result<bool> {
+    async fn exists<P: AsRef<Path> + Send>(&self, path: P) -> Result<bool> {
         match self {
             #[cfg(feature = "fs")]
             Self::Filesystem(fs) => fs.exists(path).await,
 
             #[cfg(feature = "gridfs")]
             Self::GridFS(gridfs) => gridfs.exists(path).await,
+
+            #[cfg(feature = "azure")]
+            Self::Azure(azure) => azure.exists(path).await,
 
             #[cfg(feature = "s3")]
             Self::S3(s3) => s3.exists(path).await,
@@ -175,13 +185,16 @@ impl remi_core::StorageService for StorageService {
         }
     }
 
-    async fn upload(&self, path: impl AsRef<Path> + Send, options: UploadRequest) -> Result<()> {
+    async fn upload<P: AsRef<Path> + Send>(&self, path: P, options: UploadRequest) -> Result<()> {
         match self {
             #[cfg(feature = "fs")]
             Self::Filesystem(fs) => fs.upload(path, options).await,
 
             #[cfg(feature = "gridfs")]
             Self::GridFS(gridfs) => gridfs.upload(path, options).await,
+
+            #[cfg(feature = "azure")]
+            Self::Azure(azure) => azure.upload(path, options).await,
 
             #[cfg(feature = "s3")]
             Self::S3(s3) => s3.upload(path, options).await,
@@ -204,6 +217,9 @@ pub enum Config {
 
     #[cfg(feature = "gridfs")]
     GridFS(remi_gridfs::GridfsStorageConfig),
+
+    #[cfg(feature = "azure")]
+    Azure(remi_azure::Config),
 
     #[cfg(feature = "s3")]
     S3(remi_s3::S3StorageConfig),

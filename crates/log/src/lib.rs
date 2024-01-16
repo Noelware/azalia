@@ -61,7 +61,7 @@ where
 /// [`WriteFn`] to go alongside with this type.
 pub struct WriteLayer {
     writer: RwLock<Box<dyn Write + Send + Sync>>,
-    write_fn: Option<Box<dyn WriteFn>>,
+    write_fn: Option<Box<dyn WriteFn + Send + Sync>>,
 }
 
 impl WriteLayer {
@@ -74,7 +74,10 @@ impl WriteLayer {
     }
 
     /// Creates a new [`WriteLayer`] with a specified [`WriteFn`].
-    pub fn new_with<W: Write + Send + Sync + 'static, F: WriteFn + 'static>(writer: W, fn_: F) -> WriteLayer {
+    pub fn new_with<W: Write + Send + Sync + 'static, F: WriteFn + Send + Sync + 'static>(
+        writer: W,
+        fn_: F,
+    ) -> WriteLayer {
         WriteLayer {
             writer: RwLock::new(Box::new(writer)),
             write_fn: Some(Box::new(fn_)),
@@ -148,5 +151,30 @@ impl<S: Subscriber + for<'l> LookupSpan<'l>> Layer<S> for WriteLayer {
             let _ = write!(writer, "{buf}");
             let _ = writeln!(writer);
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::WriteLayer;
+    use std::io;
+    use tracing::Dispatch;
+    use tracing_subscriber::{layer::SubscriberExt, registry, Layer, Registry};
+
+    fn __assert_is_layer<S>(_: &dyn Layer<S>) {
+        /* no body here */
+    }
+
+    fn __assert_is_dispatchable(_: impl Into<Dispatch>) {
+        /* no body here :3 */
+    }
+
+    #[test]
+    fn assertions() {
+        __assert_is_layer::<Registry>(&WriteLayer::new(io::stdout()));
+        __assert_is_dispatchable(registry().with(WriteLayer::new(io::stdout())));
+
+        #[cfg(feature = "writers")]
+        __assert_is_dispatchable(registry().with(WriteLayer::new_with(io::stdout(), crate::writers::default)))
     }
 }
