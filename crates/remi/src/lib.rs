@@ -47,15 +47,15 @@ use remi::{async_trait, Blob, Bytes, ListBlobsRequest, StorageService as _, Uplo
 use std::{io::Result, path::Path};
 
 /// Union-like enum for [`StorageService`].
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 #[allow(deprecated)]
 #[non_exhaustive]
 pub enum StorageService {
     #[cfg(feature = "fs")]
-    Filesystem(remi_fs::FilesystemStorageService),
+    Filesystem(remi_fs::StorageService),
 
     #[cfg(feature = "gridfs")]
-    GridFS(remi_gridfs::GridfsStorageService),
+    GridFS(remi_gridfs::StorageService),
 
     #[cfg(feature = "azure")]
     Azure(remi_azure::StorageService),
@@ -213,13 +213,13 @@ impl remi::StorageService for StorageService {
 #[cfg_attr(feature = "serde", serde(untagged))]
 pub enum Config {
     #[cfg(feature = "fs")]
-    Filesystem(remi_fs::FilesystemStorageConfig),
+    Filesystem(remi_fs::Config),
 
     #[cfg(feature = "gridfs")]
-    GridFS(remi_gridfs::GridfsStorageConfig),
+    GridFS(remi_gridfs::StorageConfig),
 
     #[cfg(feature = "azure")]
-    Azure(remi_azure::Config),
+    Azure(remi_azure::StorageConfig),
 
     #[cfg(feature = "s3")]
     S3(remi_s3::S3StorageConfig),

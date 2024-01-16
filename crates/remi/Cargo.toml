@@ -52,7 +52,7 @@ serde = [
     "remi-gridfs/serde",
 ]
 log = ["remi-fs/log", "remi-s3/log", "remi-azure/log", "remi-gridfs/log"]
-all = ["gridfs", "s3", "fs"]
+all = ["gridfs", "s3", "fs", "azure"]
 s3 = ["dep:remi-s3"]
 fs = ["dep:remi-fs"]
 
