@@ -26,7 +26,7 @@ use serde_json::{json, Value};
 use std::{
     collections::BTreeMap,
     fmt::{self, Debug, Write as _},
-    process,
+    process, thread,
 };
 use tracing::{
     field::{Field, Visit},
@@ -66,11 +66,11 @@ impl<'s> Visit for DefaultVisitor<'s> {
     }
 }
 
+// time level   module (thread name): message
 /// Provides a default [`WriteFn`](crate::WriteFn) that is soothing to see in your terminal.
 pub fn default(event: &Event, metadata: &Metadata, _spans: Vec<Value>) -> String {
     let mut buf = String::new();
-    let now = Local::now().format("[%B %d, %G - %H:%M:%S %p]");
-
+    let now = Local::now().format("%B %d, %G - %H:%M:%S %p");
     let (b1, b2) = (
         "[".if_supports_color(Stream::Stdout, gray_fg),
         "]".if_supports_color(Stream::Stdout, gray_fg),
@@ -78,7 +78,7 @@ pub fn default(event: &Event, metadata: &Metadata, _spans: Vec<Value>) -> String
 
     let _ = write!(
         buf,
-        "{} {} {b1}",
+        "{} {}     ",
         now.if_supports_color(Stream::Stdout, |x| x.fg_rgb::<134, 134, 134>()),
         match *metadata.level() {
             Level::TRACE => "TRACE"
@@ -108,22 +108,15 @@ pub fn default(event: &Event, metadata: &Metadata, _spans: Vec<Value>) -> String
         },
     );
 
-    let target = format!(
-        "{:>49} {:>25}",
-        metadata.module_path().unwrap_or("unknown"),
-        std::thread::current()
-            .name()
-            .unwrap_or("main")
-            .if_supports_color(Stream::Stdout, |x| x.fg_rgb::<244, 181, 213>())
-    );
-
     let _ = write!(
         buf,
-        "{}",
-        target.if_supports_color(Stream::Stdout, |x| x.fg_rgb::<120, 231, 255>())
+        "{} {}{}{}: ",
+        metadata.module_path().unwrap_or("«unknown»"),
+        b1,
+        thread::current().name().unwrap_or("main"),
+        b2
     );
 
-    let _ = write!(buf, "{b2} :: ");
     let mut visitor = DefaultVisitor {
         result: Ok(()),
         writer: &mut buf,
