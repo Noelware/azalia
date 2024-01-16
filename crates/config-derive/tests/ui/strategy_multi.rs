@@ -19,14 +19,29 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#[test]
-fn ui() {
-    let cases = trybuild::TestCases::new();
-    cases.compile_fail("./tests/ui/union.rs");
-    cases.compile_fail("./tests/ui/enum.rs");
+use noelware_config::merge::Merge;
 
-    cases.pass("./tests/ui/strategy_multi.rs");
-    cases.pass("./tests/ui/custom_strategy.rs");
-    cases.pass("./tests/ui/skip_test.rs");
-    cases.pass("./tests/ui/struct.rs");
+#[derive(Debug, noelware_config_derive::Merge)]
+struct Something {
+    #[merge(strategy = noelware_config::merge::strategy::strings::append)]
+    a: String,
+
+    #[merge(strategy = noelware_config::merge::strategy::strings::overwrite_empty)]
+    b: String,
+}
+
+fn main() {
+    let mut a = Something {
+        a: String::from("weow"),
+        b: String::new(),
+    };
+
+    let b = Something {
+        a: String::from("heck"),
+        b: String::from("weow"),
+    };
+
+    a.merge(b);
+    assert_eq!(a.a, "weowheck");
+    assert_eq!(a.b, "weow");
 }

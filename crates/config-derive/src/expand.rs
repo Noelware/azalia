@@ -79,7 +79,7 @@ fn gen_struct_field_assignment(field: &Field) -> Option<TokenStream> {
 
     let name = field.ident.as_ref().expect("expected identifier");
     Some(match first.strategy {
-        Some(path) => quote_spanned!(path.span()=> #path(&mut self.#name, other.#name)),
-        None => quote_spanned!(field.span()=> ::noelware_config::merge::Merge::merge(&mut self.#name, other.#name)),
+        Some(path) => quote_spanned!(path.span()=> #path(&mut self.#name, other.#name);),
+        None => quote_spanned!(field.span()=> ::noelware_config::merge::Merge::merge(&mut self.#name, other.#name);),
     })
 }
