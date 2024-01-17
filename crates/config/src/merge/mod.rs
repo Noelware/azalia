@@ -152,5 +152,6 @@ macro_rules! impl_generic_partial_eq_merge {
 impl_unum_merge!(u8, u16, u32, u64, u128, usize);
 impl_generic_partial_eq_merge!(
     i8, i16, i32, i64, i128, isize, // numbers
-    String, &str // strings
+    String, &str, // strings
+    bool  // booleans
 );

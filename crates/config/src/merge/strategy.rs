@@ -108,6 +108,16 @@ pub mod vec {
     }
 }
 
+/// Common merging strategies for the [`bool`] type.
+pub mod bool {
+    /// Only merge `left` into `right` if `left` is `false`.
+    pub fn only_if_falsy(left: &mut bool, right: bool) {
+        if !*left {
+            *left = right;
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::strings;
