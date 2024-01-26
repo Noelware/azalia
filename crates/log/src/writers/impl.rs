@@ -132,11 +132,17 @@ pub fn default<S: for<'l> LookupSpan<'l>>(event: &Event, metadata: &Metadata, sp
     };
 
     event.record(&mut visitor);
+
+    // fast-circuit if there is no elements available
+    if spans.is_empty() {
+        return buf;
+    }
+
     let _ = writeln!(buf);
 
     // TODO(@auguwu): make this configurable as its own struct maybe?
     for (idx, span) in spans.iter().enumerate() {
-        let _ = write!(buf, "    {} #{idx}", "~> ".if_supports_color(Stream::Stdout, gray_fg));
+        let _ = write!(buf, "    {} #{idx}", "~>   ".if_supports_color(Stream::Stdout, gray_fg));
         let _ = write!(
             buf,
             "{} ",
