@@ -19,6 +19,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+use crate::JsonExtension;
+
 use super::JsonVisitor;
 use chrono::Local;
 use owo_colors::{colors::CustomColor, FgColorDisplay, OwoColorize, Stream};
@@ -32,6 +34,7 @@ use tracing::{
     field::{Field, Visit},
     Event, Level, Metadata,
 };
+use tracing_subscriber::registry::{LookupSpan, SpanRef};
 
 pub(crate) struct DefaultVisitor<'s> {
     result: fmt::Result,
@@ -68,7 +71,7 @@ impl<'s> Visit for DefaultVisitor<'s> {
 
 // time level   module (thread name): message
 /// Provides a default [`WriteFn`](crate::WriteFn) that is soothing to see in your terminal.
-pub fn default(event: &Event, metadata: &Metadata, _spans: Vec<Value>) -> String {
+pub fn default<S: for<'l> LookupSpan<'l>>(event: &Event, metadata: &Metadata, spans: Vec<SpanRef<'_, S>>) -> String {
     let mut buf = String::new();
     let now = Local::now().format("%B %d, %G - %H:%M:%S %p");
     let (b1, b2) = (
@@ -129,11 +132,25 @@ pub fn default(event: &Event, metadata: &Metadata, _spans: Vec<Value>) -> String
     };
 
     event.record(&mut visitor);
+    let _ = writeln!(buf);
+
+    // TODO(@auguwu): make this configurable as its own struct maybe?
+    for (idx, span) in spans.iter().enumerate() {
+        let _ = write!(buf, "    {} #{idx}", "~> ".if_supports_color(Stream::Stdout, gray_fg));
+        let _ = write!(
+            buf,
+            "{} ",
+            span.metadata().name().if_supports_color(Stream::Stdout, |x| x.bold())
+        );
+
+        let _ = writeln!(buf);
+    }
+
     buf
 }
 
 /// Provides a Logstash-style [`WriteFn`](crate::WriteFn) implementation as a stringified JSON object.
-pub fn json(event: &Event, metadata: &Metadata, spans: Vec<Value>) -> String {
+pub fn json<S: for<'l> LookupSpan<'l>>(event: &Event, metadata: &Metadata, spans: Vec<SpanRef<'_, S>>) -> String {
     let now = Local::now();
     let thread = std::thread::current();
     let pid = process::id();
@@ -146,6 +163,30 @@ pub fn json(event: &Event, metadata: &Metadata, spans: Vec<Value>) -> String {
         .remove("message")
         .unwrap_or(Value::String(String::from("<none provided>")));
 
+    let mut spans_as_json: Vec<Value> = vec![];
+    for span in spans.iter() {
+        let ext = span.extensions();
+        let storage = ext.get::<JsonExtension>().unwrap();
+        let data = &storage.0;
+
+        spans_as_json.push(json!({
+            // show `null` if there are no fields available
+            "fields": match data.is_empty() {
+                true => None,
+                false => Some(data)
+            },
+
+            "target": span.metadata().target(),
+            "level": metadata.level().as_str().to_lowercase(),
+            "name": span.metadata().name(),
+            "meta": json!({
+                "module": span.metadata().module_path(),
+                "file": span.metadata().file(),
+                "line": span.metadata().line(),
+            })
+        }));
+    }
+
     serde_json::to_string(&json!({
         "@timestamp": now.to_rfc3339(),
         "message": message,
@@ -154,7 +195,7 @@ pub fn json(event: &Event, metadata: &Metadata, spans: Vec<Value>) -> String {
         "metadata.line": metadata.line(),
         "thread.name": thread.name().unwrap_or("main"),
         "process.id": pid,
-        "spans": spans,
+        "spans": spans_as_json,
         "fields": match tree.is_empty() {
             true => None,
             false => Some(tree),
@@ -167,8 +208,8 @@ pub fn json(event: &Event, metadata: &Metadata, spans: Vec<Value>) -> String {
 fn __assert_dyn() {
     use crate::WriteFn;
 
-    let _: &dyn WriteFn = &default;
-    let _: &dyn WriteFn = &json;
+    let _: &dyn WriteFn<tracing_subscriber::Registry> = &default;
+    let _: &dyn WriteFn<tracing_subscriber::Registry> = &json;
 }
 
 fn gray_fg<'a>(x: &'a &'a str) -> FgColorDisplay<'a, CustomColor<134, 134, 134>, &str> {

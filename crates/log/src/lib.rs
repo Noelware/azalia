@@ -33,10 +33,12 @@ mod writers;
 #[cfg(not(feature = "writers"))]
 pub use writers::JsonVisitor;
 
-use serde_json::{json, Value};
 use std::{io::Write, sync::RwLock};
 use tracing::{span, Event, Metadata, Subscriber};
-use tracing_subscriber::{registry::LookupSpan, Layer};
+use tracing_subscriber::{
+    registry::{LookupSpan, SpanRef},
+    Layer,
+};
 
 /// Represents a function-based trait to create a [`String`] buffer with pieces you might need. This shouldn't
 /// be implemented directly, but can be written with the following function signature:
@@ -44,29 +46,29 @@ use tracing_subscriber::{registry::LookupSpan, Layer};
 /// ```rust,ignore
 /// fn(&tracing::Event, &tracing::Metadata, Vec<serde_json::Value>) -> Result<String, std::fmt::Error>
 /// ```
-pub trait WriteFn: Send {
-    fn buffer(&self, event: &Event, metadata: &Metadata, spans: Vec<Value>) -> String;
+pub trait WriteFn<S: for<'l> LookupSpan<'l>>: Send {
+    fn buffer(&self, event: &Event, metadata: &Metadata, spans: Vec<SpanRef<'_, S>>) -> String;
 }
 
-impl<F> WriteFn for F
+impl<S: for<'l> LookupSpan<'l>, F> WriteFn<S> for F
 where
-    F: Fn(&Event, &Metadata, Vec<Value>) -> String + Send,
+    F: Fn(&Event, &Metadata, Vec<SpanRef<'_, S>>) -> String + Send,
 {
-    fn buffer(&self, event: &Event, metadata: &Metadata, spans: Vec<Value>) -> String {
+    fn buffer(&self, event: &Event, metadata: &Metadata, spans: Vec<SpanRef<'_, S>>) -> String {
         (self)(event, metadata, spans)
     }
 }
 
 /// Represents a [`Layer`] for writing to a type that implements [`Write`], with a optional
 /// [`WriteFn`] to go alongside with this type.
-pub struct WriteLayer {
+pub struct WriteLayer<S: for<'l> LookupSpan<'l>> {
     writer: RwLock<Box<dyn Write + Send + Sync>>,
-    write_fn: Option<Box<dyn WriteFn + Send + Sync>>,
+    write_fn: Option<Box<dyn WriteFn<S> + Send + Sync>>,
 }
 
-impl WriteLayer {
+impl<S: for<'l> LookupSpan<'l>> WriteLayer<S> {
     /// Creates a new [`WriteLayer`] without a [`WriteFn`].
-    pub fn new<W: Write + Send + Sync + 'static>(writer: W) -> WriteLayer {
+    pub fn new<W: Write + Send + Sync + 'static>(writer: W) -> WriteLayer<S> {
         WriteLayer {
             writer: RwLock::new(Box::new(writer)),
             write_fn: None,
@@ -74,10 +76,10 @@ impl WriteLayer {
     }
 
     /// Creates a new [`WriteLayer`] with a specified [`WriteFn`].
-    pub fn new_with<W: Write + Send + Sync + 'static, F: WriteFn + Send + Sync + 'static>(
+    pub fn new_with<W: Write + Send + Sync + 'static, F: WriteFn<S> + Send + Sync + 'static>(
         writer: W,
         fn_: F,
-    ) -> WriteLayer {
+    ) -> WriteLayer<S> {
         WriteLayer {
             writer: RwLock::new(Box::new(writer)),
             write_fn: Some(Box::new(fn_)),
@@ -86,7 +88,7 @@ impl WriteLayer {
 }
 
 pub(crate) struct JsonExtension(pub(crate) std::collections::BTreeMap<String, serde_json::Value>);
-impl<S: Subscriber + for<'l> LookupSpan<'l>> Layer<S> for WriteLayer {
+impl<S: Subscriber + for<'l> LookupSpan<'l>> Layer<S> for WriteLayer<S> {
     fn on_new_span(&self, attrs: &span::Attributes<'_>, id: &span::Id, ctx: tracing_subscriber::layer::Context<'_, S>) {
         let span = ctx.span(id).unwrap();
         let mut data = std::collections::BTreeMap::new();
@@ -119,29 +121,10 @@ impl<S: Subscriber + for<'l> LookupSpan<'l>> Layer<S> for WriteLayer {
         #[cfg(not(feature = "log"))]
         let metadata = event.metadata();
 
-        let mut spans: Vec<Value> = vec![];
+        let mut spans: Vec<SpanRef<'_, S>> = vec![];
         if let Some(scope) = ctx.event_scope(event) {
             for span in scope.from_root() {
-                let ext = span.extensions();
-                let storage = ext.get::<JsonExtension>().unwrap();
-                let data = &storage.0;
-
-                spans.push(json!({
-                    // show `null` if there are no fields available
-                    "fields": match data.is_empty() {
-                        true => None,
-                        false => Some(data)
-                    },
-
-                    "target": span.metadata().target(),
-                    "level": metadata.level().as_str().to_lowercase(),
-                    "name": span.metadata().name(),
-                    "meta": json!({
-                        "module": span.metadata().module_path(),
-                        "file": span.metadata().file(),
-                        "line": span.metadata().line(),
-                    })
-                }));
+                spans.push(span);
             }
         }
 
