@@ -71,7 +71,7 @@ impl<'s> Visit for DefaultVisitor<'s> {
 
 // time level   module (thread name): message
 /// Provides a default [`WriteFn`](crate::WriteFn) that is soothing to see in your terminal.
-pub fn default<S: for<'l> LookupSpan<'l>>(event: &Event, metadata: &Metadata, spans: Vec<SpanRef<'_, S>>) -> String {
+pub fn default<S: for<'l> LookupSpan<'l>>(event: &Event, metadata: &Metadata, _spans: Vec<SpanRef<'_, S>>) -> String {
     let mut buf = String::new();
     let now = Local::now().format("%B %d, %G - %H:%M:%S %p");
     let (b1, b2) = (
@@ -132,25 +132,6 @@ pub fn default<S: for<'l> LookupSpan<'l>>(event: &Event, metadata: &Metadata, sp
     };
 
     event.record(&mut visitor);
-
-    // fast-circuit if there is no elements available
-    if spans.is_empty() {
-        return buf;
-    }
-
-    let _ = writeln!(buf);
-
-    // TODO(@auguwu): make this configurable as its own struct maybe?
-    for (idx, span) in spans.iter().enumerate() {
-        let _ = write!(buf, "    {} #{idx}", "~>   ".if_supports_color(Stream::Stdout, gray_fg));
-        let _ = write!(
-            buf,
-            "{} ",
-            span.metadata().name().if_supports_color(Stream::Stdout, |x| x.bold())
-        );
-
-        let _ = writeln!(buf);
-    }
 
     buf
 }
