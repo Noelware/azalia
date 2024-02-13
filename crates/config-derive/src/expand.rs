@@ -42,8 +42,10 @@ pub fn struct_fields(input: &DeriveInput, fields: &Fields) -> TokenStream {
         }
     }
 
+    let generics = &input.generics;
     quote! {
-        impl ::noelware_config::merge::Merge for #name {
+        #[automatically_derived]
+        impl #generics ::noelware_config::merge::Merge for #name #generics {
             fn merge(&mut self, other: Self) {
                 #(#assignments)*
             }

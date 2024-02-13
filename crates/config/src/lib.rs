@@ -157,7 +157,7 @@ impl<O, T: FromEnv<Output = O>> TryFromEnv for T {
 #[cfg(not(feature = "no-std"))]
 #[macro_export]
 macro_rules! env {
-    ($key:literal, to: $ty:ty, or_else: $else_:expr) => {
+    ($key:expr, to: $ty:ty, or_else: $else_:expr) => {
         $crate::env!($key, mapper: |p| {
             p.parse::<$ty>().expect(concat!(
                 "Unable to resolve env var [",
@@ -170,11 +170,11 @@ macro_rules! env {
         .unwrap_or($else_)
     };
 
-    ($key:literal, to: $ty:ty, is_optional: true) => {
+    ($key:expr, to: $ty:ty, is_optional: true) => {
         $crate::env!($key, mapper: |p| p.parse::<$ty>().ok()).unwrap_or(None)
     };
 
-    ($key:literal, to: $ty:ty) => {
+    ($key:expr, to: $ty:ty) => {
         $crate::env!($key, mapper: |p| {
             p.parse::<$ty>().expect(concat!(
                 "Unable to resolve env var [",
@@ -187,34 +187,34 @@ macro_rules! env {
         .unwrap()
     };
 
-    ($key:literal, {
+    ($key:expr, {
         or_else: $else_:expr;
         mapper: $mapper:expr;
     }) => {
         $crate::env!($key, mapper: $mapper).unwrap_or($else_)
     };
 
-    ($key:literal, mapper: $expr:expr) => {
+    ($key:expr, mapper: $expr:expr) => {
         $crate::env!($key).map($expr)
     };
 
-    ($key:literal, use_default: true) => {
+    ($key:expr, use_default: true) => {
         $crate::env!($key, or_else_do: |_| Default::default())
     };
 
-    ($key:literal, or_else_do: $expr:expr) => {
+    ($key:expr, or_else_do: $expr:expr) => {
         $crate::env!($key).unwrap_or_else($expr)
     };
 
-    ($key:literal, or_else: $else_:expr) => {
+    ($key:expr, or_else: $else_:expr) => {
         $crate::env!($key).unwrap_or($else_)
     };
 
-    ($key:literal, is_optional: true) => {
+    ($key:expr, is_optional: true) => {
         $crate::env!($key).ok()
     };
 
-    ($key:literal) => {
+    ($key:expr) => {
         ::std::env::var($key)
     };
 }
