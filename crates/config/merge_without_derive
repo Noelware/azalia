@@ -1,0 +1,5 @@
+impl Merge for MyWrapper {
+    fn merge(&mut self, other: Self) {
+        self.0 = other.0;
+    }
+}

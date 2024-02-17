@@ -19,6 +19,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#![doc(html_logo_url = "https://cdn.floofy.dev/images/trans.png")]
+#![doc = include_str!("../README.md")]
+
 use proc_macro::TokenStream;
 use proc_macro2::Span;
 use proc_macro_error::proc_macro_error;
@@ -28,6 +31,35 @@ use syn::{parse_macro_input, Data, DataStruct, DeriveInput};
 mod args;
 mod expand;
 
+/// Implements the `Merge` trait onto a struct. Unions won't be supported but enums
+/// might be if a concrete implementation can be reasoned.
+///
+/// ## Example
+/// ```rust,ignore
+/// # use noelware_config::merge::Merge;
+/// #
+/// #[derive(Merge)]
+/// struct MyStruct;
+///
+/// /*
+/// // expands to:
+/// #[automatically_derived]
+/// impl ::noelware_config::merge::Merge for MyStruct {
+///     fn merge(&mut self, _other: Self) {}
+/// }
+/// */
+/// ```
+///
+/// ## Attributes
+/// ### `#[merge(skip)]`
+/// This will skip a field from being merged.
+///
+/// ### `#[merge(strategy = <path>)]`
+/// This will replace the strategy for a field into what `<path>` is. It expects this signature:
+///
+/// ```rust,ignore
+/// fn(left: &mut Type, right: Type);
+/// ````
 #[proc_macro_error]
 #[proc_macro_derive(Merge, attributes(merge))]
 pub fn merge(body: TokenStream) -> TokenStream {

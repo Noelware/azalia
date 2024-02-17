@@ -101,7 +101,7 @@ pub mod vec {
 
     /// Extends all the elements from `right` into `left`. This doesn't move
     /// all elements from `right` into `left`, leaving `right` empty like
-    /// [`append`][crate::strategy::vec::append] does.
+    /// [`append`] does.
     pub fn extend<T>(left: &mut Vec<T>, right: Vec<T>) {
         left.extend(right);
     }
@@ -114,7 +114,7 @@ pub mod vec {
     }
 }
 
-/// Common merging strategies for the [`bool`] type.
+/// Common merging strategies for the [`bool`][prim@bool] type.
 pub mod bool {
     /// Only merge `left` into `right` if `left` is `false`.
     pub fn only_if_falsy(left: &mut bool, right: bool) {
@@ -124,7 +124,7 @@ pub mod bool {
     }
 }
 
-/// Common merging strategies for the [`f32`] type. the [`f32::non_negative`] is the default
+/// Common merging strategies for the [`f32`][prim@f32] type. the [`f32::non_negative`] is the default
 /// for the main `impl f32`.
 pub mod f32 {
     /// Does comparisons from [`PartialEq`] to determine if `right` can be merged as `left`. This does
@@ -159,7 +159,7 @@ pub mod f32 {
     }
 }
 
-/// Common merging strategies for the [`f64`] type. the [`f64::non_negative`] is the default
+/// Common merging strategies for the [`f32`][prim@f64] type. the [`f64::non_negative`] is the default
 /// for the main `impl f64`.
 pub mod f64 {
     /// Does comparisons from [`PartialEq`] to determine if `right` can be merged as `left`. This does
@@ -197,6 +197,9 @@ pub mod f64 {
 #[cfg(test)]
 mod tests {
     use super::strings;
+
+    #[cfg(feature = "no-std")]
+    use alloc::string::String;
 
     // ~ strings ~
     #[test]

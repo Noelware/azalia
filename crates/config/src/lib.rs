@@ -23,6 +23,7 @@
 #![doc = include_str!("../README.md")]
 #![cfg_attr(docsrs, feature(doc_cfg))]
 #![cfg_attr(feature = "no-std", no_std)]
+#![allow(rustdoc::broken_intra_doc_links)] // we use GitHub's alerts and rustdoc doesn't like them
 
 pub mod merge;
 
@@ -81,11 +82,14 @@ impl<O, T: FromEnv<Output = O>> TryFromEnv for T {
 
 // macro is originally the `env!` macro from charted-server
 // original: https://github.com/charted-dev/charted/blob/94e6c9de95059a9f582c934e32d599031a920c18/crates/config/src/lib.rs#L110-L257
+#[cfg(not(feature = "no-std"))]
+#[cfg_attr(feature = "no-std", doc(hidden))]
+#[macro_export]
 /// Generic Rust functional macro to help with locating an environment variable in the host machine.
 ///
 /// ## Variants
 /// ### `env!($key: expr)`
-/// This will just expand `$key` into a Result<[`String`][alloc::string::String], [`VarError`][std::env::VarError]> variant.
+/// This will just expand `$key` into a Result<[`String`][std::string::String], [`VarError`][std::env::VarError]> variant.
 ///
 /// ```
 /// # use noelware_config::env;
@@ -164,8 +168,6 @@ impl<O, T: FromEnv<Output = O>> TryFromEnv for T {
 /// ```
 ///
 /// [result-map]: https://doc.rust-lang.org/nightly/core/result/enum.Result.html#method.map
-#[cfg(not(feature = "no-std"))]
-#[macro_export]
 macro_rules! env {
     ($key:expr, to: $ty:ty, or_else: $else_:expr) => {
         $crate::env!($key, mapper: |p| {

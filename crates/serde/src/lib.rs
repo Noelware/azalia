@@ -22,6 +22,7 @@
 #![doc(html_logo_url = "https://cdn.floofy.dev/images/trans.png")]
 #![doc = include_str!("../README.md")]
 #![cfg_attr(docsrs, feature(doc_cfg))]
+#![allow(rustdoc::broken_intra_doc_links)] // we use GitHub's alerts and rustdoc doesn't like them
 
 #[cfg(feature = "tracing")]
 #[cfg_attr(docsrs, doc(cfg(feature = "tracing")))]

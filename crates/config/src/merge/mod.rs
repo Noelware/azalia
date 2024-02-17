@@ -30,16 +30,13 @@ pub use noelware_config_derive::*;
 /// advantage to allow deep merging.
 ///
 /// ## Example
-/// ```ignore
+/// ```rust
 /// # use noelware_config::merge::Merge;
 /// #
+#[cfg_attr(feature = "derive", doc = "#[derive(Merge)]")]
 /// pub struct MyWrapper(u64);
-/// #
-/// impl Merge for MyWrapper {
-///     fn merge(&mut self, other: Self) {
-///         *self.0 = other.0;
-///     }
-/// }
+///
+#[cfg_attr(not(feature = "derive"), doc = include_str!("../../merge_without_derive"))]
 /// ```
 pub trait Merge {
     /// Does the merging all-together by modifying `self` from `other`.
