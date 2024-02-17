@@ -60,6 +60,14 @@ impl<T> Merge for Option<T> {
     }
 }
 
+#[cfg(feature = "no-std")]
+impl<T> Merge for alloc::vec::Vec<T> {
+    fn merge(&mut self, other: Self) {
+        strategy::vec::extend::<T>(self, other);
+    }
+}
+
+#[cfg(not(feature = "no-std"))]
 impl<T> Merge for Vec<T> {
     fn merge(&mut self, other: Self) {
         strategy::vec::extend(self, other);
@@ -225,6 +233,12 @@ impl_nonzero_merge!(
 impl_unum_merge!(u8, u16, u32, u64, u128, usize);
 impl_generic_partial_eq_merge!(
     i8, i16, i32, i64, i128, isize, // numbers
-    String, &str, // strings
-    bool  // booleans
+    &str,  // strings
+    bool   // booleans
 );
+
+#[cfg(feature = "no-std")]
+impl_generic_partial_eq_merge!(alloc::string::String);
+
+#[cfg(not(feature = "no-std"))]
+impl_generic_partial_eq_merge!(String);

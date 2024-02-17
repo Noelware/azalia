@@ -34,6 +34,9 @@
 /// while [`String`] is mutable, so we don't plan to add `&str` support without doing
 /// unsafe code.
 pub mod strings {
+    #[cfg(feature = "no-std")]
+    use alloc::string::String;
+
     /// Grows and appends the `right` into the `left`.
     ///
     /// ## Example
@@ -87,6 +90,9 @@ pub mod strings {
 
 /// Common merging strategies for the `Vec` type.
 pub mod vec {
+    #[cfg(feature = "no-std")]
+    use alloc::vec::Vec;
+
     /// Moves all the elements from `right` into `left`, this doesn't
     /// sort the elements or checks for uniqueness.
     pub fn append<T>(left: &mut Vec<T>, mut right: Vec<T>) {

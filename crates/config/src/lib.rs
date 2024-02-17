@@ -26,6 +26,9 @@
 
 pub mod merge;
 
+#[cfg(feature = "no-std")]
+extern crate alloc;
+
 // mainly used to import types from `core`/`alloc` if `no-std` feature is enabled, or just
 // uses `std::*` imports if `no-std` is disabled.
 #[cfg(feature = "no-std")]
