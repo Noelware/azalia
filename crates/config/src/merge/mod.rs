@@ -66,42 +66,54 @@ impl<T> Merge for Vec<T> {
     }
 }
 
-#[cfg(not(feature = "no_std"))]
+impl Merge for f32 {
+    fn merge(&mut self, other: Self) {
+        strategy::f32::non_negative(self, other);
+    }
+}
+
+impl Merge for f64 {
+    fn merge(&mut self, other: Self) {
+        strategy::f64::non_negative(self, other);
+    }
+}
+
+#[cfg(not(feature = "no-std"))]
 impl<K: std::hash::Hash + Eq, V> Merge for std::collections::HashMap<K, V> {
     fn merge(&mut self, other: Self) {
         self.extend(other);
     }
 }
 
-#[cfg(not(feature = "no_std"))]
+#[cfg(not(feature = "no-std"))]
 impl<T: std::hash::Hash + Eq> Merge for std::collections::HashSet<T> {
     fn merge(&mut self, other: Self) {
         self.extend(other);
     }
 }
 
-#[cfg(feature = "no_std")]
+#[cfg(feature = "no-std")]
 impl<K: core::cmp::Ord, V> Merge for alloc::collections::BTreeMap<K, V> {
     fn merge(&mut self, other: Self) {
         self.extend(other);
     }
 }
 
-#[cfg(not(feature = "no_std"))]
+#[cfg(not(feature = "no-std"))]
 impl<K: std::cmp::Ord, V> Merge for std::collections::BTreeMap<K, V> {
     fn merge(&mut self, other: Self) {
         self.extend(other);
     }
 }
 
-#[cfg(feature = "no_std")]
+#[cfg(feature = "no-std")]
 impl<T: core::cmp::Ord> Merge for alloc::collections::BTreeSet<T> {
     fn merge(&mut self, other: Self) {
         self.extend(other);
     }
 }
 
-#[cfg(not(feature = "no_std"))]
+#[cfg(not(feature = "no-std"))]
 impl<T: std::cmp::Ord> Merge for std::collections::BTreeSet<T> {
     fn merge(&mut self, other: Self) {
         self.extend(other);
@@ -118,6 +130,11 @@ macro_rules! impl_unum_merge {
                         return;
                     }
 
+                    // fast path: self != 0 & other = 0
+                    if *self != 0 && other == 0 {
+                        return;
+                    }
+
                     // fast path: if self is 0 and other is not, then override
                     if *self == 0 && other > 0 {
                         *self = other;
@@ -127,6 +144,22 @@ macro_rules! impl_unum_merge {
                     // slow path: compare
                     if *self != other {
                         *self = other;
+                    }
+                }
+            }
+        )*
+    };
+}
+
+macro_rules! impl_nonzero_merge {
+    ($($ty:ty),*) => {
+        $(
+            impl Merge for $ty {
+                fn merge(&mut self, other: Self) {
+                    if self.get() != other.get() {
+                        // SAFETY: we are guranteed that `other` is always NOT zero, if it is
+                        //         zero then it is the caller's fault rather than ours :3
+                        *self = unsafe { <$ty>::new_unchecked(other.get()) };
                     }
                 }
             }
@@ -148,6 +181,46 @@ macro_rules! impl_generic_partial_eq_merge {
         )*
     };
 }
+
+#[cfg(feature = "no-std")]
+impl_nonzero_merge!(
+    core::num::NonZeroU8,
+    core::num::NonZeroU16,
+    core::num::NonZeroU32,
+    core::num::NonZeroU64,
+    core::num::NonZeroUsize,
+    core::num::NonZeroU128
+);
+
+#[cfg(not(feature = "no-std"))]
+impl_nonzero_merge!(
+    std::num::NonZeroU8,
+    std::num::NonZeroU16,
+    std::num::NonZeroU32,
+    std::num::NonZeroU64,
+    std::num::NonZeroUsize,
+    std::num::NonZeroU128
+);
+
+#[cfg(feature = "no-std")]
+impl_nonzero_merge!(
+    core::num::NonZeroI8,
+    core::num::NonZeroI16,
+    core::num::NonZeroI32,
+    core::num::NonZeroI64,
+    core::num::NonZeroI128,
+    core::num::NonZeroIsize
+);
+
+#[cfg(not(feature = "no-std"))]
+impl_nonzero_merge!(
+    std::num::NonZeroI8,
+    std::num::NonZeroI16,
+    std::num::NonZeroI32,
+    std::num::NonZeroI64,
+    std::num::NonZeroI128,
+    std::num::NonZeroIsize
+);
 
 impl_unum_merge!(u8, u16, u32, u64, u128, usize);
 impl_generic_partial_eq_merge!(

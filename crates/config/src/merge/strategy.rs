@@ -118,6 +118,76 @@ pub mod bool {
     }
 }
 
+/// Common merging strategies for the [`f32`] type. the [`f32::non_negative`] is the default
+/// for the main `impl f32`.
+pub mod f32 {
+    /// Does comparisons from [`PartialEq`] to determine if `right` can be merged as `left`. This does
+    /// reject negatives, use the [`f32::negatives`][crate::merge::strategy::f32::negatives] method to
+    /// not reject negatives.
+    pub fn non_negative(left: &mut f32, right: f32) {
+        // don't even attempt to merge if either left or right are negative floats
+        if *left < 0.0 || right < 0.0 {
+            return;
+        }
+
+        // we use negatives since we know that either left or right are negative floats
+        super::f32::negatives(left, right);
+    }
+
+    /// Does comparisons from [`PartialEq`] to determine if `right` can be merged as `left`. This doesn't
+    /// reject negatives.
+    pub fn negatives(left: &mut f32, right: f32) {
+        // if both are 0.0, then don't do any merging (as a fast path)
+        if *left == 0.0 && right == 0.0 {
+            return;
+        }
+
+        // don't even attempt if self is 0.0 and other is 0.0
+        if *left != 0.0 && right == 0.0 {
+            return;
+        }
+
+        if *left != right {
+            *left = right;
+        }
+    }
+}
+
+/// Common merging strategies for the [`f64`] type. the [`f64::non_negative`] is the default
+/// for the main `impl f64`.
+pub mod f64 {
+    /// Does comparisons from [`PartialEq`] to determine if `right` can be merged as `left`. This does
+    /// reject negatives, use the [`f64::negatives`][crate::merge::strategy::f64::negatives] method to
+    /// not reject negatives.
+    pub fn non_negative(left: &mut f64, right: f64) {
+        // don't even attempt to merge if either left or right are negative floats
+        if *left < 0.0 || right < 0.0 {
+            return;
+        }
+
+        // we use negatives since we know that either left or right are negative floats
+        super::f64::negatives(left, right);
+    }
+
+    /// Does comparisons from [`PartialEq`] to determine if `right` can be merged as `left`. This doesn't
+    /// reject negatives.
+    pub fn negatives(left: &mut f64, right: f64) {
+        // if both are 0.0, then don't do any merging (as a fast path)
+        if *left == 0.0 && right == 0.0 {
+            return;
+        }
+
+        // don't even attempt if self is 0.0 and other is 0.0
+        if *left != 0.0 && right == 0.0 {
+            return;
+        }
+
+        if *left != right {
+            *left = right;
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::strings;

@@ -22,16 +22,23 @@
 #![doc(html_logo_url = "https://cdn.floofy.dev/images/trans.png")]
 #![doc = include_str!("../README.md")]
 #![cfg_attr(docsrs, feature(doc_cfg))]
-#![cfg_attr(feature = "no_std", no_std)]
+#![cfg_attr(feature = "no-std", no_std)]
 
 pub mod merge;
 
 // mainly used to import types from `core`/`alloc` if `no-std` feature is enabled, or just
 // uses `std::*` imports if `no-std` is disabled.
-#[cfg(feature = "no_std")]
+#[cfg(feature = "no-std")]
 pub(crate) mod std {
     pub mod convert {
         pub use core::convert::Infallible;
+    }
+}
+
+#[cfg(not(feature = "no-std"))]
+pub(crate) mod std {
+    pub mod convert {
+        pub use ::std::convert::Infallible;
     }
 }
 
@@ -62,7 +69,7 @@ pub trait TryFromEnv: Sized {
 
 impl<O, T: FromEnv<Output = O>> TryFromEnv for T {
     type Output = O;
-    type Error = std::convert::Infallible;
+    type Error = crate::std::convert::Infallible;
 
     fn try_from_env() -> Result<Self::Output, Self::Error> {
         Ok(T::from_env())
@@ -74,7 +81,7 @@ impl<O, T: FromEnv<Output = O>> TryFromEnv for T {
 /// Generic Rust functional macro to help with locating an environment variable in the host machine.
 ///
 /// ## Variants
-/// ### `env!($key: literal)`
+/// ### `env!($key: expr)`
 /// This will just expand `$key` into a Result<[`String`][alloc::string::String], [`VarError`][std::env::VarError]> variant.
 ///
 /// ```
@@ -86,7 +93,7 @@ impl<O, T: FromEnv<Output = O>> TryFromEnv for T {
 /// # assert!(result.is_err());
 /// ```
 ///
-/// ### `env!($key: literal, is_optional: true)`
+/// ### `env!($key: expr, is_optional: true)`
 /// Expands the `$key` into a Option type if a [`VarError`][std::env::VarError] occurs.
 ///
 /// ```
@@ -98,7 +105,7 @@ impl<O, T: FromEnv<Output = O>> TryFromEnv for T {
 /// # assert!(result.is_none());
 /// ```
 ///
-/// ### `env!($key: literal, or_else: $else: expr)`
+/// ### `env!($key: expr, or_else: $else: expr)`
 /// Expands `$key` into a String, but if a [`VarError`][std::env::VarError] occurs, then a provided `$else`
 /// is used as the default.
 ///
@@ -111,8 +118,8 @@ impl<O, T: FromEnv<Output = O>> TryFromEnv for T {
 /// # assert!(result.is_empty());
 /// ```
 ///
-/// ### `env!($key: literal, or_else_do: $else: expr)`
-/// Same as [`env!($key: literal, or_else: $else: expr)`][crate::var], but uses `.unwrap_or_else` to
+/// ### `env!($key: expr, or_else_do: $else: expr)`
+/// Same as [`env!($key: expr, or_else: $else: expr)`][crate::var], but uses `.unwrap_or_else` to
 /// accept a [`Fn`][std::ops::Fn].
 ///
 /// ```
@@ -124,8 +131,8 @@ impl<O, T: FromEnv<Output = O>> TryFromEnv for T {
 /// # assert!(result.is_empty());
 /// ```
 ///
-/// ### `env!($key: literal, use_default: true)`
-/// Same as [`env!($key: literal, or_else_do: $else: expr)`][crate::var], but will use the
+/// ### `env!($key: expr, use_default: true)`
+/// Same as [`env!($key: expr, or_else_do: $else: expr)`][crate::var], but will use the
 /// [Default][core::default::Default] implementation, if it can be resolved.
 ///
 /// ```
@@ -137,7 +144,7 @@ impl<O, T: FromEnv<Output = O>> TryFromEnv for T {
 /// # assert!(result.is_empty());
 /// ```
 ///
-/// ### `env!($key: literal, mapper: $mapper: expr)`
+/// ### `env!($key: expr, mapper: $mapper: expr)`
 /// Uses the [`.map`][result-map] method with an accepted `mapper` to map to a different type.
 ///
 /// ```

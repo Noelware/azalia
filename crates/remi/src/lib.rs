@@ -210,7 +210,7 @@ impl remi::StorageService for StorageService {
 #[allow(deprecated)]
 #[non_exhaustive]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[cfg_attr(feature = "serde", serde(untagged))]
+#[cfg_attr(feature = "serde", serde(rename_all = "lowercase"))]
 pub enum Config {
     #[cfg(feature = "fs")]
     Filesystem(remi_fs::Config),

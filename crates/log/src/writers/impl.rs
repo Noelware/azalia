@@ -191,6 +191,8 @@ pub fn json<S: for<'l> LookupSpan<'l>>(event: &Event, metadata: &Metadata, spans
     .unwrap()
 }
 
+#[cfg(test)]
+#[test]
 #[cold]
 fn __assert_dyn() {
     use crate::WriteFn;
