@@ -19,16 +19,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#[test]
-fn ui() {
-    let cases = trybuild::TestCases::new();
-    cases.compile_fail("./tests/ui/union.rs");
-    cases.compile_fail("./tests/ui/enum.rs");
+#[derive(noelware_config_derive::Merge)]
+struct MyStruct1;
 
-    cases.pass("./tests/ui/strategy_multi.rs");
-    cases.pass("./tests/ui/custom_strategy.rs");
-    cases.pass("./tests/ui/skip_test.rs");
-    cases.pass("./tests/ui/generics.rs");
-    cases.pass("./tests/ui/struct.rs");
-    cases.pass("./tests/ui/unnamed.rs");
-}
+#[derive(noelware_config_derive::Merge)]
+struct MyStruct2(usize);
+
+fn main() {}
