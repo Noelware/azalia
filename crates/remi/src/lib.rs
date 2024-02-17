@@ -44,9 +44,10 @@ pub use remi_fs as fs;
 
 #[allow(unused)]
 use remi::{async_trait, Blob, Bytes, ListBlobsRequest, StorageService as _, UploadRequest};
-use std::{io::Result, path::Path};
+use std::{error, fmt::Display, path::Path};
 
-/// Union-like enum for [`StorageService`].
+/// Union-like enum for [`StorageService`]. As more official crates are supported, this will always
+/// be non-exhausive.
 #[derive(Clone)]
 #[allow(deprecated)]
 #[non_exhaustive]
@@ -63,65 +64,144 @@ pub enum StorageService {
     #[cfg(feature = "s3")]
     S3(remi_s3::S3StorageService),
 
-    #[deprecated(since = "0.1.0", note = "This should be handled when using pattern matching")]
     #[allow(deprecated, non_camel_case_types)]
     __non_exhaustive,
+}
+
+/// Represents an error that occurred. As more official crates are supported, this will always
+/// be non-exhausive.
+#[derive(Debug)]
+#[non_exhaustive]
+pub enum Error {
+    /// Represents the error type for the local filesystem's [`StorageService`][remi_fs::StorageService] implementation.
+    #[cfg(feature = "fs")]
+    Filesystem(std::io::Error),
+
+    /// Represents the error type for MongoDB Gridfs' [`StorageService`][remi_fs::StorageService] implementation.
+    #[cfg(feature = "gridfs")]
+    GridFS(mongodb::error::Error),
+
+    /// Represents the error type for Microsoft's Azure Blob Storage [`StorageService`][remi_fs::StorageService] implementation.
+    #[cfg(feature = "gridfs")]
+    Azure(azure_core::Error),
+
+    /// Represents the error type for Amazon S3's [`StorageService`][remi_fs::StorageService] implementation.
+    #[cfg(feature = "s3")]
+    S3(std::io::Error),
+
+    #[allow(deprecated, non_camel_case_types)]
+    __non_exhaustive,
+}
+
+impl Display for Error {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            #[cfg(feature = "filesystem")]
+            Error::Filesystem(err) => Display::fmt(err, f),
+
+            #[cfg(feature = "gridfs")]
+            Error::GridFS(err) => Display::fmt(err, f),
+
+            #[cfg(feature = "azure")]
+            Error::Azure(err) => Display::fmt(err, f),
+
+            #[cfg(feature = "s3")]
+            Error::S3(err) => Display::fmt(err, f),
+
+            _ => f.write_str("<unknown error>"),
+        }
+    }
+}
+
+impl error::Error for Error {
+    fn source(&self) -> Option<&(dyn error::Error + 'static)> {
+        match self {
+            #[cfg(feature = "filesystem")]
+            Error::Filesystem(err) => Some(err),
+
+            #[cfg(feature = "gridfs")]
+            Error::GridFS(err) => Some(err),
+
+            #[cfg(feature = "azure")]
+            Error::Azure(err) => Some(err),
+
+            #[cfg(feature = "s3")]
+            Error::S3(err) => Some(err),
+
+            _ => None,
+        }
+    }
+}
+
+#[cfg(feature = "gridfs")]
+impl From<mongodb::error::Error> for Error {
+    fn from(err: mongodb::error::Error) -> Error {
+        Error::GridFS(err)
+    }
+}
+
+#[cfg(feature = "azure")]
+impl From<azure_core::Error> for Error {
+    fn from(err: azure_core::Error) -> Error {
+        Error::Azure(err)
+    }
 }
 
 #[async_trait]
 #[allow(unused)]
 impl remi::StorageService for StorageService {
+    type Error = Error;
     const NAME: &'static str = "noelware:remi";
 
-    async fn init(&self) -> Result<()> {
+    async fn init(&self) -> Result<(), Self::Error> {
         match self {
             #[cfg(feature = "fs")]
-            Self::Filesystem(fs) => fs.init().await,
+            Self::Filesystem(fs) => fs.init().await.map_err(Error::Filesystem),
 
             #[cfg(feature = "gridfs")]
-            Self::GridFS(gridfs) => gridfs.init().await,
+            Self::GridFS(gridfs) => gridfs.init().await.map_err(From::from),
 
             #[cfg(feature = "azure")]
-            Self::Azure(azure) => azure.init().await,
+            Self::Azure(azure) => azure.init().await.map_err(From::from),
 
             #[cfg(feature = "s3")]
-            Self::S3(s3) => s3.init().await,
+            Self::S3(s3) => s3.init().await.map_err(Error::S3),
 
             _ => Ok(()),
         }
     }
 
-    async fn open<P: AsRef<Path> + Send>(&self, path: P) -> Result<Option<Bytes>> {
+    async fn open<P: AsRef<Path> + Send>(&self, path: P) -> Result<Option<Bytes>, Self::Error> {
         match self {
             #[cfg(feature = "fs")]
-            Self::Filesystem(fs) => fs.open(path).await,
+            Self::Filesystem(fs) => fs.open(path).await.map_err(Error::Filesystem),
 
             #[cfg(feature = "gridfs")]
-            Self::GridFS(gridfs) => gridfs.open(path).await,
+            Self::GridFS(gridfs) => gridfs.open(path).await.map_err(From::from),
 
             #[cfg(feature = "azure")]
-            Self::Azure(azure) => azure.open(path).await,
+            Self::Azure(azure) => azure.open(path).await.map_err(From::from),
 
             #[cfg(feature = "s3")]
-            Self::S3(s3) => s3.open(path).await,
+            Self::S3(s3) => s3.open(path).await.map_err(Error::S3),
 
             _ => Ok(None),
         }
     }
 
-    async fn blob<P: AsRef<Path> + Send>(&self, path: P) -> Result<Option<Blob>> {
+    async fn blob<P: AsRef<Path> + Send>(&self, path: P) -> Result<Option<Blob>, Self::Error> {
         match self {
             #[cfg(feature = "fs")]
-            Self::Filesystem(fs) => fs.blob(path).await,
+            Self::Filesystem(fs) => fs.blob(path).await.map_err(Error::Filesystem),
 
             #[cfg(feature = "gridfs")]
-            Self::GridFS(gridfs) => gridfs.blob(path).await,
+            Self::GridFS(gridfs) => gridfs.blob(path).await.map_err(From::from),
 
             #[cfg(feature = "azure")]
-            Self::Azure(azure) => azure.blob(path).await,
+            Self::Azure(azure) => azure.blob(path).await.map_err(From::from),
 
             #[cfg(feature = "s3")]
-            Self::S3(s3) => s3.blob(path).await,
+            Self::S3(s3) => s3.blob(path).await.map_err(Error::S3),
 
             _ => Ok(None),
         }
@@ -131,73 +211,73 @@ impl remi::StorageService for StorageService {
         &self,
         path: Option<P>,
         options: Option<ListBlobsRequest>,
-    ) -> Result<Vec<Blob>> {
+    ) -> Result<Vec<Blob>, Self::Error> {
         match self {
             #[cfg(feature = "fs")]
-            Self::Filesystem(fs) => fs.blobs(path, options).await,
+            Self::Filesystem(fs) => fs.blobs(path, options).await.map_err(Error::Filesystem),
 
             #[cfg(feature = "gridfs")]
-            Self::GridFS(gridfs) => gridfs.blobs(path, options).await,
+            Self::GridFS(gridfs) => gridfs.blobs(path, options).await.map_err(From::from),
 
             #[cfg(feature = "azure")]
-            Self::Azure(azure) => azure.blobs(path, options).await,
+            Self::Azure(azure) => azure.blobs(path, options).await.map_err(From::from),
 
             #[cfg(feature = "s3")]
-            Self::S3(s3) => s3.blobs(path, options).await,
+            Self::S3(s3) => s3.blobs(path, options).await.map_err(Error::S3),
 
             _ => Ok(vec![]),
         }
     }
 
-    async fn delete<P: AsRef<Path> + Send>(&self, path: P) -> Result<()> {
+    async fn delete<P: AsRef<Path> + Send>(&self, path: P) -> Result<(), Self::Error> {
         match self {
             #[cfg(feature = "fs")]
-            Self::Filesystem(fs) => fs.delete(path).await,
+            Self::Filesystem(fs) => fs.delete(path).await.map_err(Error::Filesystem),
 
             #[cfg(feature = "gridfs")]
-            Self::GridFS(gridfs) => gridfs.delete(path).await,
+            Self::GridFS(gridfs) => gridfs.delete(path).await.map_err(From::from),
 
             #[cfg(feature = "azure")]
-            Self::Azure(azure) => azure.delete(path).await,
+            Self::Azure(azure) => azure.delete(path).await.map_err(From::from),
 
             #[cfg(feature = "s3")]
-            Self::S3(s3) => s3.delete(path).await,
+            Self::S3(s3) => s3.delete(path).await.map_err(Error::S3),
 
             _ => Ok(()),
         }
     }
 
-    async fn exists<P: AsRef<Path> + Send>(&self, path: P) -> Result<bool> {
+    async fn exists<P: AsRef<Path> + Send>(&self, path: P) -> Result<bool, Self::Error> {
         match self {
             #[cfg(feature = "fs")]
-            Self::Filesystem(fs) => fs.exists(path).await,
+            Self::Filesystem(fs) => fs.exists(path).await.map_err(Error::Filesystem),
 
             #[cfg(feature = "gridfs")]
-            Self::GridFS(gridfs) => gridfs.exists(path).await,
+            Self::GridFS(gridfs) => gridfs.exists(path).await.map_err(From::from),
 
             #[cfg(feature = "azure")]
-            Self::Azure(azure) => azure.exists(path).await,
+            Self::Azure(azure) => azure.exists(path).await.map_err(From::from),
 
             #[cfg(feature = "s3")]
-            Self::S3(s3) => s3.exists(path).await,
+            Self::S3(s3) => s3.exists(path).await.map_err(Error::S3),
 
             _ => Ok(false),
         }
     }
 
-    async fn upload<P: AsRef<Path> + Send>(&self, path: P, options: UploadRequest) -> Result<()> {
+    async fn upload<P: AsRef<Path> + Send>(&self, path: P, options: UploadRequest) -> Result<(), Self::Error> {
         match self {
             #[cfg(feature = "fs")]
-            Self::Filesystem(fs) => fs.upload(path, options).await,
+            Self::Filesystem(fs) => fs.upload(path, options).await.map_err(Error::Filesystem),
 
             #[cfg(feature = "gridfs")]
-            Self::GridFS(gridfs) => gridfs.upload(path, options).await,
+            Self::GridFS(gridfs) => gridfs.upload(path, options).await.map_err(From::from),
 
             #[cfg(feature = "azure")]
-            Self::Azure(azure) => azure.upload(path, options).await,
+            Self::Azure(azure) => azure.upload(path, options).await.map_err(From::from),
 
             #[cfg(feature = "s3")]
-            Self::S3(s3) => s3.upload(path, options).await,
+            Self::S3(s3) => s3.upload(path, options).await.map_err(Error::S3),
 
             _ => Ok(()),
         }
@@ -224,7 +304,6 @@ pub enum Config {
     #[cfg(feature = "s3")]
     S3(remi_s3::S3StorageConfig),
 
-    #[deprecated(since = "0.1.0", note = "This should be handled when using pattern matching")]
     #[allow(deprecated, non_camel_case_types)]
     __non_exhaustive,
 }
