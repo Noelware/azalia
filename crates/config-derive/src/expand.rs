@@ -20,13 +20,35 @@
 // SOFTWARE.
 
 use crate::args::Args;
-use proc_macro2::TokenStream;
+use proc_macro2::{Span, TokenStream};
 use proc_macro_error::set_dummy;
 use quote::{quote, quote_spanned};
-use syn::{spanned::Spanned, DeriveInput, Field, Fields};
+use syn::{spanned::Spanned, Attribute, DeriveInput, Fields, Member};
+
+struct Field {
+    member: Member,
+    span: Span,
+    attrs: Vec<Attribute>,
+}
+
+impl From<(usize, &syn::Field)> for Field {
+    fn from((idx, field): (usize, &syn::Field)) -> Self {
+        Field {
+            attrs: field.attrs.clone(),
+            span: field.span(),
+            member: if let Some(ident) = field.ident.clone() {
+                Member::Named(ident)
+            } else {
+                Member::Unnamed(idx.into())
+            },
+        }
+    }
+}
 
 pub fn struct_fields(input: &DeriveInput, fields: &Fields) -> TokenStream {
     let name = &input.ident;
+    let generics = &input.generics;
+
     set_dummy(quote! {
         impl ::noelware_config::merge::Merge for #name {
             fn merge(&self, other: Self) {
@@ -35,14 +57,23 @@ pub fn struct_fields(input: &DeriveInput, fields: &Fields) -> TokenStream {
         }
     });
 
+    if fields.is_empty() {
+        return quote! {
+            #[automatically_derived]
+            impl #generics ::noelware_config::merge::Merge for #name #generics {
+                fn merge(&mut self, _other: Self) {}
+            }
+        };
+    }
+
     let mut assignments = Vec::with_capacity(fields.len());
+    let fields = fields.iter().enumerate().map(Field::from);
     for field in fields {
-        if let Some(tt) = gen_struct_field_assignment(field) {
+        if let Some(tt) = gen_struct_field_assignment(&field) {
             assignments.push(tt);
         }
     }
 
-    let generics = &input.generics;
     quote! {
         #[automatically_derived]
         impl #generics ::noelware_config::merge::Merge for #name #generics {
@@ -79,9 +110,9 @@ fn gen_struct_field_assignment(field: &Field) -> Option<TokenStream> {
         return None;
     }
 
-    let name = field.ident.as_ref().expect("expected identifier");
+    let name = &field.member;
     Some(match first.strategy {
         Some(path) => quote_spanned!(path.span()=> #path(&mut self.#name, other.#name);),
-        None => quote_spanned!(field.span()=> ::noelware_config::merge::Merge::merge(&mut self.#name, other.#name);),
+        None => quote_spanned!(field.span=> ::noelware_config::merge::Merge::merge(&mut self.#name, other.#name);),
     })
 }
