@@ -82,7 +82,7 @@ pub enum Error {
     GridFS(mongodb::error::Error),
 
     /// Represents the error type for Microsoft's Azure Blob Storage [`StorageService`][remi_fs::StorageService] implementation.
-    #[cfg(feature = "gridfs")]
+    #[cfg(feature = "azure")]
     Azure(azure_core::Error),
 
     /// Represents the error type for Amazon S3's [`StorageService`][remi_fs::StorageService] implementation.
@@ -100,7 +100,19 @@ impl Display for Error {
             Error::Filesystem(err) => Display::fmt(err, f),
 
             #[cfg(feature = "gridfs")]
-            Error::GridFS(err) => Display::fmt(err, f),
+            Error::GridFS(err) => match &*err.kind {
+                mongodb::error::ErrorKind::Custom(msg) => {
+                    if let Some(msg) = msg.downcast_ref::<&str>() {
+                        f.write_str(msg)
+                    } else if let Some(msg) = msg.downcast_ref::<String>() {
+                        write!(f, "{msg}")
+                    } else {
+                        Display::fmt(err, f)
+                    }
+                }
+
+                _ => Display::fmt(err, f),
+            },
 
             #[cfg(feature = "azure")]
             Error::Azure(err) => Display::fmt(err, f),
