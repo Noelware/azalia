@@ -63,7 +63,7 @@ mongodb = { version = "2.8.1", optional = true }
 remi = "0.6.3"
 remi-azure = { version = "0.6.3", optional = true }
 remi-fs = { version = "0.6.3", optional = true }
-remi-gridfs = { version = "0.6.2", optional = true }
+remi-gridfs = { version = "0.6.3", optional = true }
 remi-s3 = { version = "0.6.2", optional = true }
 serde = { version = "1.0.196", optional = true }
 
