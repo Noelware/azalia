@@ -187,17 +187,6 @@ macro_rules! impl_generic_partial_eq_merge {
     };
 }
 
-#[cfg(feature = "no-std")]
-impl_nonzero_merge!(
-    core::num::NonZeroU8,
-    core::num::NonZeroU16,
-    core::num::NonZeroU32,
-    core::num::NonZeroU64,
-    core::num::NonZeroUsize,
-    core::num::NonZeroU128
-);
-
-#[cfg(not(feature = "no-std"))]
 impl_nonzero_merge!(
     std::num::NonZeroU8,
     std::num::NonZeroU16,
@@ -207,17 +196,6 @@ impl_nonzero_merge!(
     std::num::NonZeroU128
 );
 
-#[cfg(feature = "no-std")]
-impl_nonzero_merge!(
-    core::num::NonZeroI8,
-    core::num::NonZeroI16,
-    core::num::NonZeroI32,
-    core::num::NonZeroI64,
-    core::num::NonZeroI128,
-    core::num::NonZeroIsize
-);
-
-#[cfg(not(feature = "no-std"))]
 impl_nonzero_merge!(
     std::num::NonZeroI8,
     std::num::NonZeroI16,
@@ -239,3 +217,6 @@ impl_generic_partial_eq_merge!(alloc::string::String);
 
 #[cfg(not(feature = "no-std"))]
 impl_generic_partial_eq_merge!(String);
+
+#[cfg(not(feature = "no-std"))]
+impl_generic_partial_eq_merge!(std::path::PathBuf);

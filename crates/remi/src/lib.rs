@@ -23,6 +23,7 @@
 #![doc = include_str!("../README.md")]
 #![cfg_attr(docsrs, feature(doc_cfg))]
 #![allow(deprecated)] // all #[deprecated] are all the non exhaustive types
+#![allow(non_camel_case_types)]
 
 pub use remi;
 
@@ -64,7 +65,6 @@ pub enum StorageService {
     #[cfg(feature = "s3")]
     S3(remi_s3::S3StorageService),
 
-    #[allow(deprecated, non_camel_case_types)]
     __non_exhaustive,
 }
 
@@ -89,7 +89,6 @@ pub enum Error {
     #[cfg(feature = "s3")]
     S3(std::io::Error),
 
-    #[allow(deprecated, non_camel_case_types)]
     __non_exhaustive,
 }
 
@@ -105,7 +104,7 @@ impl Display for Error {
                     if let Some(msg) = msg.downcast_ref::<&str>() {
                         f.write_str(msg)
                     } else if let Some(msg) = msg.downcast_ref::<String>() {
-                        write!(f, "{msg}")
+                        f.write_str(&msg)
                     } else {
                         Display::fmt(err, f)
                     }
@@ -316,6 +315,5 @@ pub enum Config {
     #[cfg(feature = "s3")]
     S3(remi_s3::S3StorageConfig),
 
-    #[allow(deprecated, non_camel_case_types)]
     __non_exhaustive,
 }

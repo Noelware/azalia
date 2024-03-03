@@ -19,9 +19,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-use crate::JsonExtension;
-
 use super::JsonVisitor;
+use crate::JsonExtension;
 use chrono::Local;
 use owo_colors::{colors::CustomColor, FgColorDisplay, OwoColorize, Stream};
 use serde_json::{json, Value};
