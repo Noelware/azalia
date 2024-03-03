@@ -241,7 +241,7 @@ macro_rules! env {
     };
 
     ($key:expr, as $T:ty, or $value:expr) => {
-        $crate::env!($key).map(|value| value.parse::<$T>().unwrap_or_else(|| $value))
+        $crate::env!($key).map(|value| value.parse::<$T>().unwrap_or_else(|_| $value))
     };
 
     ($key:expr, as $T:ty) => {
