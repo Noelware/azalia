@@ -69,7 +69,7 @@ impl<O, T: FromEnv<Output = O>> TryFromEnv for T {
 
 #[cfg(not(feature = "no-std"))]
 #[doc(hidden)]
-mod env {
+mod env_impl {
     /// Represents a guard that sets an environment variable and removes it as its [`Drop`] impl. This is
     /// mainly useful for testing and shouldn't be used in production code.
     ///
@@ -189,159 +189,147 @@ mod env {
         let _guard = EnvGuard::enter_with(env, val);
         f()
     }
-
-    // macro is originally the `env!` macro from charted-server
-    // original: https://github.com/charted-dev/charted/blob/94e6c9de95059a9f582c934e32d599031a920c18/crates/config/src/lib.rs#L110-L257
-    /// Generic Rust functional macro to help with locating an environment variable in the host machine.
-    ///
-    /// ## Variants
-    /// ### `env!($key: expr)`
-    /// This will just expand `$key` into a Result<[`String`][std::string::String], [`VarError`][std::env::VarError]> variant.
-    ///
-    /// ```
-    /// # use noelware_config::env;
-    /// #
-    /// let result = env!("SOME_ENV_VARIABLE");
-    /// // expanded: ::std::env::var("SOME_ENV_VARIABLE");
-    /// #
-    /// # assert!(result.is_err());
-    /// ```
-    ///
-    /// ### `env!($key: expr, is_optional: true)`
-    /// Expands the `$key` into a Option type if a [`VarError`][std::env::VarError] occurs.
-    ///
-    /// ```
-    /// # use noelware_config::env;
-    /// #
-    /// let result = env!("SOME_ENV_VARIABLE", is_optional: true);
-    /// // expanded: ::std::env::var("SOME_ENV_VARIABLE").ok();
-    /// #
-    /// # assert!(result.is_none());
-    /// ```
-    ///
-    /// ### `env!($key: expr, or_else: $else: expr)`
-    /// Expands `$key` into a String, but if a [`VarError`][std::env::VarError] occurs, then a provided `$else`
-    /// is used as the default.
-    ///
-    /// ```
-    /// # use noelware_config::env;
-    /// #
-    /// let result = env!("SOME_ENV_VARIABLE", or_else: "".into());
-    /// // expanded: ::std::env::var("SOME_ENV_VARIABLE").unwrap_or("".into());
-    /// #
-    /// # assert!(result.is_empty());
-    /// ```
-    ///
-    /// ### `env!($key: expr, or_else_do: $else: expr)`
-    /// Same as [`env!($key: expr, or_else: $else: expr)`][crate::var], but uses `.unwrap_or_else` to
-    /// accept a [`Fn`][std::ops::Fn].
-    ///
-    /// ```
-    /// # use noelware_config::env;
-    /// #
-    /// let result = env!("SOME_ENV_VARIABLE", or_else_do: |_| Default::default());
-    /// // expanded: ::std::env::var("SOME_ENV_VARIABLE").unwrap_or_else(|_| Default::default());
-    /// #
-    /// # assert!(result.is_empty());
-    /// ```
-    ///
-    /// ### `env!($key: expr, use_default: true)`
-    /// Same as [`env!($key: expr, or_else_do: $else: expr)`][crate::var], but will use the
-    /// [Default][core::default::Default] implementation, if it can be resolved.
-    ///
-    /// ```
-    /// # use noelware_config::env;
-    /// #
-    /// let result = env!("SOME_ENV_VARIABLE", use_default: true);
-    /// // expanded: ::std::env::var("SOME_ENV_VARIABLE").unwrap_or_else(|_| Default::default());
-    /// #
-    /// # assert!(result.is_empty());
-    /// ```
-    ///
-    /// ### `env!($key: expr, mapper: $mapper: expr)`
-    /// Uses the [`.map`][result-map] method with an accepted `mapper` to map to a different type.
-    ///
-    /// ```
-    /// # use noelware_config::env;
-    /// #
-    /// let result = env!("SOME_ENV_VARIABLE", mapper: |val| &val == "true");
-    ///
-    /// /*
-    /// expanded:
-    /// ::std::env::var("SOME_ENV_VARIABLE").map(|val| &val == "true");
-    /// */
-    /// #
-    /// # assert!(result.is_err());
-    /// ```
-    ///
-    /// [result-map]: https://doc.rust-lang.org/nightly/core/result/enum.Result.html#method.map
-    #[macro_export(local_inner_macros)]
-    macro_rules! env {
-        ($key:expr, to: $ty:ty, or_else: $else_:expr) => {
-            $crate::env!($key, mapper: |p| {
-                p.parse::<$ty>().expect(concat!(
-                    "Unable to resolve env var [",
-                    $key,
-                    "] to a [",
-                    stringify!($ty),
-                    "] value"
-                ))
-            })
-            .unwrap_or($else_)
-        };
-
-        ($key:expr, to: $ty:ty, is_optional: true) => {
-            $crate::env!($key, mapper: |p| p.parse::<$ty>().ok()).unwrap_or(None)
-        };
-
-        ($key:expr, to: $ty:ty) => {
-            $crate::env!($key, mapper: |p| {
-                p.parse::<$ty>().expect(concat!(
-                    "Unable to resolve env var [",
-                    $key,
-                    "] to a [",
-                    stringify!($ty),
-                    "] value"
-                ))
-            })
-            .unwrap()
-        };
-
-        ($key:expr, {
-            or_else: $else_:expr;
-            mapper: $mapper:expr;
-        }) => {
-            $crate::env!($key, mapper: $mapper).unwrap_or($else_)
-        };
-
-        ($key:expr, mapper: $expr:expr) => {
-            $crate::env!($key).map($expr)
-        };
-
-        ($key:expr, use_default: true) => {
-            $crate::env!($key, or_else_do: |_| Default::default())
-        };
-
-        ($key:expr, or_else_do: $expr:expr) => {
-            $crate::env!($key).unwrap_or_else($expr)
-        };
-
-        ($key:expr, or_else: $else_:expr) => {
-            $crate::env!($key).unwrap_or($else_)
-        };
-
-        ($key:expr, is_optional: true) => {
-            $crate::env!($key).ok()
-        };
-
-        ($key:expr) => {
-            ::std::env::var($key)
-        };
-    }
-
-    #[allow(unused)]
-    pub use env;
 }
 
 #[cfg(not(feature = "no-std"))]
-pub use env::*;
+pub use env_impl::{expand, expand_with, EnvGuard};
+
+// macro is originally the `env!` macro from charted-server
+// original: https://github.com/charted-dev/charted/blob/94e6c9de95059a9f582c934e32d599031a920c18/crates/config/src/lib.rs#L110-L257
+/// Generic Rust functional macro to help with locating an environment variable in the host machine that can validate the result
+/// of the lookup on the fly. This is useful for configuration files that also support using the system environment variables
+/// like [`charted-server`] or [`Hazel`] by Noelware, it pairs well with the [`TryFromEnv`]/[`FromEnv`] traits.
+///
+/// ## Variants
+/// ### `env!($key:expr)`
+/// Simply calls [`std::env::var`] and doesn't tamper with the result.
+///
+/// ```rust
+/// # use noelware_config::env;
+/// #
+/// env!("HELLO");
+/// // => Result<String, std::env::VarError>
+/// ```
+///
+/// ### `env!($key:expr, as $T:ty)`
+/// Calls [`std::env::var`] and inspects the result to check if the value can be parsed from a string. `T` will
+/// need to implement [`FromStr`] for this to work.
+///
+/// #### Panics
+/// This method will panic if the value cannot be parsed from a [`FromStr`].
+///
+/// ```rust
+/// # use noelware_config::env;
+/// #
+/// env!("HELLO", as u32);
+/// // => Result<u32, std::env::VarError>
+/// ```
+///
+/// ### `env!($key:expr, as $T:ty [optional])`
+/// It is the same premise of `env!($key:expr, as $T:ty)`, but it will throw away the parsing
+/// error and returning a `Result<Option<T>, std::env::VarError` instead.
+///
+/// [`charted-server`]: https://charts.noelware.org
+/// [`Hazel`]: https://noelware.org/oss/hazel
+#[macro_export]
+macro_rules! env {
+    ($key:expr, as $T:ty [optional]) => {
+        match $crate::env!($key) {
+            Ok(value) => Ok(value.parse::<$T>().ok()),
+            Err(e) => Err(e),
+        }
+    };
+
+    ($key:expr, as $T:ty, or $value:expr) => {
+        $crate::env!($key).map(|value| value.parse::<$T>().unwrap_or_else(|| $value))
+    };
+
+    ($key:expr, as $T:ty) => {
+        match $crate::env!($key) {
+            Ok(value) => match value.parse::<$T>() {
+                Ok(val) => Ok(val),
+                Err(e) => panic!(
+                    std::concat!(
+                        "Unable to resolve environment variable from expression [",
+                        $key,
+                        "] to type [",
+                        std::stringify!($T),
+                        "]: {}"
+                    ),
+                    e
+                ),
+            },
+            Err(e) => Err(e),
+        }
+    };
+
+    ($key:expr, |$val:ident| $return:expr; or $otherwise:expr) => {
+        $crate::env!($key, |$val| $return).unwrap_or_else(|_| $otherwise)
+    };
+
+    ($key:expr, |$val:ident| $return:expr) => {
+        $crate::env!($key).map(|val| {
+            let $val = val;
+            $return
+        })
+    };
+
+    ($key:expr, optional) => {
+        $crate::env!($key).ok()
+    };
+
+    ($key:expr, or: $otherwise:expr) => {
+        $crate::env!($key).unwrap_or_else(|_| $otherwise)
+    };
+
+    ($key:expr) => {
+        ::std::env::var($key)
+    };
+}
+
+#[cfg(not(feature = "no-std"))]
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn env_macro() {
+        assert!(env!("HELLO").is_err());
+        expand("HELLO", || {
+            assert!(env!("HELLO").is_ok());
+        });
+    }
+
+    #[test]
+    fn env_macro_to_type() {
+        assert!(env!("HELLO").is_err());
+
+        expand("HELLO", || assert_eq!(env!("HELLO", as u32), Ok(1)));
+
+        assert!(env!("LUCIFER", as u32).is_err());
+    }
+
+    #[test]
+    fn env_macro_optional() {
+        assert!(env!("HELLO").is_err());
+        expand("HELLO", || assert_eq!(env!("HELLO", optional), Some(String::from("1"))));
+    }
+
+    #[test]
+    fn env_macro_mapper() {
+        assert!(env!("HELLO").is_err());
+        expand("HELLO", || assert_eq!(env!("HELLO", |val| val == "1"), Ok(true)));
+    }
+
+    #[test]
+    fn env_macro_or() {
+        assert_eq!("heck", env!("HELLO", or: String::from("heck")));
+        expand("HELLO", || {
+            assert_eq!("1", env!("HELLO", or: String::from("alakazam!")));
+        });
+
+        expand_with("LUCIFER", "dos", || {
+            assert_eq!("alakazam!", env!("LUCIFER", or: String::from("alakazam!")));
+        });
+    }
+}
