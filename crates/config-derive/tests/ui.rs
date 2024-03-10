@@ -29,6 +29,6 @@ fn ui() {
     cases.pass("./tests/ui/custom_strategy.rs");
     cases.pass("./tests/ui/skip_test.rs");
     cases.pass("./tests/ui/generics.rs");
-    cases.pass("./tests/ui/struct.rs");
     cases.pass("./tests/ui/unnamed.rs");
+    cases.pass("./tests/ui/struct.rs");
 }

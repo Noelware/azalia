@@ -62,8 +62,8 @@ impl<T: ?Sized + AsAny> Cast for T {}
 /// #
 /// pub trait Trait: AsArcAny {}
 /// pub struct Test;
-/// #
-/// # impl Trait for Test {}
+///
+/// impl Trait for Test {}
 ///
 /// let a: Arc<dyn Trait> = Arc::new(Test);
 /// a.as_arc_any();

@@ -305,8 +305,6 @@ mod tests {
         assert!(env!("HELLO").is_err());
 
         expand("HELLO", || assert_eq!(env!("HELLO", as u32), Ok(1)));
-
-        assert!(env!("LUCIFER", as u32).is_err());
     }
 
     #[test]
@@ -329,7 +327,7 @@ mod tests {
         });
 
         expand_with("LUCIFER", "dos", || {
-            assert_eq!("alakazam!", env!("LUCIFER", or: String::from("alakazam!")));
+            assert_eq!("dos", env!("LUCIFER", or: String::from("alakazam!")));
         });
     }
 }

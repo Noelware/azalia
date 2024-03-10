@@ -69,7 +69,7 @@ pub fn struct_fields(input: &DeriveInput, fields: &Fields) -> TokenStream {
     let mut assignments = Vec::with_capacity(fields.len());
     let fields = fields.iter().enumerate().map(Field::from);
     for field in fields {
-        if let Some(tt) = gen_struct_field_assignment(&field) {
+        if let Some(tt) = gen_field_assignment(&field) {
             assignments.push(tt);
         }
     }
@@ -84,7 +84,7 @@ pub fn struct_fields(input: &DeriveInput, fields: &Fields) -> TokenStream {
     }
 }
 
-fn gen_struct_field_assignment(field: &Field) -> Option<TokenStream> {
+fn gen_field_assignment(field: &Field) -> Option<TokenStream> {
     let attr = field
         .attrs
         .iter()

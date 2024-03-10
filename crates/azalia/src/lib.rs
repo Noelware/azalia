@@ -58,13 +58,13 @@ pub fn message_from_panic(error: Box<dyn Any + Send + 'static>) -> Cow<'static, 
 /// ```rust
 /// # use azalia::hashmap;
 /// #
-/// let map = hashmap!(&str, &str);
+/// let mut map = hashmap!(&str, &str);
 /// map.insert("hello", "world");
 /// ```
 #[cfg(feature = "std")]
 #[macro_export]
 macro_rules! hashmap {
-    ($K:ty, $V:ty: { $($key:expr => $value:expr),* }) => {{
+    ($K:ty, $V:ty, { $($key:expr => $value:expr),* }) => {{
         let mut map = $crate::hashmap!($K, $V);
         $(
             map.insert(From::from($key), From::from($value));
@@ -91,19 +91,19 @@ macro_rules! hashmap {
     }};
 }
 
-/// Easily create a [`HashMap`][alloc::collections::HashMap].
+/// Easily create a [`HashMap`][std::collections::HashMap].
 ///
 /// ## Example
 /// ```rust
 /// # use azalia::hashmap;
 /// #
-/// let map = hashmap!(&str, &str);
+/// let mut map = hashmap!(&str, &str);
 /// map.insert("hello", "world");
 /// ```
 #[cfg(not(feature = "std"))]
 #[macro_export]
 macro_rules! hashmap {
-    ($K:ty, $V:ty: { $($key:expr => $value:expr),* }) => {{
+    ($K:ty, $V:ty, { $($key:expr => $value:expr),* }) => {{
         let mut map = $crate::hashmap!($K, $V);
         $(
             map.insert($key, $value);
@@ -134,9 +134,9 @@ macro_rules! hashmap {
 ///
 /// ## Example
 /// ```rust
-/// # use azalia::hashmap;
+/// # use azalia::hashset;
 /// #
-/// let map = hashset!(&str);
+/// let mut map = hashset!(&str);
 /// map.insert("hello");
 /// map.insert("world");
 /// ```
@@ -165,7 +165,7 @@ macro_rules! hashset {
 /// ```rust
 /// # use azalia::hashset;
 /// #
-/// let map = hashset!(&str);
+/// let mut map = hashset!(&str);
 /// map.insert("hello");
 /// map.insert("world");
 /// ```
@@ -212,7 +212,7 @@ mod tests {
             "key" => "value"
         };
 
-        let _map = hashmap!(String, String: {
+        let _map = hashmap!(String, String, {
             "hello" => "world",
             "weow" => "true"
         });
