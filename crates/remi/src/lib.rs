@@ -63,7 +63,7 @@ pub enum StorageService {
     Azure(remi_azure::StorageService),
 
     #[cfg(feature = "s3")]
-    S3(remi_s3::S3StorageService),
+    S3(remi_s3::StorageService),
 
     __non_exhaustive,
 }
@@ -87,7 +87,7 @@ pub enum Error {
 
     /// Represents the error type for Amazon S3's [`StorageService`][remi_fs::StorageService] implementation.
     #[cfg(feature = "s3")]
-    S3(std::io::Error),
+    S3(remi_s3::Error),
 
     __non_exhaustive,
 }
@@ -144,6 +144,13 @@ impl error::Error for Error {
     }
 }
 
+#[cfg(feature = "s3")]
+impl From<remi_s3::Error> for Error {
+    fn from(err: remi_s3::Error) -> Error {
+        Error::S3(err)
+    }
+}
+
 #[cfg(feature = "gridfs")]
 impl From<mongodb::error::Error> for Error {
     fn from(err: mongodb::error::Error) -> Error {
@@ -176,7 +183,7 @@ impl remi::StorageService for StorageService {
             Self::Azure(azure) => azure.init().await.map_err(From::from),
 
             #[cfg(feature = "s3")]
-            Self::S3(s3) => s3.init().await.map_err(Error::S3),
+            Self::S3(s3) => s3.init().await.map_err(From::from),
 
             _ => Ok(()),
         }
@@ -194,7 +201,7 @@ impl remi::StorageService for StorageService {
             Self::Azure(azure) => azure.open(path).await.map_err(From::from),
 
             #[cfg(feature = "s3")]
-            Self::S3(s3) => s3.open(path).await.map_err(Error::S3),
+            Self::S3(s3) => s3.open(path).await.map_err(From::from),
 
             _ => Ok(None),
         }
@@ -212,7 +219,7 @@ impl remi::StorageService for StorageService {
             Self::Azure(azure) => azure.blob(path).await.map_err(From::from),
 
             #[cfg(feature = "s3")]
-            Self::S3(s3) => s3.blob(path).await.map_err(Error::S3),
+            Self::S3(s3) => s3.blob(path).await.map_err(From::from),
 
             _ => Ok(None),
         }
@@ -234,7 +241,7 @@ impl remi::StorageService for StorageService {
             Self::Azure(azure) => azure.blobs(path, options).await.map_err(From::from),
 
             #[cfg(feature = "s3")]
-            Self::S3(s3) => s3.blobs(path, options).await.map_err(Error::S3),
+            Self::S3(s3) => s3.blobs(path, options).await.map_err(From::from),
 
             _ => Ok(vec![]),
         }
@@ -252,7 +259,7 @@ impl remi::StorageService for StorageService {
             Self::Azure(azure) => azure.delete(path).await.map_err(From::from),
 
             #[cfg(feature = "s3")]
-            Self::S3(s3) => s3.delete(path).await.map_err(Error::S3),
+            Self::S3(s3) => s3.delete(path).await.map_err(From::from),
 
             _ => Ok(()),
         }
@@ -270,7 +277,7 @@ impl remi::StorageService for StorageService {
             Self::Azure(azure) => azure.exists(path).await.map_err(From::from),
 
             #[cfg(feature = "s3")]
-            Self::S3(s3) => s3.exists(path).await.map_err(Error::S3),
+            Self::S3(s3) => s3.exists(path).await.map_err(From::from),
 
             _ => Ok(false),
         }
@@ -288,7 +295,7 @@ impl remi::StorageService for StorageService {
             Self::Azure(azure) => azure.upload(path, options).await.map_err(From::from),
 
             #[cfg(feature = "s3")]
-            Self::S3(s3) => s3.upload(path, options).await.map_err(Error::S3),
+            Self::S3(s3) => s3.upload(path, options).await.map_err(From::from),
 
             _ => Ok(()),
         }
@@ -313,7 +320,7 @@ pub enum Config {
     Azure(remi_azure::StorageConfig),
 
     #[cfg(feature = "s3")]
-    S3(remi_s3::S3StorageConfig),
+    S3(remi_s3::StorageConfig),
 
     __non_exhaustive,
 }
