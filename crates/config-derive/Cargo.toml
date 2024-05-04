@@ -41,4 +41,4 @@ syn = "2.0.60"
 
 [dev-dependencies]
 noelware-config = { path = "../config", version = "0.1.0" }
-trybuild = "1.0.92"
+trybuild = "1.0.93"
