@@ -31,5 +31,17 @@ repository.workspace = true
 rust-version.workspace = true
 
 [features]
-default = ["std"]
+# Enables the `regex!` macro that just unwraps to `::regex::Regex::new().unwrap()`
+regex = ["dep:regex"]
+
+# Enables the `lazy!` macro that unwraps to `::once_cell::sync::Lazy::new(|| ...)`
+lazy = ["dep:once_cell"]
+
+# Enables the use of Rust's standard library and Azalia can disable some code that requires `libstd`.
 std = []
+
+default = ["std"]
+
+[dependencies]
+once_cell = { version = "1.19.0", optional = true }
+regex = { version = "1.10.4", optional = true }

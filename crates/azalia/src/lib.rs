@@ -39,8 +39,12 @@ use std::borrow::Cow;
 #[cfg(not(feature = "std"))]
 use alloc::borrow::Cow;
 
-pub mod rust;
 mod macros;
+pub mod rust;
+
+#[cfg(all(feature = "lazy", feature = "regex"))]
+pub static TRUTHY_REGEX: once_cell::sync::Lazy<regex::Regex> =
+    crate::lazy!(regex::Regex::new(r#"^(yes|true|si*|e|enable|1)$"#).unwrap());
 
 /// Returns a [`Cow`]<'static, [`str`]> of a panic message, probably from [`std::panic::catch_unwind`].
 pub fn message_from_panic(error: Box<dyn Any + Send + 'static>) -> Cow<'static, str> {
@@ -56,6 +60,27 @@ pub fn message_from_panic(error: Box<dyn Any + Send + 'static>) -> Cow<'static, 
 #[cfg(test)]
 mod tests {
     use super::{hashmap, hashset};
+
+    #[cfg(feature = "lazy")]
+    #[test]
+    fn test_lazy_exprs() {
+        let weow = crate::lazy!("weow");
+        assert_eq!(*weow, "weow");
+    }
+
+    #[cfg(all(feature = "lazy", feature = "regex"))]
+    #[test]
+    fn test_truthy_values() {
+        // force-init lazy value
+        let regex: &regex::Regex = &*crate::TRUTHY_REGEX;
+
+        assert!(regex.is_match("true"));
+        assert!(regex.is_match("yes"));
+        assert!(regex.is_match("si"));
+        assert!(regex.is_match("siiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii"));
+        assert!(regex.is_match("enable"));
+        assert!(regex.is_match("1"));
+    }
 
     #[test]
     fn test_hashmap_variants() {

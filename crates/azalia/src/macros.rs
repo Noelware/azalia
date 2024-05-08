@@ -19,6 +19,15 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+/// Macro to wrap around [`once_cell::sync::Lazy`].
+#[cfg(feature = "lazy")]
+#[macro_export]
+macro_rules! lazy {
+    ($code:expr) => {
+        ::once_cell::sync::Lazy::new(|| $code)
+    };
+}
+
 /// Easily create a [`HashMap`][std::collections::HashMap].
 ///
 /// ## Example

@@ -69,9 +69,11 @@
           ++ (lib.optional stdenv.isDarwin [darwin.apple_sdk.frameworks.CoreFoundation]);
 
         buildInputs = with pkgs; [
+          cargo-nextest
           cargo-machete
           cargo-expand
           cargo-deny
+
           openssl
           rust
         ];
