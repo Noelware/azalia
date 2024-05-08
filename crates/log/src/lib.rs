@@ -87,6 +87,7 @@ impl<S: for<'l> LookupSpan<'l>> WriteLayer<S> {
     }
 }
 
+#[derive(Debug)]
 pub(crate) struct JsonExtension(pub(crate) std::collections::BTreeMap<String, serde_json::Value>);
 impl<S: Subscriber + for<'l> LookupSpan<'l>> Layer<S> for WriteLayer<S> {
     fn on_new_span(&self, attrs: &span::Attributes<'_>, id: &span::Id, ctx: tracing_subscriber::layer::Context<'_, S>) {
@@ -109,27 +110,27 @@ impl<S: Subscriber + for<'l> LookupSpan<'l>> Layer<S> for WriteLayer<S> {
     }
 
     fn on_event(&self, event: &Event<'_>, ctx: tracing_subscriber::layer::Context<'_, S>) {
-        #[cfg(feature = "log")]
-        use tracing_log::NormalizeEvent;
-
-        #[cfg(feature = "log")]
-        let metadata = event.normalized_metadata();
-
-        #[cfg(feature = "log")]
-        let metadata = metadata.as_ref().unwrap_or_else(|| event.metadata());
-
-        #[cfg(not(feature = "log"))]
-        let metadata = event.metadata();
-
-        let mut spans: Vec<SpanRef<'_, S>> = vec![];
-        if let Some(scope) = ctx.event_scope(event) {
-            for span in scope.from_root() {
-                spans.push(span);
-            }
-        }
-
         let mut writer = self.writer.write().unwrap();
         if let Some(ref fn_) = self.write_fn {
+            #[cfg(feature = "log")]
+            use tracing_log::NormalizeEvent;
+
+            #[cfg(feature = "log")]
+            let metadata = event.normalized_metadata();
+
+            #[cfg(feature = "log")]
+            let metadata = metadata.as_ref().unwrap_or_else(|| event.metadata());
+
+            #[cfg(not(feature = "log"))]
+            let metadata = event.metadata();
+
+            let mut spans: Vec<SpanRef<'_, S>> = vec![];
+            if let Some(scope) = ctx.event_scope(event) {
+                for span in scope.from_root() {
+                    spans.push(span);
+                }
+            }
+
             let buf = fn_.buffer(event, metadata, spans);
             let _ = write!(writer, "{buf}");
             let _ = writeln!(writer);
@@ -158,6 +159,9 @@ mod tests {
         __assert_is_dispatchable(registry().with(WriteLayer::new(io::stdout())));
 
         #[cfg(feature = "writers")]
-        __assert_is_dispatchable(registry().with(WriteLayer::new_with(io::stdout(), crate::writers::default)))
+        __assert_is_dispatchable(registry().with(WriteLayer::new_with(
+            io::stdout(),
+            crate::writers::default::writer(None),
+        )))
     }
 }

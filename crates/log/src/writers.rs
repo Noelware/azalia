@@ -23,10 +23,13 @@
 //! from a [`BTreeMap`] structure.
 
 #[cfg(feature = "writers")]
-mod r#impl;
+pub mod default;
 
 #[cfg(feature = "writers")]
-pub use r#impl::*;
+mod json;
+
+#[cfg(feature = "writers")]
+pub use json::*;
 
 use serde_json::{json, Value};
 use std::{collections::BTreeMap, fmt::Debug};
