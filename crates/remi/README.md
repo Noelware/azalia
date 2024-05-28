@@ -11,7 +11,7 @@ This uses Cargo's crate features to implicitilly allow you to pick out which Rem
 // noelware-remi = { version = "0.1", features = ["all"] }
 // tokio = { version = "*", features = ["full"] }
 
-use noelware_remi::{StorageService, Config, remi::StorageConfig as _, fs::Config as FSConfig};
+use noelware_remi::{StorageService, Config, remi::StorageService as _, fs::Config as FSConfig};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

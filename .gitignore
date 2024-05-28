@@ -512,4 +512,5 @@ FodyWeavers.xsd
 # Additional files built by Visual Studio
 
 !crates/log
+!Cargo.lock
 .direnv/

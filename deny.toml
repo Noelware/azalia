@@ -19,35 +19,20 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-# we only support the following targets below
+[graph]
 all-features = true
-targets = [
-    { triple = "x86_64-unknown-linux-gnu" },
-    { triple = "x86_64-unknown-linux-musl" },
-    { triple = "x86_64-apple-darwin" },
-    { triple = "aarch64-unknown-linux-gnu" },
-    { triple = "aarch64-apple-darwin" },
-    { triple = "x86_64-pc-windows-msvc" },
-]
 
 [advisories]
-vulnerability = "deny"
-unmaintained = "deny"
-unsound = "deny"
-notice = "warn"
-
-[bans]
-multiple-versions = "warn"
-wildcards = "deny"
-
-[sources]
-unknown-registry = "deny"
-unknown-git = "deny"
+# We use version 2 of the advisory config, which
+# roughly defaults to denying any vulnerable,
+# unmaintained, or unsound crates.
+#
+# See also: https://github.com/EmbarkStudios/cargo-deny/pull/611
+version = 2
 
 [licenses]
-unlicensed = "deny"
-allow-osi-fsf-free = "neither"
-copyleft = "deny"
+# Similar to advisories, opt in to version 2.
+version = 2
 # We want really high confidence when inferring licenses from text
 confidence-threshold = 0.93
 allow = [

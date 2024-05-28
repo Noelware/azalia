@@ -50,22 +50,23 @@ use std::{error, fmt::Display, path::Path};
 /// Union-like enum for [`StorageService`]. As more official crates are supported, this will always
 /// be non-exhausive.
 #[derive(Clone)]
-#[allow(deprecated)]
 #[non_exhaustive]
 pub enum StorageService {
+    /// Uses the local filesystem to store data in.
     #[cfg(feature = "fs")]
     Filesystem(remi_fs::StorageService),
 
+    /// Uses a external MongoDB server that uses the GridFS specification to store data in.
     #[cfg(feature = "gridfs")]
     GridFS(remi_gridfs::StorageService),
 
+    /// Uses Microsoft's Azure Blob Storage product to store data in.
     #[cfg(feature = "azure")]
     Azure(remi_azure::StorageService),
 
+    /// Uses AWS S3 or any compatible S3 server to store data in.
     #[cfg(feature = "s3")]
     S3(remi_s3::StorageService),
-
-    __non_exhaustive,
 }
 
 /// Represents an error that occurred. As more official crates are supported, this will always
@@ -88,8 +89,6 @@ pub enum Error {
     /// Represents the error type for Amazon S3's [`StorageService`][remi_fs::StorageService] implementation.
     #[cfg(feature = "s3")]
     S3(remi_s3::Error),
-
-    __non_exhaustive,
 }
 
 impl Display for Error {
@@ -305,7 +304,6 @@ impl remi::StorageService for StorageService {
 /// Union-like enum for all the possible configuration structures for each
 /// Remi-based crate.
 #[derive(Debug, Clone)]
-#[allow(deprecated)]
 #[non_exhaustive]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "serde", serde(rename_all = "lowercase"))]
@@ -321,6 +319,4 @@ pub enum Config {
 
     #[cfg(feature = "s3")]
     S3(remi_s3::StorageConfig),
-
-    __non_exhaustive,
 }
