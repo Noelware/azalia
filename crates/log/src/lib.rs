@@ -112,17 +112,16 @@ impl<S: Subscriber + for<'l> LookupSpan<'l>> Layer<S> for WriteLayer<S> {
     fn on_event(&self, event: &Event<'_>, ctx: tracing_subscriber::layer::Context<'_, S>) {
         let mut writer = self.writer.write().unwrap();
         if let Some(ref fn_) = self.write_fn {
-            #[cfg(feature = "log")]
-            use tracing_log::NormalizeEvent;
+            cfg_if::cfg_if! {
+                if #[cfg(feature = "log")] {
+                    use tracing_log::NormalizeEvent;
 
-            #[cfg(feature = "log")]
-            let metadata = event.normalized_metadata();
-
-            #[cfg(feature = "log")]
-            let metadata = metadata.as_ref().unwrap_or_else(|| event.metadata());
-
-            #[cfg(not(feature = "log"))]
-            let metadata = event.metadata();
+                    let metadata = event.normalized_metadata();
+                    let metadata = metadata.as_ref().unwrap_or_else(|| event.metadata());
+                } else {
+                    let metadata = event.metadata();
+                }
+            };
 
             let mut spans: Vec<SpanRef<'_, S>> = vec![];
             if let Some(scope) = ctx.event_scope(event) {

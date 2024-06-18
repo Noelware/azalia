@@ -39,6 +39,11 @@ impl<'s, W: fmt::Write + Send> Visit for Visitor<'s, W> {
             return;
         }
 
+        // don't write if the field starts with `log.`
+        if field.name().starts_with("log.") {
+            return;
+        }
+
         match field.name() {
             "message" => {
                 self.result = write!(self.writer, "{value:?}");

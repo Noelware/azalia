@@ -2098,6 +2098,7 @@ dependencies = [
 name = "noelware-log"
 version = "0.1.0"
 dependencies = [
+ "cfg-if",
  "chrono",
  "owo-colors",
  "serde_json",
