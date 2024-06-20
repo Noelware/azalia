@@ -160,7 +160,10 @@ mod tests {
         #[cfg(feature = "writers")]
         __assert_is_dispatchable(registry().with(WriteLayer::new_with(
             io::stdout(),
-            crate::writers::default::writer(None),
-        )))
+            crate::writers::default::Writer::default(),
+        )));
+
+        #[cfg(feature = "writers")]
+        __assert_is_dispatchable(registry().with(WriteLayer::new_with(io::stdout(), crate::writers::json)));
     }
 }
