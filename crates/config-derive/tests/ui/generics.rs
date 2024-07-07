@@ -19,7 +19,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#[derive(Debug, noelware_config_derive::Merge)]
+#[derive(Debug, azalia_config_derive::Merge)]
 struct Generic<'a, T> {
     #[merge(skip)]
     _marker: std::marker::PhantomData<&'a T>,

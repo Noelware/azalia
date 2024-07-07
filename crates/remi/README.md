@@ -1,17 +1,17 @@
-# 🐻‍❄️🪚 `noelware-remi`
-The **noelware-remi** crate defines a union-like enum structure for possible [`remi::StorageService`](https://docs.rs/remi) and configuration files without implementing them into the library since it'll create too much fuss, so this is here to combat it (and not to repeat it everytime)
+# 🐻‍❄️🪚 `azalia-remi`
+The **azalia-remi** crate defines a union-like enum structure for possible [`remi::StorageService`](https://docs.rs/remi) and configuration files without implementing them into the library since it'll create too much fuss, so this is here to combat it (and not to repeat it everytime)
 
-This uses Cargo's crate features to implicitilly allow you to pick out which Remi-based crates to implement into your applications. You can use the `features = ["all"]` in your Cargo.toml's definition of `noelware-remi` to include all crates.
+This uses Cargo's crate features to implicitilly allow you to pick out which Remi-based crates to implement into your applications. You can use the `features = ["all"]` in your Cargo.toml's definition of `azalia-remi` to include all crates.
 
 ## Usage
 ```rust,ignore
 // > Cargo.toml:
 //
 // [dependencies]
-// noelware-remi = { version = "0.1", features = ["all"] }
+// azalia-remi = { version = "0.1", features = ["all"], registry = "noelware" }
 // tokio = { version = "*", features = ["full"] }
 
-use noelware_remi::{StorageService, Config, remi::StorageService as _, fs::Config as FSConfig};
+use azalia_remi::{StorageService, Config, remi::StorageService as _, fs::Config as FSConfig};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

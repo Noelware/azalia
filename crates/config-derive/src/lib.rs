@@ -36,7 +36,7 @@ mod expand;
 ///
 /// ## Example
 /// ```rust,ignore
-/// # use noelware_config::merge::Merge;
+/// # use azalia_config::merge::Merge;
 /// #
 /// #[derive(Merge)]
 /// struct MyStruct;
@@ -44,7 +44,7 @@ mod expand;
 /// /*
 /// // expands to:
 /// #[automatically_derived]
-/// impl ::noelware_config::merge::Merge for MyStruct {
+/// impl ::azalia_config::merge::Merge for MyStruct {
 ///     fn merge(&mut self, _other: Self) {}
 /// }
 /// */

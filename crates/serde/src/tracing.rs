@@ -37,7 +37,7 @@ use tracing::Level;
 /// #
 /// #[derive(Serialize)]
 /// pub struct MyStruct {
-///     #[serde(serialize_with = "noelware_serde::tracing::serialize")]
+///     #[serde(serialize_with = "azalia_serde::tracing::serialize")]
 ///     level: Level,
 /// }
 /// ```
@@ -60,7 +60,7 @@ pub fn serialize<S: Serializer>(filter: &Level, serializer: S) -> Result<S::Ok, 
 /// #
 /// #[derive(Deserialize)]
 /// pub struct MyStruct {
-///     #[serde(deserialize_with = "noelware_serde::tracing::deserialize")]
+///     #[serde(deserialize_with = "azalia_serde::tracing::deserialize")]
 ///     level: Level,
 /// }
 /// ```

@@ -19,9 +19,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-use noelware_config::merge::Merge;
+use azalia_config::merge::Merge;
 
-#[derive(Debug, noelware_config_derive::Merge)]
+#[derive(Debug, azalia_config_derive::Merge)]
 struct Something {
     a: String,
 }

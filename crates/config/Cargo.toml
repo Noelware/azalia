@@ -20,7 +20,7 @@
 # SOFTWARE.
 
 [package]
-name = "noelware-config"
+name = "azalia-config"
 description = "🐻‍❄️🪚 Provides useful Rust types to make configurations more easier."
 version.workspace = true
 authors.workspace = true
@@ -33,11 +33,11 @@ rust-version.workspace = true
 
 [features]
 default = []
-derive = ["dep:noelware-config-derive"]
+derive = ["dep:azalia-config-derive"]
 no-std = []
 
 [dependencies]
-noelware-config-derive = { version = "0.1.0", path = "../config-derive", optional = true }
+azalia-config-derive = { version = "0.1.0", path = "../config-derive", optional = true }
 
 [package.metadata.docs.rs]
 all-features = true

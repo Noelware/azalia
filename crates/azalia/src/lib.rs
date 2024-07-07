@@ -31,7 +31,27 @@ extern crate core as std;
 #[cfg(not(feature = "std"))]
 extern crate alloc;
 
+#[cfg(feature = "config")]
+#[cfg_attr(docsrs, doc(cfg(feature = "config")))]
+pub use azalia_config as config;
+
+#[cfg(feature = "log")]
+#[cfg_attr(docsrs, doc(cfg(feature = "log")))]
+pub use azalia_log as log;
+
+#[cfg(feature = "remi")]
+#[cfg_attr(docsrs, doc(cfg(feature = "remi")))]
+pub use azalia_remi as remi;
+
+#[cfg(feature = "serde")]
+#[cfg_attr(docsrs, doc(cfg(feature = "serde")))]
+pub use azalia_serde as serde;
+
+#[cfg(feature = "std")]
 use std::any::Any;
+
+#[cfg(not(feature = "std"))]
+use core::any::Any;
 
 #[cfg(feature = "std")]
 use std::borrow::Cow;

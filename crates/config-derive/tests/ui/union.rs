@@ -20,7 +20,7 @@
 // SOFTWARE.
 
 #[repr(C)]
-#[derive(noelware_config_derive::Merge)]
+#[derive(azalia_config_derive::Merge)]
 union MyUnion {
     f1: u32,
     f2: f32,

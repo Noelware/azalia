@@ -19,10 +19,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#[derive(noelware_config_derive::Merge)]
+#[derive(azalia_config_derive::Merge)]
 struct MyStruct1;
 
-#[derive(noelware_config_derive::Merge)]
+#[derive(azalia_config_derive::Merge)]
 struct MyStruct2(usize);
 
 fn main() {}

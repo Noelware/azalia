@@ -68,131 +68,12 @@ impl<O, T: FromEnv<Output = O>> TryFromEnv for T {
 }
 
 #[cfg(not(feature = "no-std"))]
+#[path = "env.rs"]
 #[doc(hidden)]
-mod env_impl {
-    /// Represents a guard that sets an environment variable and removes it as its [`Drop`] impl. This is
-    /// mainly useful for testing and shouldn't be used in production code.
-    ///
-    /// ## Safety
-    /// This is safe to call in a single-threaded environment but might be unstable and unsafe
-    /// to call when in a multi-threaded situation. As advertised, this is mainly for unit testing
-    /// and shouldn't be used in other production code, so it is safe to call at any `#[test]` fn.
-    ///
-    /// ## Example
-    /// ```
-    /// # use noelware_config::{expand, env};
-    /// #
-    /// # fn main() {
-    /// // `expand` will create a `EnvGuard` that will be dropped
-    /// // once this goes out of scope
-    /// expand("ENV", || {
-    ///     // this will print `Ok("1")`
-    ///     println!("{:?}", env!("ENV"));
-    /// });
-    /// # }
-    /// ```
-    #[cfg(not(feature = "no-std"))]
-    #[cfg_attr(feature = "no-std", doc(hidden))]
-    pub struct EnvGuard(String);
-
-    #[cfg(not(feature = "no-std"))]
-    impl EnvGuard {
-        /// Enters a [`EnvGuard`] with the given value as `1`. It is recommended to use
-        /// the [`expand`] function instead to set `env` to `1` and be dropped once a closure
-        /// is done invoking.
-        ///
-        /// ## Example
-        /// ```
-        /// # use noelware_config::EnvGuard;
-        /// #
-        /// # fn main() {
-        /// let _guard = EnvGuard::enter("ENV");
-        /// // `ENV` will be 1 and once it is dropped, it will be no longer available.
-        /// # }
-        /// ```
-        pub fn enter(env: impl Into<String>) -> EnvGuard {
-            use ::std::env::set_var;
-
-            let env = env.into();
-            set_var(&env, "1");
-
-            EnvGuard(env)
-        }
-
-        /// Same as [`EnvGuard::enter`], but will set a different value than `1`.
-        ///
-        /// [`EnvGuard::enter`]: https://crates.noelware.cloud/~/noelware-config/doc/*/struct.EnvGuard#fn.enter
-        pub fn enter_with(env: impl Into<String>, val: impl Into<String>) -> EnvGuard {
-            use ::std::env::set_var;
-
-            let env = env.into();
-            set_var(&env, val.into());
-
-            EnvGuard(env)
-        }
-    }
-
-    impl Drop for EnvGuard {
-        fn drop(&mut self) {
-            use ::std::env::remove_var;
-
-            remove_var(&self.0);
-        }
-    }
-
-    /// Expand a system environment variable as `env`, set `env` to `1`, run the specified closure, and remove
-    /// the environment variable once the closure is done.
-    ///
-    /// ## Safety
-    /// View the [safety docs][EnvGuard#safety] to see why this could be unsafe to be called.
-    ///
-    /// ## Example
-    /// ```
-    /// # use noelware_config::{expand, env};
-    /// #
-    /// # fn main() {
-    /// // the `ENV` variable will be dropped once it is printed
-    /// expand("ENV", || {
-    ///     // `env!` is safe to call here and won't fail
-    ///     println!("{:?}", env!("ENV"));
-    /// });
-    /// # }
-    /// ```
-    ///
-    /// [EnvGuard#safety]: https://crates.noelware.cloud/~/noelware-config/doc/*/struct.EnvGuard#safety
-    pub fn expand(env: impl Into<String>, f: impl FnOnce()) {
-        let _guard = EnvGuard::enter(env);
-        f()
-    }
-
-    /// Expand a system environment variable as `env`, set `env` to `val`, run the specified closure, and remove
-    /// the environment variable once the closure is done.
-    ///
-    /// ## Safety
-    /// View the [safety docs][EnvGuard#safety] to see why this could be unsafe to be called.
-    ///
-    /// ## Example
-    /// ```
-    /// # use noelware_config::{expand_with, env};
-    /// #
-    /// # fn main() {
-    /// // the `ENV` variable will be dropped once it is printed
-    /// expand_with("ENV", "2", || {
-    ///     // `env!` is safe to call here and won't fail
-    ///     println!("{:?}", env!("ENV"));
-    /// });
-    /// # }
-    /// ```
-    ///
-    /// [EnvGuard#safety]: https://crates.noelware.cloud/~/noelware-config/doc/*/struct.EnvGuard#safety
-    pub fn expand_with(env: impl Into<String>, val: impl Into<String>, f: impl FnOnce()) {
-        let _guard = EnvGuard::enter_with(env, val);
-        f()
-    }
-}
+mod env_impl;
 
 #[cfg(not(feature = "no-std"))]
-pub use env_impl::{expand, expand_with, EnvGuard};
+pub use env_impl::*;
 
 // macro is originally the `env!` macro from charted-server
 // original: https://github.com/charted-dev/charted/blob/94e6c9de95059a9f582c934e32d599031a920c18/crates/config/src/lib.rs#L110-L257
@@ -205,7 +86,7 @@ pub use env_impl::{expand, expand_with, EnvGuard};
 /// Simply calls [`std::env::var`] and doesn't tamper with the result.
 ///
 /// ```rust
-/// # use noelware_config::env;
+/// # use azalia_config::env;
 /// #
 /// env!("HELLO");
 /// // => Result<String, std::env::VarError>
@@ -219,7 +100,7 @@ pub use env_impl::{expand, expand_with, EnvGuard};
 /// This method will panic if the value cannot be parsed from a [`FromStr`].
 ///
 /// ```rust
-/// # use noelware_config::env;
+/// # use azalia_config::env;
 /// #
 /// env!("HELLO", as u32);
 /// // => Result<u32, std::env::VarError>

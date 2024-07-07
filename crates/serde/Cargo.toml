@@ -20,8 +20,8 @@
 # SOFTWARE.
 
 [package]
-name = "noelware-serde"
-description = "🐻‍❄️🪚 Provides `serde` implementations for important structs/enums/etc"
+name = "azalia-serde"
+description = "🐻‍❄️🪚 Provides useful (de)serialization implementations for common types within external libraries"
 version.workspace = true
 authors.workspace = true
 edition.workspace = true

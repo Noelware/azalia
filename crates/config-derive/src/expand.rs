@@ -50,7 +50,7 @@ pub fn struct_fields(input: &DeriveInput, fields: &Fields) -> TokenStream {
     let generics = &input.generics;
 
     set_dummy(quote! {
-        impl ::noelware_config::merge::Merge for #name {
+        impl ::azalia_config::merge::Merge for #name {
             fn merge(&self, other: Self) {
                 unimplemented!()
             }
@@ -60,7 +60,7 @@ pub fn struct_fields(input: &DeriveInput, fields: &Fields) -> TokenStream {
     if fields.is_empty() {
         return quote! {
             #[automatically_derived]
-            impl #generics ::noelware_config::merge::Merge for #name #generics {
+            impl #generics ::azalia_config::merge::Merge for #name #generics {
                 fn merge(&mut self, _other: Self) {}
             }
         };
@@ -76,7 +76,7 @@ pub fn struct_fields(input: &DeriveInput, fields: &Fields) -> TokenStream {
 
     quote! {
         #[automatically_derived]
-        impl #generics ::noelware_config::merge::Merge for #name #generics {
+        impl #generics ::azalia_config::merge::Merge for #name #generics {
             fn merge(&mut self, other: Self) {
                 #(#assignments)*
             }
@@ -113,6 +113,6 @@ fn gen_field_assignment(field: &Field) -> Option<TokenStream> {
     let name = &field.member;
     Some(match first.strategy {
         Some(path) => quote_spanned!(path.span()=> #path(&mut self.#name, other.#name);),
-        None => quote_spanned!(field.span=> ::noelware_config::merge::Merge::merge(&mut self.#name, other.#name);),
+        None => quote_spanned!(field.span=> ::azalia_config::merge::Merge::merge(&mut self.#name, other.#name);),
     })
 }

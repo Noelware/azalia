@@ -20,8 +20,8 @@
 # SOFTWARE.
 
 [package]
-name = "noelware-remi"
-description = "🐻‍❄️🪚 Provides a union-enum of `remi::StorageConfig` for supported remi-based crates."
+name = "azalia-remi"
+description = "🐻‍❄️🪚 Allows to create a union enum for each official Remi crate"
 version.workspace = true
 authors.workspace = true
 edition.workspace = true

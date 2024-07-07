@@ -20,8 +20,8 @@
 # SOFTWARE.
 
 [package]
-name = "noelware-log"
-description = "🐻‍❄️🪚 Provides a `tracing_subscriber::Layer` implementation for any `std::io::Write` implementation and writers that are used in Noelware projects"
+name = "azalia-log"
+description = "🐻‍❄️🪚 Provides a beautiful `tracing_subscriber::Layer` formatter and a JSON-compat formatter"
 version.workspace = true
 authors.workspace = true
 edition.workspace = true

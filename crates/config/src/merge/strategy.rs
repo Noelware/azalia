@@ -41,7 +41,7 @@ pub mod strings {
     ///
     /// ## Example
     /// ```no_run
-    /// # use noelware_config::merge::strategy::strings::append;
+    /// # use azalia_config::merge::strategy::strings::append;
     /// #
     /// let mut a = String::from("hello");
     /// let b = String::from(", world!");
@@ -57,7 +57,7 @@ pub mod strings {
     ///
     /// ## Example
     /// ```no_run
-    /// # use noelware_config::merge::strategy::strings::overwrite;
+    /// # use azalia_config::merge::strategy::strings::overwrite;
     /// #
     /// let mut a = String::from("hi!");
     /// let b = String::from("overwritten...");
@@ -73,7 +73,7 @@ pub mod strings {
     ///
     /// ## Example
     /// ```no_run
-    /// # use noelware_config::merge::strategy::strings::overwrite_empty;
+    /// # use azalia_config::merge::strategy::strings::overwrite_empty;
     /// #
     /// let mut a = String::new();
     /// let b = String::from("overwritten!");

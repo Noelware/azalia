@@ -1,2 +1,2 @@
 # 🐻‍❄️🪚 `azalia`
-The **azalia** crate provides very common utilities and extension traits.
+The **azalia** crate is the main source of truth for Noelware's Azalia utilities library.

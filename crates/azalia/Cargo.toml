@@ -31,17 +31,46 @@ repository.workspace = true
 rust-version.workspace = true
 
 [features]
-# Enables the `regex!` macro that just unwraps to `::regex::Regex::new().unwrap()`
 regex = ["dep:regex"]
-
-# Enables the `lazy!` macro that unwraps to `::once_cell::sync::Lazy::new(|| ...)`
 lazy = ["dep:once_cell"]
-
-# Enables the use of Rust's standard library and Azalia can disable some code that requires `libstd`.
 std = []
+
+config = ["dep:azalia-config"]
+config-derive = ["config", "azalia-config/derive"]
+
+log-writers = ["azalia-log/writers"]
+log-tracing-log = ["azalia-log/log"]
+log = ["dep:azalia-log"]
+
+remi-file-format = ["azalia-remi/file-format"]
+remi-async-std = ["azalia-remi/async-std"]
+remi-serde_json = ["azalia-remi/serde_json"]
+remi-serde_yaml = ["azalia-remi/serde_yaml"]
+remi-tracing = ["azalia-remi/tracing"]
+remi-gridfs = ["azalia-remi/gridfs"]
+remi-azure = ["azalia-remi/azure"]
+remi-serde = ["azalia-remi/serde"]
+remi-log = ["azalia-remi/log"]
+remi-all = ["azalia-remi/all"]
+remi-s3 = ["azalia-remi/s3"]
+remi-fs = ["azalia-remi/fs"]
+remi = ["dep:azalia-remi"]
+
+serde-tracing = ["azalia-serde/tracing"]
+serde-aws = ["azalia-serde/aws"]
+serde-s3 = ["azalia-serde/s3"]
+serde = ["dep:azalia-serde"]
 
 default = ["std"]
 
 [dependencies]
+azalia-config = { version = "=0.1.0", path = "../config", optional = true }
+azalia-log = { version = "=0.1.0", path = "../log", optional = true }
+azalia-remi = { version = "=0.1.0", path = "../remi", optional = true }
+azalia-serde = { version = "=0.1.0", path = "../serde", optional = true }
 once_cell = { version = "1.19.0", optional = true }
 regex = { version = "1.10.4", optional = true }
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]

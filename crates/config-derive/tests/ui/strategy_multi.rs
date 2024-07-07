@@ -19,14 +19,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-use noelware_config::merge::Merge;
+use azalia_config::merge::Merge;
 
-#[derive(Debug, noelware_config_derive::Merge)]
+#[derive(Debug, azalia_config_derive::Merge)]
 struct Something {
-    #[merge(strategy = noelware_config::merge::strategy::strings::append)]
+    #[merge(strategy = azalia_config::merge::strategy::strings::append)]
     a: String,
 
-    #[merge(strategy = noelware_config::merge::strategy::strings::overwrite_empty)]
+    #[merge(strategy = azalia_config::merge::strategy::strings::overwrite_empty)]
     b: String,
 }
 

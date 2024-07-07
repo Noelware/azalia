@@ -37,7 +37,7 @@ macro_rules! impl_methods {
             /// #
             /// #[derive(Serialize)]
             /// pub struct MyStruct {
-            #[doc = concat!("   #[serde(serialize_with = \"noelware_serde::s3::", stringify!($mod), "::serialize\")]")]
+            #[doc = concat!("   #[serde(serialize_with = \"azalia_serde::s3::", stringify!($mod), "::serialize\")]")]
             #[doc = concat!("   acl: ", stringify!($name), ",")]
             /// }
             /// ```
@@ -59,7 +59,7 @@ macro_rules! impl_methods {
             /// #
             /// #[derive(Deserialize)]
             /// pub struct MyStruct {
-            #[doc = concat!("   #[serde(deserialize_with = \"noelware_serde::s3::", stringify!($mod), "::deserialize\")]")]
+            #[doc = concat!("   #[serde(deserialize_with = \"azalia_serde::s3::", stringify!($mod), "::deserialize\")]")]
             #[doc = concat!("   acl: ", stringify!($name), ",")]
             /// }
             /// ```

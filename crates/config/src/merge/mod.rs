@@ -24,14 +24,14 @@
 pub mod strategy;
 
 #[cfg(feature = "derive")]
-pub use noelware_config_derive::*;
+pub use azalia_config_derive::*;
 
 /// Trait that allows you to merge together two objects into one easily. This can be used to your
 /// advantage to allow deep merging.
 ///
 /// ## Example
 /// ```rust
-/// # use noelware_config::merge::Merge;
+/// # use azalia_config::merge::Merge;
 /// #
 #[cfg_attr(feature = "derive", doc = "#[derive(Merge)]")]
 /// pub struct MyWrapper(u64);

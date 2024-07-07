@@ -38,7 +38,7 @@ pub mod region {
     /// #
     /// #[derive(Serialize)]
     /// pub struct MyStruct {
-    ///     #[serde(serialize_with = "noelware_serde::aws::region::serialize")]
+    ///     #[serde(serialize_with = "azalia_serde::aws::region::serialize")]
     ///     region: Region,
     /// }
     /// ```
@@ -60,7 +60,7 @@ pub mod region {
     /// #
     /// #[derive(Deserialize)]
     /// pub struct MyStruct {
-    ///     #[serde(deserialize_with = "noelware_serde::aws::region::deserialize")]
+    ///     #[serde(deserialize_with = "azalia_serde::aws::region::deserialize")]
     ///     region: Region,
     /// }
     /// ```
