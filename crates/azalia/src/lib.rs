@@ -1,4 +1,4 @@
-// 🐻‍❄️🪚 core-rs: Collection of Rust crates that are used by and built for Noelware's projects
+// 🐻‍❄️🪚 Azalia: Family of crates that implement common Rust code
 // Copyright (c) 2024 Noelware, LLC. <team@noelware.org>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,7 +21,7 @@
 
 #![doc(html_logo_url = "https://cdn.floofy.dev/images/trans.png")]
 #![doc = include_str!("../README.md")]
-#![cfg_attr(docsrs, feature(doc_cfg))]
+#![cfg_attr(any(noeldoc, docsrs), feature(doc_cfg))]
 #![cfg_attr(not(feature = "std"), no_std)]
 #![allow(rustdoc::broken_intra_doc_links)] // we use GitHub's alerts and rustdoc doesn't like them
 
@@ -32,19 +32,19 @@ extern crate core as std;
 extern crate alloc;
 
 #[cfg(feature = "config")]
-#[cfg_attr(docsrs, doc(cfg(feature = "config")))]
+#[cfg_attr(any(noeldoc, docsrs), doc(cfg(feature = "config")))]
 pub use azalia_config as config;
 
 #[cfg(feature = "log")]
-#[cfg_attr(docsrs, doc(cfg(feature = "log")))]
+#[cfg_attr(any(noeldoc, docsrs), doc(cfg(feature = "log")))]
 pub use azalia_log as log;
 
 #[cfg(feature = "remi")]
-#[cfg_attr(docsrs, doc(cfg(feature = "remi")))]
+#[cfg_attr(any(noeldoc, docsrs), doc(cfg(feature = "remi")))]
 pub use azalia_remi as remi;
 
 #[cfg(feature = "serde")]
-#[cfg_attr(docsrs, doc(cfg(feature = "serde")))]
+#[cfg_attr(any(noeldoc, docsrs), doc(cfg(feature = "serde")))]
 pub use azalia_serde as serde;
 
 #[cfg(feature = "std")]

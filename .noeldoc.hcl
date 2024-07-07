@@ -19,26 +19,38 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-[package]
-name = "azalia-config"
-description = "🐻‍❄️🪚 Provides useful Rust types to make configurations more easier."
-version.workspace = true
-authors.workspace = true
-edition.workspace = true
-homepage.workspace = true
-license.workspace = true
-publish.workspace = true
-repository.workspace = true
-rust-version.workspace = true
+# We use Noeldoc to allow the documentation generator that lives in the `crates` repository
+# to get the documentation for all crates except `azalia-serde`. Each Azalia release builds
+# the documentation suite and publishes the artifacts to S3.
 
-[features]
-default = []
-derive = ["dep:azalia-config-derive"]
-no-std = []
+noeldoc {
+    version     = ">=0.1.0"
+    experiments = ["dockerRunner"]
 
-[dependencies]
-azalia-config-derive = { version = "0.1.0", path = "../config-derive", optional = true }
+    extension "noeldoc/rustdoc" {
+        version = "0.1.0"
+    }
+}
 
-[package.metadata.docs.rs]
-all-features = true
-rustdoc-args = ["--cfg", "docsrs"]
+locals {
+    cargoTOML = readCargoToml({ root = "${cwd}/Cargo.toml" })
+}
+
+project "azalia" {
+    description = "🐻‍❄️🪚 Family of crates that implement common Rust code"
+    version     = local.cargoTOML.workspace.package.version
+
+    extension "noeldoc/rustdoc" {
+        cargoTOML = local.cargoTOML
+        crates    = omit(cargoTOML.workspace.members, ["azalia-serde"])
+
+        # Noeldoc's Rustdoc extension has the ability to extract `#[doc(cfg)]` comments.
+        #
+        # example:
+        #
+        # #[cfg_attr(any(noeldoc, rustdoc), doc(cfg(feature = "weow")))]
+        rustflags = [
+            "--cfg=noeldoc"
+        ]
+    }
+}

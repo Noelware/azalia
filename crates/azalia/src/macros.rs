@@ -1,4 +1,4 @@
-// 🐻‍❄️🪚 core-rs: Collection of Rust crates that are used by and built for Noelware's projects
+// 🐻‍❄️🪚 Azalia: Family of crates that implement common Rust code
 // Copyright (c) 2024 Noelware, LLC. <team@noelware.org>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy

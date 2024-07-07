@@ -1,4 +1,4 @@
-// 🐻‍❄️🪚 core-rs: Collection of Rust crates that are used by and built for Noelware's projects
+// 🐻‍❄️🪚 Azalia: Family of crates that implement common Rust code
 // Copyright (c) 2024 Noelware, LLC. <team@noelware.org>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -103,7 +103,7 @@ impl Display for Error {
                     if let Some(msg) = msg.downcast_ref::<&str>() {
                         f.write_str(msg)
                     } else if let Some(msg) = msg.downcast_ref::<String>() {
-                        f.write_str(&msg)
+                        f.write_str(msg)
                     } else {
                         Display::fmt(err, f)
                     }
@@ -168,7 +168,7 @@ impl From<azure_core::Error> for Error {
 #[allow(unused)]
 impl remi::StorageService for StorageService {
     type Error = Error;
-    const NAME: &'static str = "noelware:remi";
+    const NAME: &'static str = "azalia:remi";
 
     async fn init(&self) -> Result<(), Self::Error> {
         match self {

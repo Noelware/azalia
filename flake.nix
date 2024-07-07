@@ -1,4 +1,4 @@
-# 🐻‍❄️🪚 core-rs: Collection of Rust crates that are used by and built for Noelware's projects
+# 🐻‍❄️🪚 Azalia: Family of crates that implement common Rust code
 # Copyright (c) 2024 Noelware, LLC. <team@noelware.org>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,24 +21,22 @@
 {
   description = "Collection of Rust crates that are used by and built for Noelware's projects";
   inputs = {
-    nixpkgs.url = github:NixOS/nixpkgs/nixpkgs-unstable;
-    flake-utils.url = github:numtide/flake-utils;
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    flake-utils.url = "github:numtide/flake-utils";
     rust-overlay = {
-      url = github:oxalica/rust-overlay;
+      url = "github:oxalica/rust-overlay";
       inputs = {
         nixpkgs.follows = "nixpkgs";
-        flake-utils.follows = "flake-utils";
       };
     };
 
     flake-compat = {
-      url = github:edolstra/flake-compat;
+      url = "github:edolstra/flake-compat";
       flake = false;
     };
   };
 
   outputs = {
-    self,
     nixpkgs,
     flake-utils,
     rust-overlay,
@@ -51,30 +49,25 @@
         overlays = [(import rust-overlay)];
       };
 
-      stdenv =
-        if pkgs.stdenv.isLinux
-        then pkgs.stdenv
-        else pkgs.clangStdenv;
-
       rust = pkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml;
       rustflags =
-        if stdenv.isLinux
+        if pkgs.stdenv.isLinux
         then ''-C link-arg=-fuse-ld=mold -C target-cpu=native $RUSTFLAGS''
         else "$RUSTFLAGS";
     in {
       devShells.default = pkgs.mkShell {
+        RUSTFLAGS = "${rustflags}";
         nativeBuildInputs = with pkgs;
           [pkg-config]
           ++ (lib.optional stdenv.isLinux [mold lldb])
           ++ (lib.optional stdenv.isDarwin [darwin.apple_sdk.frameworks.CoreFoundation]);
 
-        buildInputs = with pkgs; [
-          cargo-nextest
-          cargo-machete
-          cargo-expand
-          cargo-deny
+        buildInputs = [
+          pkgs.cargo-nextest
+          pkgs.cargo-machete
+          pkgs.cargo-expand
+          pkgs.cargo-deny
 
-          openssl
           rust
         ];
       };
