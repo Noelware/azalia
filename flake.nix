@@ -52,11 +52,11 @@
       rust = pkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml;
       rustflags =
         if pkgs.stdenv.isLinux
-        then ''-C link-arg=-fuse-ld=mold -C target-cpu=native $RUSTFLAGS''
-        else "$RUSTFLAGS";
+        then ''-C link-arg=-fuse-ld=mold -C target-cpu=native''
+        else "";
     in {
       devShells.default = pkgs.mkShell {
-        RUSTFLAGS = "${rustflags}";
+        LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath (with pkgs; [openssl]);
         nativeBuildInputs = with pkgs;
           [pkg-config]
           ++ (lib.optional stdenv.isLinux [mold lldb])
@@ -68,8 +68,13 @@
           pkgs.cargo-expand
           pkgs.cargo-deny
 
+          pkgs.openssl
           rust
         ];
+
+        shellHook = ''
+          export RUSTFLAGS="${rustflags} $RUSTFLAGS"
+        '';
       };
     });
 }
