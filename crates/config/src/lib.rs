@@ -25,13 +25,10 @@
 #![cfg_attr(feature = "no-std", no_std)]
 #![allow(rustdoc::broken_intra_doc_links)] // we use GitHub's alerts and rustdoc doesn't like them
 
-pub mod merge;
-
-#[cfg(feature = "no-std")]
-extern crate core as std;
-
 #[cfg(feature = "no-std")]
 extern crate alloc;
+
+pub mod merge;
 
 /// Represents a way to import a type from the system's environment variables easily when
 /// doing implicit conversions. This doesn't handle any use-case if it ever fails, if you
@@ -56,15 +53,6 @@ pub trait TryFromEnv: Sized {
 
     /// Do an implicit conversion that could possibly fail.
     fn try_from_env() -> Result<Self::Output, Self::Error>;
-}
-
-impl<O, T: FromEnv<Output = O>> TryFromEnv for T {
-    type Output = O;
-    type Error = std::convert::Infallible;
-
-    fn try_from_env() -> Result<Self::Output, Self::Error> {
-        Ok(T::from_env())
-    }
 }
 
 #[cfg(not(feature = "no-std"))]

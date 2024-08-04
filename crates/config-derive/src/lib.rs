@@ -24,12 +24,10 @@
 
 use proc_macro::TokenStream;
 use proc_macro2::Span;
-use proc_macro_error::proc_macro_error;
 use std::fmt::Display;
 use syn::{parse_macro_input, Data, DataStruct, DeriveInput};
 
-mod args;
-mod expand;
+mod merge;
 
 /// Implements the `Merge` trait onto a struct. Unions won't be supported but enums
 /// might be if a concrete implementation can be reasoned.
@@ -60,12 +58,11 @@ mod expand;
 /// ```rust,ignore
 /// fn(left: &mut Type, right: Type);
 /// ````
-#[proc_macro_error]
 #[proc_macro_derive(Merge, attributes(merge))]
 pub fn merge(body: TokenStream) -> TokenStream {
     let input = parse_macro_input!(body as DeriveInput);
     match &input.data {
-        Data::Struct(DataStruct { fields, .. }) => expand::struct_fields(&input, fields).into(),
+        Data::Struct(DataStruct { fields, .. }) => merge::struct_fields(&input, fields).into(),
         Data::Enum(_) => error(Span::call_site(), "enums are not supported with #[derive(Merge)]"),
         Data::Union(_) => error(Span::call_site(), "unions are not supported with #[derive(Merge)]"),
     }
