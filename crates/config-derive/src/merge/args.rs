@@ -24,6 +24,33 @@ use syn::{
     Path, Result, Token,
 };
 
+#[derive(Clone)]
+pub struct Container {
+    pub krate: Path,
+}
+
+impl Default for Container {
+    fn default() -> Self {
+        Container {
+            krate: syn::parse_quote!(::azalia::config),
+        }
+    }
+}
+
+impl Parse for Container {
+    fn parse(input: ParseStream) -> Result<Self> {
+        let mut me = Container::default();
+        if input.peek(Token![crate]) {
+            input.parse::<Token![crate]>()?;
+            input.parse::<Token![=]>()?;
+
+            me.krate = input.parse()?;
+        }
+
+        Ok(me)
+    }
+}
+
 #[derive(Default)]
 pub struct Args {
     pub is_skipped: bool,

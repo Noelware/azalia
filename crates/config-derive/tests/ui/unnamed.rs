@@ -20,9 +20,11 @@
 // SOFTWARE.
 
 #[derive(azalia_config_derive::Merge)]
+#[merge(crate = ::azalia_config)]
 struct MyStruct1;
 
 #[derive(azalia_config_derive::Merge)]
+#[merge(crate = ::azalia_config)]
 struct MyStruct2(usize);
 
 fn main() {}
