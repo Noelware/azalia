@@ -62,10 +62,11 @@ pub fn struct_fields(input: &DeriveInput, fields: &Fields) -> TokenStream {
         Err(x) => return x.into_compile_error(),
     };
 
+    let krate = &container_args.krate;
     if fields.is_empty() {
         return quote! {
             #[automatically_derived]
-            impl #generics ::azalia_config::merge::Merge for #name #generics {
+            impl #generics #krate::merge::Merge for #name #generics {
                 fn merge(&mut self, _other: Self) {}
             }
         };
@@ -79,7 +80,6 @@ pub fn struct_fields(input: &DeriveInput, fields: &Fields) -> TokenStream {
         }
     }
 
-    let krate = &container_args.krate;
     quote! {
         #[automatically_derived]
         impl #generics #krate::merge::Merge for #name #generics {
