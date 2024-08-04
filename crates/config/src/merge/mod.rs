@@ -23,6 +23,12 @@
 
 pub mod strategy;
 
+#[cfg(feature = "no-std")]
+use core::num;
+
+#[cfg(not(feature = "no-std"))]
+use std::num;
+
 #[cfg(feature = "derive")]
 pub use azalia_config_derive::*;
 
@@ -188,21 +194,21 @@ macro_rules! impl_generic_partial_eq_merge {
 }
 
 impl_nonzero_merge!(
-    std::num::NonZeroU8,
-    std::num::NonZeroU16,
-    std::num::NonZeroU32,
-    std::num::NonZeroU64,
-    std::num::NonZeroUsize,
-    std::num::NonZeroU128
+    num::NonZeroU8,
+    num::NonZeroU16,
+    num::NonZeroU32,
+    num::NonZeroU64,
+    num::NonZeroUsize,
+    num::NonZeroU128
 );
 
 impl_nonzero_merge!(
-    std::num::NonZeroI8,
-    std::num::NonZeroI16,
-    std::num::NonZeroI32,
-    std::num::NonZeroI64,
-    std::num::NonZeroI128,
-    std::num::NonZeroIsize
+    num::NonZeroI8,
+    num::NonZeroI16,
+    num::NonZeroI32,
+    num::NonZeroI64,
+    num::NonZeroI128,
+    num::NonZeroIsize
 );
 
 impl_unum_merge!(u8, u16, u32, u64, u128, usize);
