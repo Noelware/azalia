@@ -19,9 +19,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-use crate::args::Args;
+use crate::merge::Args;
 use proc_macro2::{Span, TokenStream};
-use proc_macro_error::set_dummy;
 use quote::{quote, quote_spanned};
 use syn::{spanned::Spanned, Attribute, DeriveInput, Fields, Member};
 
@@ -48,14 +47,6 @@ impl From<(usize, &syn::Field)> for Field {
 pub fn struct_fields(input: &DeriveInput, fields: &Fields) -> TokenStream {
     let name = &input.ident;
     let generics = &input.generics;
-
-    set_dummy(quote! {
-        impl ::azalia_config::merge::Merge for #name {
-            fn merge(&self, other: Self) {
-                unimplemented!()
-            }
-        }
-    });
 
     if fields.is_empty() {
         return quote! {
@@ -101,7 +92,7 @@ fn gen_field_assignment(field: &Field) -> Option<TokenStream> {
         // TODO(@auguwu): fix
         .map(|s| Args {
             is_skipped: s.is_skipped,
-            strategy: s.strategy.clone(),
+            strategy: s.strategy.clone()
         })
         .unwrap_or_default();
 
@@ -113,6 +104,6 @@ fn gen_field_assignment(field: &Field) -> Option<TokenStream> {
     let name = &field.member;
     Some(match first.strategy {
         Some(path) => quote_spanned!(path.span()=> #path(&mut self.#name, other.#name);),
-        None => quote_spanned!(field.span=> ::azalia_config::merge::Merge::merge(&mut self.#name, other.#name);),
+        None => quote_spanned!(field.span=> ::azalia::config::merge::Merge::merge(&mut self.#name, other.#name);),
     })
 }
