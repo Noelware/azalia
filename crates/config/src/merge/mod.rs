@@ -40,6 +40,7 @@ pub use azalia_config_derive::*;
 /// # use azalia_config::merge::Merge;
 /// #
 #[cfg_attr(feature = "derive", doc = "#[derive(Merge)]")]
+/// # #[merge(crate = ::azalia_config)]
 /// pub struct MyWrapper(u64);
 ///
 #[cfg_attr(not(feature = "derive"), doc = include_str!("../../merge_without_derive"))]

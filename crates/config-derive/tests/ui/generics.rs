@@ -20,6 +20,7 @@
 // SOFTWARE.
 
 #[derive(Debug, azalia_config_derive::Merge)]
+#[merge(crate = ::azalia_config)]
 struct Generic<'a, T> {
     #[merge(skip)]
     _marker: std::marker::PhantomData<&'a T>,

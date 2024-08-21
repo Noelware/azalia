@@ -19,7 +19,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-use crate::merge::Args;
+use crate::merge::{Args, Container};
 use proc_macro2::{Span, TokenStream};
 use quote::{quote, quote_spanned};
 use syn::{spanned::Spanned, Attribute, DeriveInput, Fields, Member};
@@ -47,11 +47,26 @@ impl From<(usize, &syn::Field)> for Field {
 pub fn struct_fields(input: &DeriveInput, fields: &Fields) -> TokenStream {
     let name = &input.ident;
     let generics = &input.generics;
+    let container_args = match input
+        .attrs
+        .clone()
+        .into_iter()
+        .filter(|x| match x.meta.path().require_ident() {
+            Ok(ident) => ident == "merge",
+            Err(_) => false,
+        })
+        .map(|attr| attr.parse_args::<Container>())
+        .collect::<Result<Vec<_>, _>>()
+    {
+        Ok(elems) => elems.first().cloned().unwrap_or_default(),
+        Err(x) => return x.into_compile_error(),
+    };
 
+    let krate = &container_args.krate;
     if fields.is_empty() {
         return quote! {
             #[automatically_derived]
-            impl #generics ::azalia_config::merge::Merge for #name #generics {
+            impl #generics #krate::merge::Merge for #name #generics {
                 fn merge(&mut self, _other: Self) {}
             }
         };
@@ -60,14 +75,14 @@ pub fn struct_fields(input: &DeriveInput, fields: &Fields) -> TokenStream {
     let mut assignments = Vec::with_capacity(fields.len());
     let fields = fields.iter().enumerate().map(Field::from);
     for field in fields {
-        if let Some(tt) = gen_field_assignment(&field) {
+        if let Some(tt) = gen_field_assignment(&field, &container_args) {
             assignments.push(tt);
         }
     }
 
     quote! {
         #[automatically_derived]
-        impl #generics ::azalia_config::merge::Merge for #name #generics {
+        impl #generics #krate::merge::Merge for #name #generics {
             fn merge(&mut self, other: Self) {
                 #(#assignments)*
             }
@@ -75,7 +90,7 @@ pub fn struct_fields(input: &DeriveInput, fields: &Fields) -> TokenStream {
     }
 }
 
-fn gen_field_assignment(field: &Field) -> Option<TokenStream> {
+fn gen_field_assignment(field: &Field, Container { krate }: &Container) -> Option<TokenStream> {
     let attr = field
         .attrs
         .iter()
@@ -104,6 +119,6 @@ fn gen_field_assignment(field: &Field) -> Option<TokenStream> {
     let name = &field.member;
     Some(match first.strategy {
         Some(path) => quote_spanned!(path.span()=> #path(&mut self.#name, other.#name);),
-        None => quote_spanned!(field.span=> ::azalia::config::merge::Merge::merge(&mut self.#name, other.#name);),
+        None => quote_spanned!(field.span=> #krate::merge::Merge::merge(&mut self.#name, other.#name);),
     })
 }

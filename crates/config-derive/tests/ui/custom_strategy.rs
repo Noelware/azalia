@@ -22,6 +22,7 @@
 use azalia_config::merge::Merge;
 
 #[derive(Debug, azalia_config_derive::Merge)]
+#[merge(crate = ::azalia_config)]
 struct Something {
     #[merge(strategy = azalia_config::merge::strategy::strings::append)]
     a: String,
