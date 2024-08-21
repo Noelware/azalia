@@ -70,6 +70,11 @@ jobs:
             - name: Setup Rust cache
               uses: Swatinem/rust-cache@v2
 
+            # On Windows, we'll also need nasm for use with BoringSSL via aws-lc-sys.
+            - name: Install NASM
+              uses: ilammy/setup-nasm@v1
+              if: matrix.runner == 'windows-latest'
+
             - name: Pull dependencies
               run: cargo build --all-features
 
