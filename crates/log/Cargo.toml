@@ -39,7 +39,7 @@ log = ["dep:tracing-log"]
 [dependencies]
 cfg-if = "1.0.0"
 chrono = { version = "0.4.38", optional = true }
-owo-colors = { version = "4.0.0", optional = true, features = [
+owo-colors = { version = "5.0.0", optional = true, features = [
     "supports-colors",
 ] }
 serde_json = "1.0.116"
