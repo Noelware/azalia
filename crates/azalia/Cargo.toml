@@ -64,11 +64,14 @@ serde-aws = ["azalia-serde/aws"]
 serde-s3 = ["azalia-serde/s3"]
 serde = ["dep:azalia-serde"]
 
+proc-macros = ["dep:azalia-proc-macros"]
+
 default = ["std"]
 
 [dependencies]
 azalia-config = { version = "=0.1.0", path = "../config", optional = true }
 azalia-log = { version = "=0.1.0", path = "../log", optional = true }
+azalia-proc-macros = { version = "=0.1.0", path = "../proc-macros", optional = true }
 azalia-remi = { version = "=0.1.0", path = "../remi", optional = true }
 azalia-serde = { version = "=0.1.0", path = "../serde", optional = true }
 once_cell = { version = "1.19.0", optional = true }

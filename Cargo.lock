@@ -589,6 +589,7 @@ version = "0.1.0"
 dependencies = [
  "azalia-config",
  "azalia-log",
+ "azalia-proc-macros",
  "azalia-remi",
  "azalia-serde",
  "once_cell",

@@ -39,6 +39,10 @@ pub use azalia_config as config;
 #[cfg_attr(any(noeldoc, docsrs), doc(cfg(feature = "log")))]
 pub use azalia_log as log;
 
+#[cfg(feature = "proc-macros")]
+#[cfg_attr(any(noeldoc, docsrs), doc(cfg(feature = "proc-macros")))]
+pub use azalia_proc_macros as proc_macros;
+
 #[cfg(feature = "remi")]
 #[cfg_attr(any(noeldoc, docsrs), doc(cfg(feature = "remi")))]
 pub use azalia_remi as remi;
