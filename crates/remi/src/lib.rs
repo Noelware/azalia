@@ -25,7 +25,7 @@
 #![allow(deprecated)] // all #[deprecated] are all the non exhaustive types
 #![allow(non_camel_case_types)]
 
-pub use remi;
+pub use remi as core;
 
 #[cfg(feature = "gridfs")]
 #[cfg_attr(docsrs, doc(cfg(feature = "gridfs")))]
@@ -94,7 +94,7 @@ pub enum Error {
 impl Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            #[cfg(feature = "filesystem")]
+            #[cfg(feature = "fs")]
             Error::Filesystem(err) => Display::fmt(err, f),
 
             #[cfg(feature = "gridfs")]
@@ -126,7 +126,7 @@ impl Display for Error {
 impl error::Error for Error {
     fn source(&self) -> Option<&(dyn error::Error + 'static)> {
         match self {
-            #[cfg(feature = "filesystem")]
+            #[cfg(feature = "fs")]
             Error::Filesystem(err) => Some(err),
 
             #[cfg(feature = "gridfs")]

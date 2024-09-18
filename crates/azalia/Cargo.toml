@@ -30,6 +30,9 @@ license.workspace = true
 repository.workspace = true
 rust-version.workspace = true
 
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(noeldoc)'] }
+
 [features]
 regex = ["dep:regex"]
 lazy = ["dep:once_cell"]

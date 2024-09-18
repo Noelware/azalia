@@ -31,4 +31,4 @@ homepage = "https://cargo.noelware.cloud"
 license = "MIT"
 publish = ["noelware"]
 repository = "https://github.com/Noelware/core-rs"
-rust-version = "1.74"
+rust-version = "1.77"

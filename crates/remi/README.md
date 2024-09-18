@@ -11,7 +11,7 @@ This uses Cargo's crate features to implicitilly allow you to pick out which Rem
 // azalia-remi = { version = "0.1", features = ["all"], registry = "noelware" }
 // tokio = { version = "*", features = ["full"] }
 
-use azalia_remi::{StorageService, Config, remi::StorageService as _, fs::Config as FSConfig};
+use azalia_remi::{StorageService, Config, core::StorageService as _, fs::Config as FSConfig};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

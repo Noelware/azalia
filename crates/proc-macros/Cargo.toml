@@ -20,33 +20,17 @@
 # SOFTWARE.
 
 [package]
-name = "azalia-log"
-description = "🐻‍❄️🪚 Provides a beautiful `tracing_subscriber::Layer` formatter and a JSON-compat formatter"
+name = "azalia-proc-macros"
+description = "🐻‍❄️🪚 Helper functions and macros to help aid proc-macro development"
 version.workspace = true
 authors.workspace = true
 edition.workspace = true
 homepage.workspace = true
 license.workspace = true
-publish.workspace = true
 repository.workspace = true
 rust-version.workspace = true
 
-[features]
-writers = ["dep:owo-colors", "dep:chrono"]
-default = ["writers"]
-log = ["dep:tracing-log"]
-
 [dependencies]
-cfg-if = "1.0.0"
-chrono = { version = "0.4.38", optional = true }
-owo-colors = { version = "4.1.0", optional = true, features = [
-    "supports-colors",
-] }
-serde_json = "1.0.116"
-tracing = "0.1.40"
-tracing-log = { version = "0.2.0", optional = true }
-tracing-subscriber = "0.3.18"
-
-[package.metadata.docs.rs]
-all-features = true
-rustdoc-args = ["--cfg", "docsrs"]
+proc-macro2 = "1.0.86"
+quote = "1.0.37"
+syn = "2.0.77"
