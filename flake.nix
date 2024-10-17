@@ -60,7 +60,7 @@
         nativeBuildInputs = with pkgs;
           [pkg-config]
           ++ (lib.optional stdenv.isLinux [mold lldb])
-          ++ (lib.optional stdenv.isDarwin [darwin.apple_sdk.frameworks.CoreFoundation]);
+          ++ (lib.optional stdenv.isDarwin [darwin.apple_sdk.frameworks.CoreFoundation darwin.apple_sdk.frameworks.Security]);
 
         buildInputs = [
           pkgs.cargo-nextest
