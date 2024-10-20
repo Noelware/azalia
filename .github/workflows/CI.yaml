@@ -58,46 +58,32 @@ jobs:
                 rust-version: [stable, nightly]
                 runner: [ubuntu-latest, windows-latest, macos-latest]
         steps:
-            - name: Checkout repository
-              uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # v4
-
-            - name: Setup Rust toolchain
-              uses: dtolnay/rust-toolchain@master
+            - uses: actions/checkout@v4
+            - run: rm rust-toolchain.toml
+            - uses: dtolnay/rust-toolchain@master
               with:
                 toolchain: ${{matrix.rust-version}}
                 components: clippy, rustfmt
 
-            - name: Setup Rust cache
-              uses: Swatinem/rust-cache@v2
+            - uses: Swatinem/rust-cache@v2
 
             # On Windows, we'll also need nasm for use with BoringSSL via aws-lc-sys.
-            - name: Install NASM
-              uses: ilammy/setup-nasm@v1
+            - uses: ilammy/setup-nasm@v1
               if: matrix.runner == 'windows-latest'
 
-            - name: Pull dependencies
-              run: cargo build --all-features
-
-            - name: Run tests
-              run: cargo test --all-features
+            - run: cargo build --all-features --workspace
+            - run: cargo test --all-features --workspace
     clippy:
         name: Clippy
         runs-on: ubuntu-latest
         steps:
-            - name: Checkout repository
-              uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # v4
-
-            - name: Setup Rust toolchain
-              uses: dtolnay/rust-toolchain@master
+            - uses: actions/checkout@v4
+            - uses: dtolnay/rust-toolchain@master
               with:
                 toolchain: stable
                 components: clippy, rustfmt
-
-            - name: Setup Rust cache
-              uses: Swatinem/rust-cache@v2
-
-            - name: Clippy!
-              uses: auguwu/clippy-action@1.4.0
+            - uses: Swatinem/rust-cache@v2
+            - uses: auguwu/clippy-action@1.4.0
               with:
                 all-features: true
                 token: ${{secrets.GITHUB_TOKEN}}
