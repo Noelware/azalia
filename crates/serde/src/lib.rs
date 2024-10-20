@@ -25,13 +25,13 @@
 #![allow(rustdoc::broken_intra_doc_links)] // we use GitHub's alerts and rustdoc doesn't like them
 
 #[cfg(feature = "tracing")]
-#[cfg_attr(docsrs, doc(cfg(feature = "tracing")))]
+#[cfg_attr(any(docsrs, noeldoc), doc(cfg(feature = "tracing")))]
 pub mod tracing;
 
 #[cfg(feature = "aws")]
-#[cfg_attr(docsrs, doc(cfg(feature = "aws")))]
+#[cfg_attr(any(docsrs, noeldoc), doc(cfg(feature = "aws")))]
 pub mod aws;
 
 #[cfg(feature = "s3")]
-#[cfg_attr(docsrs, doc(cfg(feature = "s3")))]
+#[cfg_attr(any(docsrs, noeldoc), doc(cfg(feature = "s3")))]
 pub mod s3;

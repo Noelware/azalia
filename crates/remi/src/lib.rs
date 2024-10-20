@@ -21,26 +21,26 @@
 
 #![doc(html_logo_url = "https://cdn.floofy.dev/images/trans.png")]
 #![doc = include_str!("../README.md")]
-#![cfg_attr(docsrs, feature(doc_cfg))]
+#![cfg_attr(any(noeldoc, docsrs), feature(doc_cfg))]
 #![allow(deprecated)] // all #[deprecated] are all the non exhaustive types
 #![allow(non_camel_case_types)]
 
 pub use remi as core;
 
 #[cfg(feature = "gridfs")]
-#[cfg_attr(docsrs, doc(cfg(feature = "gridfs")))]
+#[cfg_attr(any(docsrs, noeldoc), doc(cfg(feature = "gridfs")))]
 pub use remi_gridfs as gridfs;
 
 #[cfg(feature = "azure")]
-#[cfg_attr(docsrs, doc(cfg(feature = "azure")))]
+#[cfg_attr(any(docsrs, noeldoc), doc(cfg(feature = "azure")))]
 pub use remi_azure as azure;
 
 #[cfg(feature = "s3")]
-#[cfg_attr(docsrs, doc(cfg(feature = "s3")))]
+#[cfg_attr(any(docsrs, noeldoc), doc(cfg(feature = "s3")))]
 pub use remi_s3 as s3;
 
 #[cfg(feature = "fs")]
-#[cfg_attr(docsrs, doc(cfg(feature = "fs")))]
+#[cfg_attr(any(docsrs, noeldoc), doc(cfg(feature = "fs")))]
 pub use remi_fs as fs;
 
 #[allow(unused)]
@@ -67,6 +67,8 @@ pub enum StorageService {
     /// Uses AWS S3 or any compatible S3 server to store data in.
     #[cfg(feature = "s3")]
     S3(remi_s3::StorageService),
+
+    __non_exhaustive,
 }
 
 /// Represents an error that occurred. As more official crates are supported, this will always
@@ -89,6 +91,8 @@ pub enum Error {
     /// Represents the error type for Amazon S3's [`StorageService`][remi_fs::StorageService] implementation.
     #[cfg(feature = "s3")]
     S3(remi_s3::Error),
+
+    __non_exhaustive,
 }
 
 impl Display for Error {

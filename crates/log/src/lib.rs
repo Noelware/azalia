@@ -24,7 +24,7 @@
 #![cfg_attr(docsrs, feature(doc_cfg))]
 
 #[cfg(feature = "writers")]
-#[cfg_attr(docsrs, doc(cfg(feature = "writers")))]
+#[cfg_attr(any(docsrs, noeldoc), doc(cfg(feature = "writers")))]
 pub mod writers;
 
 #[cfg(not(feature = "writers"))]
