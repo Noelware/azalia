@@ -19,4 +19,5 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-msrv = "1.74"
+# Keep both this and `rust-version` in `Cargo.toml` in sync.
+msrv = "1.76"
