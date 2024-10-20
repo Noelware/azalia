@@ -277,7 +277,7 @@ impl Writer {
             let json = extensions.get::<JsonExtension>().unwrap();
 
             let _ = write!(buf, "{}", span.name());
-            let mut first = false;
+            let mut first = true;
             for (key, value) in &json.0 {
                 if first {
                     let _ = write!(buf, ": {key}={value}");
@@ -286,7 +286,7 @@ impl Writer {
                     continue;
                 }
 
-                let _ = write!(buf, "; {key}={value}");
+                let _ = write!(buf, " {key}={value}");
             }
 
             if self.colors {
