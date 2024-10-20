@@ -22,7 +22,7 @@
   description = "Collection of Rust crates that are used by and built for Noelware's projects";
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    flake-utils.url = "github:numtide/flake-utils";
+    systems.url = "github:nix-systems/default";
     rust-overlay = {
       url = "github:oxalica/rust-overlay";
       inputs = {
@@ -38,43 +38,23 @@
 
   outputs = {
     nixpkgs,
-    flake-utils,
     rust-overlay,
+    systems,
     ...
-  }:
-    flake-utils.lib.eachDefaultSystem (system: let
-      pkgs = import nixpkgs {
-        inherit system;
+  }: let
+    eachSystem = nixpkgs.lib.genAttrs (import systems);
+    overlays = [(import rust-overlay)];
 
-        overlays = [(import rust-overlay)];
+    nixpkgsFor = system:
+      import nixpkgs {
+        inherit system overlays;
       };
-
-      rust = pkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml;
-      rustflags =
-        if pkgs.stdenv.isLinux
-        then ''-C link-arg=-fuse-ld=mold -C target-cpu=native''
-        else "";
+  in {
+    formatter = eachSystem (system: (nixpkgsFor system).alejandra);
+    devShells = eachSystem (system: let
+      pkgs = nixpkgsFor system;
     in {
-      devShells.default = pkgs.mkShell {
-        LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath (with pkgs; [openssl]);
-        nativeBuildInputs = with pkgs;
-          [pkg-config]
-          ++ (lib.optional stdenv.isLinux [mold lldb])
-          ++ (lib.optional stdenv.isDarwin [darwin.apple_sdk.frameworks.CoreFoundation darwin.apple_sdk.frameworks.Security]);
-
-        buildInputs = [
-          pkgs.cargo-nextest
-          pkgs.cargo-machete
-          pkgs.cargo-expand
-          pkgs.cargo-deny
-
-          pkgs.openssl
-          rust
-        ];
-
-        shellHook = ''
-          export RUSTFLAGS="${rustflags} $RUSTFLAGS"
-        '';
-      };
+      default = import ./nix/devshell.nix {inherit pkgs;};
     });
+  };
 }

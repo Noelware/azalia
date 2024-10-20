@@ -18,16 +18,36 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+{pkgs}:
+with pkgs; let
+  toolchain = pkgs.rust-bin.fromRustupToolchainFile ../rust-toolchain.toml;
+  flags =
+    if stdenv.isLinux
+    then ''-C link-arg=-fuse-ld=mold -C target-cpu=native''
+    else "";
+in
+  mkShell {
+    LD_LIBRARY_PATH = lib.makeLibraryPath [openssl];
+    nativeBuildInputs =
+      [pkg-config]
+      ++ (lib.optional stdenv.isLinux [mold lldb])
+      ++ (lib.optional stdenv.isDarwin (with darwin.apple_sdk.frameworks; [
+        CoreFoundation
+        Security
+      ]));
 
-[toolchain]
-channel = "1.82"
-profile = "minimal"
-components = [
-    "rustc",
-    "cargo",
-    "rust-analyzer",
-    "rust-src",
-    "rust-std",
-    "clippy",
-    "rustfmt",
-]
+    buildInputs = [
+      cargo-nextest
+      cargo-machete
+      cargo-expand
+      cargo-deny
+
+      toolchain
+      openssl
+      git
+    ];
+
+    shellHook = ''
+      export RUSTFLAGS="${flags} $RUSTFLAGS"
+    '';
+  }
