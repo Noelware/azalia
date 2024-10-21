@@ -34,41 +34,59 @@ rust-version.workspace = true
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(noeldoc)'] }
 
 [features]
-default = []
-file-format = ["remi-fs/file-format"]
-async-std = ["remi-fs/async-std"]
-serde_json = ["remi-fs/serde_json"]
-serde_yaml = ["remi-fs/serde_yaml"]
-tracing = [
-    "remi-fs/tracing",
-    "remi-s3/tracing",
-    "remi-azure/tracing",
-    "remi-gridfs/tracing",
-]
-gridfs = ["dep:remi-gridfs", "dep:mongodb"]
-azure = ["dep:remi-azure", "dep:azure_core"]
-serde = [
-    "dep:serde",
-    "remi-fs/serde",
-    "remi-s3/serde",
-    "remi-azure/serde",
-    "remi-gridfs/serde",
-]
-log = ["remi-fs/log", "remi-s3/log", "remi-azure/log", "remi-gridfs/log"]
-all = ["gridfs", "s3", "fs", "azure"]
-s3 = ["dep:remi-s3"]
+default = ["export-crates", "all"]
+all = ["gridfs", "azure", "s3", "fs"]
+
+gridfs = ["dep:remi-gridfs", "remi-gridfs/export-crates"]
+azure = ["dep:remi-azure", "remi-azure/export-azure"]
+s3 = ["dep:remi-s3", "remi-s3/export-crates"]
 fs = ["dep:remi-fs"]
 
+unstable = [
+    "remi/unstable",
+    "remi-gridfs?/unstable",
+    "remi-s3?/unstable",
+    "remi-fs?/unstable",
+]
+
+export-crates = [
+    "remi-gridfs?/export-crates",
+    "remi-azure?/export-azure",
+    "remi-s3?/export-crates",
+]
+
+tracing = [
+    "remi-fs?/tracing",
+    "remi-s3?/tracing",
+    "remi-azure?/tracing",
+    "remi-gridfs?/tracing",
+]
+
+serde = [
+    "dep:serde",
+    "remi-fs?/serde",
+    "remi-s3?/serde",
+    "remi-azure?/serde",
+    "remi-gridfs?/serde",
+]
+
+log = ["remi-fs?/log", "remi-s3?/log", "remi-azure?/log", "remi-gridfs?/log"]
+
+#### remi-fs
+file-format = ["remi-fs?/file-format"]
+serde_json = ["remi-fs?/serde_json"]
+serde_yaml_ng = ["remi-fs?/serde_yaml_ng"]
+
 [dependencies]
-azure_core = { version = "0.21.0", optional = true }
-mongodb = { version = "3.1.0", optional = true }
-remi = "0.8.1"
-remi-azure = { version = "0.8.1", optional = true }
-remi-fs = { version = "0.8.1", optional = true }
-remi-gridfs = { version = "0.8.1", optional = true }
-remi-s3 = { version = "0.8.1", optional = true }
+remi = "0.9.1"
+remi-azure = { version = "0.9.1", optional = true }
+remi-fs = { version = "0.9.1", optional = true }
+remi-gridfs = { version = "0.9.1", optional = true }
+remi-s3 = { version = "0.9.1", optional = true }
 serde = { version = "1.0.200", optional = true }
 
 [package.metadata.docs.rs]
 all-features = true
-rustdoc-args = ["--cfg", "docsrs"]
+
+[package.metadata.noeldoc]
+all-features = true
