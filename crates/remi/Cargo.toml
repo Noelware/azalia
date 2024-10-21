@@ -85,6 +85,10 @@ remi-gridfs = { version = "0.9.1", optional = true }
 remi-s3 = { version = "0.9.1", optional = true }
 serde = { version = "1.0.200", optional = true }
 
+# used for README doctest
+[dev-dependencies]
+tokio = { version = "1.40.0", features = ["rt", "macros"] }
+
 [package.metadata.docs.rs]
 all-features = true
 

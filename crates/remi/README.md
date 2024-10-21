@@ -24,16 +24,18 @@ use azalia_remi::{
     Config,
 
     core::StorageService as _,
-    fs::StorageConfig
+    fs
 };
 
 #[tokio::main]
 async fn main() {
-    let service = Config::Filesystem(StorageConfig::default().with_directory("/data"));
-    service.init().await?; // initialize the fs version of remi
+    let config = fs::StorageConfig {
+        directory: "/data".into(),
+    };
+
+    let service = StorageService::Filesystem(fs::StorageService::with_config(config));
+    service.init().await.unwrap(); // initialize the fs version of remi
 
     // do whatever you want
-
-    Ok(())
 }
 ```
