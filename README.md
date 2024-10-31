@@ -1,7 +1,8 @@
-<img src="https://cdn.floofy.dev/images/trans.png" alt="Noelware logo" align="right" width="128" height="128" />
 <div align="center">
+    <img src="https://cdn.floofy.dev/images/trans.png" alt="Noelware logo" width="128" height="128" />
     <h3>🐻‍❄️🪚 Azalia</h3>
     <h4>Family of crates for Noelware's Rust projects that implement repeative code</h4>
+    <hr />
 </div>
 
 **Azalia** are a host of crates maintained by the Noelware team that implement repeative code in our codebases.
@@ -22,9 +23,6 @@
 
 ## Why aren't these crates published to **crates.io**?
 We decided that it was unnecessary to pollute code that, techincally, we would only use into a public registry. We recommended using Cargo's Git resolver when pulling the crates from this repository.
-
-<!-- ## Why aren't these crates published to **crates.io**?
-We decided that it was unnecessary to pollute code that, techincally, we would only use into a public registry. We recommended using Cargo's Git resolver when pulling the crates from this repository or link our [Cargo registry](#with-our-cargo-registry). -->
 
 ## MSRV Compatibility
 For all crates that we host, we support Rust versions 1.70+ and test on stable and nightly branches of Rust. While you could compile the crates with older Rust versions, we do not guarantee that it'll work AND we will not provide support for older Rust versions.
@@ -68,10 +66,3 @@ registry = "noelware"
 [`azalia-remi`]:        ./crates/remi
 [`azalia-log`]:         ./crates/log
 [`azalia`]:             ./crates/azalia
-
-<!-- [`azalia-proc-macros`]: https://cargo.noelware.org/~/azalia/proc-macros
-[`azalia-config`]:      https://cargo.noelware.org/~/azalia/config
-[`azalia-serde`]:       https://cargo.noelware.org/~/azalia/serde
-[`azalia-remi`]:        https://cargo.noelware.org/~/azalia/remi
-[`azalia-log`]:         https://cargo.noelware.org/~/azalia/log
-[`azalia`]:             https://cargo.noelware.org/~/azalia -->
