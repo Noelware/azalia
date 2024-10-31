@@ -19,25 +19,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#[test]
-fn merge() {
-    let cases = trybuild::TestCases::new();
-    cases.compile_fail("./tests/ui/merge/union.rs");
-    cases.compile_fail("./tests/ui/merge/enum.rs");
+use azalia_config_derive::env_test;
 
-    cases.pass("./tests/ui/merge/strategy_multi.rs");
-    cases.pass("./tests/ui/merge/custom_strategy.rs");
-    cases.pass("./tests/ui/merge/skip_test.rs");
-    cases.pass("./tests/ui/merge/generics.rs");
-    cases.pass("./tests/ui/merge/unnamed.rs");
-    cases.pass("./tests/ui/merge/struct.rs");
-}
+#[env_test]
+fn heck(a: String) {}
 
-#[test]
-#[cfg(feature = "unstable")]
-fn unstable_env_test() {
-    let cases = trybuild::TestCases::new();
-
-    cases.compile_fail("./tests/ui/unstable/env_test/disallow_inputs.rs");
-    cases.pass("./tests/ui/unstable/env_test/should_work.rs");
-}
+fn main() {}

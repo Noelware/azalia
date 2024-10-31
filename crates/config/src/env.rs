@@ -21,6 +21,8 @@
 
 //! Types and functions that interact with the system environment variables.
 
+use std::{collections::HashSet, env::set_var, ffi::OsStr};
+
 /// Represents a guard that sets an environment variable and removes it as its [`Drop`] impl. This is
 /// mainly useful for testing and shouldn't be used in production code.
 ///
@@ -28,6 +30,8 @@
 /// This is safe to call in a single-threaded environment but might be unstable and unsafe
 /// to call when in a multi-threaded situation. As advertised, this is mainly for unit testing
 /// and shouldn't be used in other production code, so it is safe to call at any `#[test]` fn.
+///
+/// As of Rust edition 2024, `std::env::{set,remove}_var` will be considered unsafe.
 ///
 /// ## Example
 /// ```
@@ -135,5 +139,82 @@ pub fn expand(env: impl Into<String>, f: impl FnOnce()) {
 /// [EnvGuard#safety]: https://crates.noelware.cloud/~/noelware-config/doc/*/struct.EnvGuard#safety
 pub fn expand_with(env: impl Into<String>, val: impl Into<String>, f: impl FnOnce()) {
     let _guard = EnvGuard::enter_with(env, val);
+    f()
+}
+
+/// Guard that places multiple environment variables together and when it is [`Drop`]ped,
+/// the environment variables get removed.
+///
+/// ## Safety
+/// Please read the safety section in [`EnvGuard`].
+#[derive(Debug)]
+pub struct MultiEnvGuard(HashSet<String>);
+impl MultiEnvGuard {
+    fn expand<S: Into<String>, V: AsRef<OsStr>, I: IntoIterator<Item = (S, V)>>(vars: I) -> MultiEnvGuard {
+        let mut set = HashSet::new();
+        for (key, value) in vars.into_iter().map(|(key, value)| (key.into(), value)) {
+            set_var(key.clone(), value.as_ref());
+            set.insert(key);
+        }
+
+        MultiEnvGuard(set)
+    }
+}
+
+impl Drop for MultiEnvGuard {
+    fn drop(&mut self) {
+        use ::std::env::remove_var;
+
+        for item in &self.0 {
+            remove_var(item);
+        }
+    }
+}
+
+/// Same as [`expand`] but will expand multiple environment variables with values set.
+///
+/// ## Safety
+/// Read the safety section in [`EnvGuard`] on why this can be unsafe.
+///
+/// ## Example
+/// ```
+/// use azalia_config::expand_multi;
+/// use std::env::var;
+///
+/// let guard = expand_multi([
+///     ("HELLO", "world")
+/// ]);
+///
+/// assert!(var("HELLO").is_ok());
+///
+/// // drop the guard
+/// drop(guard);
+///
+/// assert!(var("HELLO").is_err());
+/// ```
+pub fn expand_multi<S: Into<String>, V: AsRef<OsStr>, I: IntoIterator<Item = (S, V)>>(vars: I) -> MultiEnvGuard {
+    MultiEnvGuard::expand(vars)
+}
+
+/// Same as [`expand_with`] but will expand multiple environment variables with values set.
+///
+/// ## Safety
+/// Read the safety section in [`EnvGuard`] on why this can be unsafe.
+///
+/// ## Example
+/// ```
+/// use azalia_config::expand_multi_with;
+/// use std::env::var;
+///
+/// expand_multi_with([
+///     ("HELLO", "world")
+/// ], || {
+///     assert!(var("HELLO").is_ok());
+/// });
+///
+/// assert!(var("HELLO").is_err());
+/// ```
+pub fn expand_multi_with<S: Into<String>, V: AsRef<OsStr>, I: IntoIterator<Item = (S, V)>>(vars: I, f: impl FnOnce()) {
+    let _guard = MultiEnvGuard::expand(vars);
     f()
 }

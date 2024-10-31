@@ -36,6 +36,8 @@ unexpected_cfgs = { level = "warn", check-cfg = ['cfg(noeldoc)'] }
 
 [features]
 default = []
+
+derive-unstable = ["azalia-config-derive?/unstable"]
 derive = ["dep:azalia-config-derive"]
 no-std = []
 

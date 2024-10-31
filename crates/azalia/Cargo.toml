@@ -39,10 +39,11 @@ lazy = ["dep:once_cell"]
 std = []
 
 config = ["dep:azalia-config"]
-config-derive = ["config", "azalia-config/derive"]
+config-derive = ["config", "azalia-config?/derive"]
+config-derive-unsable = ["azalia-config?/derive-unstable"]
 
-log-writers = ["azalia-log/writers"]
-log-tracing-log = ["azalia-log/log"]
+log-writers = ["azalia-log?/writers"]
+log-tracing-log = ["azalia-log?/log"]
 log = ["dep:azalia-log"]
 
 remi-export-crates = ["azalia-remi?/export-crates"]

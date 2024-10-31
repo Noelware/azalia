@@ -510,6 +510,7 @@ name = "azalia-config-derive"
 version = "0.1.0"
 dependencies = [
  "azalia-config",
+ "heck",
  "proc-macro2",
  "quote",
  "syn 2.0.85",

@@ -21,6 +21,7 @@
 
 #![doc(html_logo_url = "https://cdn.floofy.dev/images/trans.png")]
 #![doc = include_str!("../README.md")]
+#![cfg_attr(any(noeldoc, docsrs), feature(doc_cfg))]
 
 use proc_macro::TokenStream;
 use proc_macro2::Span;
@@ -28,6 +29,98 @@ use std::fmt::Display;
 use syn::{parse_macro_input, Data, DataStruct, DeriveInput};
 
 mod merge;
+
+/// The `#[env_test]` procedural macro will generate a test with any set environment variable.
+///
+/// ## Example
+/// ```ignore
+/// use azalia::config::env_test;
+/// use std::env::var;
+///
+/// #[env_test(hello = "world")]
+/// fn test_env() {
+///     assert!(var("HELLO").is_ok());
+/// }
+/// ```
+#[cfg(feature = "unstable")]
+#[cfg_attr(any(noeldoc, docsrs), doc(cfg(feature = "unstable")))]
+#[proc_macro_attribute]
+pub fn env_test(attrs: TokenStream, body: TokenStream) -> TokenStream {
+    use heck::ToShoutySnakeCase;
+    use quote::quote;
+    use syn::{
+        parse::{Parse, ParseStream},
+        punctuated::Punctuated,
+        spanned::Spanned,
+        Expr, ExprAssign, ExprLit, ExprPath, ItemFn, Lit, Signature, Token,
+    };
+
+    struct TestEnv(Vec<(String, String)>);
+    impl Parse for TestEnv {
+        fn parse(input: ParseStream) -> syn::Result<Self> {
+            let punct: Punctuated<ExprAssign, Token![,]> = Punctuated::parse_terminated(input)?;
+            let mut items: Vec<(String, String)> = Vec::new();
+
+            for assignment in punct.into_iter() {
+                let Expr::Path(ExprPath { path, .. }) = *assignment.left else {
+                    return Err(syn::Error::new(
+                        assignment.left.span(),
+                        "expected identifier as left-hand side",
+                    ));
+                };
+
+                let ident = path.require_ident()?;
+                match *assignment.right {
+                    Expr::Lit(ExprLit { lit: Lit::Str(s), .. }) => {
+                        items.push((ident.to_string().to_shouty_snake_case(), s.value()));
+                    }
+
+                    _ => {
+                        return Err(syn::Error::new(
+                            assignment.right.span(),
+                            "expected literal string as right-hand side",
+                        ))
+                    }
+                }
+            }
+
+            Ok(Self(items))
+        }
+    }
+
+    let ItemFn {
+        vis,
+        block,
+        sig: Signature {
+            ident, inputs, output, ..
+        },
+        ..
+    } = parse_macro_input!(body as ItemFn);
+
+    if !inputs.is_empty() {
+        return syn::Error::new(inputs.span(), "expected no inputs")
+            .into_compile_error()
+            .into();
+    }
+
+    let TestEnv(env) = parse_macro_input!(attrs as TestEnv);
+
+    let env_as_slice = env
+        .iter()
+        .map(|(key, value)| quote!((#key, #value),))
+        .collect::<Vec<_>>();
+
+    quote! {
+        #[::core::prelude::v1::test]
+        #vis fn #ident() #output {
+            ::azalia::config::expand_multi_with(
+                [#(#env_as_slice),*],
+                || #output #block
+            )
+        }
+    }
+    .into()
+}
 
 /// Implements the `Merge` trait onto a struct. Unions won't be supported but enums
 /// might be if a concrete implementation can be reasoned.

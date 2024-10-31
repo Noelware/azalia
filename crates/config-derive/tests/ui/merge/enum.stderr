@@ -1,5 +1,5 @@
 error: enums are not supported with #[derive(Merge)]
-  --> ./tests/ui/enum.rs:22:10
+  --> ./tests/ui/merge/enum.rs:22:10
    |
 22 | #[derive(azalia_config_derive::Merge)]
    |          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
