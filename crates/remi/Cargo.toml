@@ -34,7 +34,7 @@ rust-version.workspace = true
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(noeldoc)'] }
 
 [features]
-default = ["export-crates", "all"]
+default = ["export-crates"]
 all = ["gridfs", "azure", "s3", "fs"]
 
 gridfs = ["dep:remi-gridfs", "remi-gridfs/export-crates"]
