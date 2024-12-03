@@ -21,7 +21,7 @@
 
 #![doc(html_logo_url = "https://cdn.floofy.dev/images/trans.png")]
 #![doc = include_str!("../README.md")]
-#![cfg_attr(docsrs, feature(doc_cfg))]
+#![cfg_attr(any(docsrs, noeldoc), feature(doc_cfg))]
 
 #[cfg(feature = "writers")]
 #[cfg_attr(any(docsrs, noeldoc), doc(cfg(feature = "writers")))]

@@ -30,7 +30,7 @@ pub struct Visitor<'s, W: fmt::Write + Send> {
     pub colors: bool,
 }
 
-impl<'s, W: fmt::Write + Send> Visit for Visitor<'s, W> {
+impl<W: fmt::Write + Send> Visit for Visitor<'_, W> {
     fn record_debug(&mut self, field: &tracing::field::Field, value: &dyn fmt::Debug) {
         // Don't even do anything if the `result` was poisoned by an internal formatting error
         if self.result.is_err() {

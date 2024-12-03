@@ -300,7 +300,7 @@ impl Writer {
     }
 }
 
-fn gray_fg<'a>(x: &'a &'a str) -> FgColorDisplay<'a, CustomColor<134, 134, 134>, &str> {
+fn gray_fg<'a>(x: &'a &'a str) -> FgColorDisplay<'a, CustomColor<134, 134, 134>, &'a str> {
     x.fg_rgb::<134, 134, 134>()
 }
 

@@ -48,7 +48,7 @@ macro_rules! impl_visitor_instructions {
     }
 }
 
-impl<'b> Visit for JsonVisitor<'b> {
+impl Visit for JsonVisitor<'_> {
     impl_visitor_instructions! {
         record_f64 => f64,
         record_i64 => i64,
