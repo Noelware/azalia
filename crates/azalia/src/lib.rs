@@ -70,7 +70,7 @@ pub mod rust;
 pub static TRUTHY_REGEX: once_cell::sync::Lazy<regex::Regex> =
     crate::lazy!(regex::Regex::new(r#"^(yes|true|si*|e|enable|1)$"#).unwrap());
 
-/// Returns a [`Cow`]<'static, [`str`]> of a panic message, probably from [`std::panic::catch_unwind`].
+/// Returns a <code>[`Cow`]<'static, [`str`]></code> of a panic message, probably from [`std::panic::catch_unwind`].
 pub fn message_from_panic(error: Box<dyn Any + Send + 'static>) -> Cow<'static, str> {
     if let Some(msg) = error.downcast_ref::<String>() {
         Cow::Owned(msg.clone())

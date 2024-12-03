@@ -39,6 +39,7 @@ lazy = ["dep:once_cell"]
 std = []
 
 config = ["dep:azalia-config"]
+config-url = ["azalia-config?/url"]
 config-derive = ["config", "azalia-config?/derive"]
 config-derive-unsable = ["azalia-config?/derive-unstable"]
 

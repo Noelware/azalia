@@ -19,7 +19,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-//! Module to provide extensions for the [`Any`](std::any::Any) trait.
+//! Module to provide extensions for the [`Any`] trait.
 // This code was ported from charted-server: https://github.com/charted-dev/charted/blob/5f7903ca6c4771d3c6a15681751f773e99483174/src/common/as_any.rs
 
 use std::any::Any;

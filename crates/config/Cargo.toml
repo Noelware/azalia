@@ -40,9 +40,11 @@ default = []
 derive-unstable = ["azalia-config-derive?/unstable"]
 derive = ["dep:azalia-config-derive"]
 no-std = []
+url = ["dep:url"]
 
 [dependencies]
 azalia-config-derive = { version = "0.1.0", path = "../config-derive", optional = true }
+url = { version = "2.5.4", optional = true }
 
 [package.metadata.docs.rs]
 all-features = true

@@ -180,8 +180,13 @@ macro_rules! impl_nonzero_merge {
 }
 
 macro_rules! impl_generic_partial_eq_merge {
-    ($($ty:ty),*) => {
+    (
         $(
+            $(#[$meta:meta])? $ty:ty
+        ),*
+    ) => {
+        $(
+            $(#[$meta])?
             impl Merge for $ty {
                 fn merge(&mut self, other: Self) {
                     // do comparsions
@@ -213,17 +218,30 @@ impl_nonzero_merge!(
 );
 
 impl_unum_merge!(u8, u16, u32, u64, u128, usize);
+
+#[rustfmt::skip]
 impl_generic_partial_eq_merge!(
-    i8, i16, i32, i64, i128, isize, // numbers
+    i8,
+    i16,
+    i32,
+    i64,
+    i128,
+    isize, // numbers
     &str,  // strings
-    bool   // booleans
+    bool,  // booleans
+
+    #[cfg(feature = "url")]
+    ::url::Url,
+
+    #[cfg(feature = "no-std")]
+    ::alloc::string::String,
+
+    #[cfg(not(feature = "no-std"))]
+    String,
+
+    #[cfg(not(feature = "no-std"))]
+    ::std::path::PathBuf,
+
+    #[cfg(not(feature = "no-std"))]
+    &::std::path::Path
 );
-
-#[cfg(feature = "no-std")]
-impl_generic_partial_eq_merge!(alloc::string::String);
-
-#[cfg(not(feature = "no-std"))]
-impl_generic_partial_eq_merge!(String);
-
-#[cfg(not(feature = "no-std"))]
-impl_generic_partial_eq_merge!(std::path::PathBuf);
