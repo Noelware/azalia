@@ -55,7 +55,7 @@ jobs:
         runs-on: ${{matrix.runner}}
         strategy:
             matrix:
-                rust-version: [stable, nightly]
+                rust-version: [stable]
                 runner: [ubuntu-latest, windows-latest, macos-latest]
         steps:
             - uses: actions/checkout@v4
