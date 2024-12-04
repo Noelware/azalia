@@ -1162,9 +1162,9 @@ dependencies = [
 
 [[package]]
 name = "file-format"
-version = "0.25.0"
+version = "0.26.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9ffe3a660c3a1b10e96f304a9413d673b2118d62e4520f7ddf4a4faccfe8b9b9"
+checksum = "e7ef3d5e8ae27277c8285ac43ed153158178ef0f79567f32024ca8140a0c7cd8"
 
 [[package]]
 name = "fnv"
@@ -2541,9 +2541,9 @@ checksum = "2b15c43186be67a4fd63bee50d0303afffcef381492ebe2c5d87f324e1b8815c"
 
 [[package]]
 name = "remi"
-version = "0.9.1"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "64c4338dc59046b354af1f87258f88a55dc46ee4e3633c98e4026ac92e82cfaa"
+checksum = "fe3c79b3a6c88c780d8fedc9d0fa83512757d50545a65bb5f1b6ec4e504daea0"
 dependencies = [
  "async-trait",
  "bytes",
@@ -2551,9 +2551,9 @@ dependencies = [
 
 [[package]]
 name = "remi-azure"
-version = "0.9.1"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5fbc256e20a300d85745bb878047f9aab08eac7ab632f3060854a779b66421b6"
+checksum = "115571fce4169d992999acd1fc0171cef7a0f57399e906a2bfa38f8c6361138f"
 dependencies = [
  "async-trait",
  "azure_core",
@@ -2569,15 +2569,16 @@ dependencies = [
 
 [[package]]
 name = "remi-fs"
-version = "0.9.1"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bc8234ca5950a3fd4c7968d121e0df3c66fdd8700f705969f8cd2602f7f1fc87"
+checksum = "99621b113276ba096c8ee56e09781a1ce209393b9f29dc22c9307c4111936791"
 dependencies = [
  "etcetera",
  "file-format",
  "infer 0.16.0",
  "log",
  "remi",
+ "rustc_version",
  "serde",
  "serde_json",
  "serde_yaml_ng",
@@ -2587,9 +2588,9 @@ dependencies = [
 
 [[package]]
 name = "remi-gridfs"
-version = "0.9.1"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4ae97978ced16901d0c80fa1f87bc64eeaa425069ae3a2cfd811705f384fb824"
+checksum = "141a4e406f67d9154eb740b7bc018edaf143424e5aaf41505c1641309df19125"
 dependencies = [
  "async-trait",
  "bytes",
@@ -2604,9 +2605,9 @@ dependencies = [
 
 [[package]]
 name = "remi-s3"
-version = "0.9.1"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "46024388d5b6897be550595040fb1036dc09e1d420343aaf9df2222add901628"
+checksum = "4ca42e6c3097c5e2791f882fa530f0478063390009b54b0116d11f5f1c5e7991"
 dependencies = [
  "aws-config",
  "aws-credential-types",
