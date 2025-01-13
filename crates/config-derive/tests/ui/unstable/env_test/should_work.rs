@@ -1,5 +1,5 @@
-// 🐻‍❄️🪚 Azalia: Family of crates that implement common Rust code
-// Copyright (c) 2024 Noelware, LLC. <team@noelware.org>
+// 🐻‍❄️🪚 azalia: Noelware's Rust commons library.
+// Copyright (c) 2024-2025 Noelware, LLC. <team@noelware.org>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal

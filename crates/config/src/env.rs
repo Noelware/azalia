@@ -1,5 +1,5 @@
-// 🐻‍❄️🪚 Azalia: Family of crates that implement common Rust code
-// Copyright (c) 2024 Noelware, LLC. <team@noelware.org>
+// 🐻‍❄️🪚 Azalia: Noelware's Rust commons library.
+// Copyright (c) 2024-2025 Noelware, LLC. <team@noelware.org>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -19,202 +19,269 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-//! Types and functions that interact with the system environment variables.
+use std::{
+    collections::HashSet,
+    env::{remove_var, set_var},
+    marker::PhantomData,
+    rc::Rc,
+};
 
-use std::{collections::HashSet, env::set_var, ffi::OsStr};
-
-/// Represents a guard that sets an environment variable and removes it as its [`Drop`] impl. This is
-/// mainly useful for testing and shouldn't be used in production code.
+/// Guard that sets a environment variable and removes it when being [dropped][Drop]. Useful
+/// for testing.
 ///
 /// ## Safety
-/// This is safe to call in a single-threaded environment but might be unstable and unsafe
-/// to call when in a multi-threaded situation. As advertised, this is mainly for unit testing
-/// and shouldn't be used in other production code, so it is safe to call at any `#[test]` fn.
+/// This is safe to call since this struct doesn't allow this guard to be [`Send`]
+/// and [`Sync`], making it impossible to be used within multi-threaded contexts
+/// but it is easy to use in threads anyway.
 ///
-/// As of Rust edition 2024, `std::env::{set,remove}_var` will be considered unsafe.
+/// <div class="warning">
 ///
-/// ## Example
-/// ```
-/// # use azalia_config::{expand, env};
-/// #
-/// # fn main() {
-/// // `expand` will create a `EnvGuard` that will be dropped
-/// // once this goes out of scope
-/// expand("ENV", || {
-///     // this will print `Ok("1")`
-///     println!("{:?}", env!("ENV"));
-/// });
-/// # }
-/// ```
-pub struct EnvGuard(String);
+/// As of Rust edition **2024**, `{set,remove}_var` is considered unsafe and
+/// will call either way but this is a fair warning when using in a non-testing
+/// environment.
+///
+/// </div>
+pub struct EnvGuard {
+    name: String,
+
+    // ensures that `EnvGuard` is `!Send` and `!Sync`
+    _p: PhantomData<Rc<i32>>,
+}
 
 impl EnvGuard {
-    /// Enters a [`EnvGuard`] with the given value as `1`. It is recommended to use
-    /// the [`expand`] function instead to set `env` to `1` and be dropped once a closure
-    /// is done invoking.
+    /// Enters the guard by setting an environment variable from `name` and
+    /// setting its value to `1`.
+    ///
+    /// ## Safety
+    /// Read the **Safety** header in the [`EnvGuard`] type documentation.
     ///
     /// ## Example
     /// ```
-    /// # use azalia_config::EnvGuard;
-    /// #
-    /// # fn main() {
-    /// let _guard = EnvGuard::enter("ENV");
-    /// // `ENV` will be 1 and once it is dropped, it will be no longer available.
-    /// # }
+    /// use azalia_config::env::EnvGuard;
+    /// use std::env;
+    ///
+    /// // The guard lives on this scope
+    /// {
+    ///     let guard = EnvGuard::enter("HELLO");
+    ///     assert!(env::var("HELLO").is_ok());
+    /// }
+    ///
+    /// // and it'll be removed when dropped from scope
+    /// assert!(env::var("HELLO").is_err());
     /// ```
-    pub fn enter(env: impl Into<String>) -> EnvGuard {
-        use ::std::env::set_var;
+    pub fn enter<K: Into<String>>(name: K) -> EnvGuard {
+        let name = name.into();
+        set_var(&name, "1");
 
-        let env = env.into();
-        set_var(&env, "1");
-
-        EnvGuard(env)
+        EnvGuard { name, _p: PhantomData }
     }
 
-    /// Same as [`EnvGuard::enter`], but will set a different value than `1`.
+    /// Enters the guard by setting an environment variable from `name` and
+    /// setting its value to the `value` parameter.
     ///
-    /// [`EnvGuard::enter`]: https://crates.noelware.cloud/~/noelware-config/doc/*/struct.EnvGuard#fn.enter
-    pub fn enter_with(env: impl Into<String>, val: impl Into<String>) -> EnvGuard {
-        use ::std::env::set_var;
+    /// ## Safety
+    /// Read the **Safety** header in the [`EnvGuard`] type documentation.
+    ///
+    /// ## Example
+    /// ```
+    /// use azalia_config::env::EnvGuard;
+    /// use std::env;
+    ///
+    /// // The guard lives on this scope
+    /// {
+    ///     let guard = EnvGuard::enter_with("HELLO", "world");
+    ///     assert!(matches!(env::var("HELLO"), Ok(String::from("world"))));
+    /// }
+    ///
+    /// // and it'll be removed when dropped from scope
+    /// assert!(env::var("HELLO").is_err());
+    /// ```
+    pub fn enter_with(name: impl Into<String>, value: impl Into<String>) -> EnvGuard {
+        let name = name.into();
+        set_var(&name, value.into());
 
-        let env = env.into();
-        set_var(&env, val.into());
-
-        EnvGuard(env)
+        EnvGuard { name, _p: PhantomData }
     }
 }
 
 impl Drop for EnvGuard {
     fn drop(&mut self) {
-        use ::std::env::remove_var;
-
-        remove_var(&self.0);
+        remove_var(&self.name);
     }
 }
 
-/// Expand a system environment variable as `env`, set `env` to `1`, run the specified closure, and remove
-/// the environment variable once the closure is done.
+/// Set a environment variable with the `name` set to the value of `1` and run the closure (`f`).
+///
+/// This is the same as <code>[`EnvGuard::enter`]\(name\)</code> but runs the closure. When the
+/// closure is finished, then the environment variable with the `name` is removed and cannot
+/// be accessed anymore.
+///
+/// This method is useful for testing code that interacts with environment variables. You
+/// can use the <code>#\[expand_env\]</code> attribute-based procedural macro if the `derive` feature
+/// is enabled and it'll use this function in the expanded code.
 ///
 /// ## Safety
-/// View the [safety docs][EnvGuard#safety] to see why this could be unsafe to be called.
+/// Read the **Safety** header in the [`EnvGuard`] type documentation.
 ///
 /// ## Example
 /// ```
-/// # use azalia_config::{expand, env};
-/// #
+/// use azalia_config::env::expand;
+/// use std::env;
+///
 /// # fn main() {
-/// // the `ENV` variable will be dropped once it is printed
 /// expand("ENV", || {
-///     // `env!` is safe to call here and won't fail
-///     println!("{:?}", env!("ENV"));
+///     assert!(env::var("ENV").is_ok());
 /// });
+///
+/// // It is dropped after the closure is called
+/// assert!(env::var("ENV").is_err());
 /// # }
 /// ```
-///
-/// [EnvGuard#safety]: https://crates.noelware.cloud/~/noelware-config/doc/*/struct.EnvGuard#safety
-pub fn expand(env: impl Into<String>, f: impl FnOnce()) {
-    let _guard = EnvGuard::enter(env);
+pub fn expand(name: impl Into<String>, f: impl FnOnce()) {
+    let _guard = EnvGuard::enter(name);
     f()
 }
 
-/// Expand a system environment variable as `env`, set `env` to `val`, run the specified closure, and remove
-/// the environment variable once the closure is done.
+/// Set a environment variable with the `name` set to the value to the `value` parameter
+/// and runs the closure (`f`).
+///
+/// This is the same as <code>[`EnvGuard::enter_with`]\(name, value\)</code> but runs the closure. When the
+/// closure is finished, then the environment variable with the `name` is removed and cannot be accessed
+/// anymore.
+///
+/// This method is useful for testing code that interacts with environment variables. You
+/// can use the <code>#\[expand_env\]</code> attribute-based procedural macro if the `derive` feature
+/// is enabled and it'll use this function in the expanded code.
 ///
 /// ## Safety
-/// View the [safety docs][EnvGuard#safety] to see why this could be unsafe to be called.
+/// Read the **Safety** header in the [`EnvGuard`] type documentation.
 ///
 /// ## Example
 /// ```
-/// # use azalia_config::{expand_with, env};
-/// #
+/// use azalia_config::env::expand_with;
+/// use std::env;
+///
 /// # fn main() {
-/// // the `ENV` variable will be dropped once it is printed
-/// expand_with("ENV", "2", || {
-///     // `env!` is safe to call here and won't fail
-///     println!("{:?}", env!("ENV"));
+/// expand_with("ENV", "var", || {
+///     assert!(matches!(env::var("ENV"), Ok(String::from("var"))));
 /// });
+///
+/// // It is dropped after the closure is called
+/// assert!(env::var("ENV").is_err());
 /// # }
 /// ```
-///
-/// [EnvGuard#safety]: https://crates.noelware.cloud/~/noelware-config/doc/*/struct.EnvGuard#safety
-pub fn expand_with(env: impl Into<String>, val: impl Into<String>, f: impl FnOnce()) {
-    let _guard = EnvGuard::enter_with(env, val);
+pub fn expand_with(name: impl Into<String>, value: impl Into<String>, f: impl FnOnce()) {
+    let _guard = EnvGuard::enter_with(name, value);
     f()
 }
 
-/// Guard that places multiple environment variables together and when it is [`Drop`]ped,
-/// the environment variables get removed.
+/// A guard type that can be used to set multiple environment variables
+/// at once and remove them when being [dropped][Drop].
+///
 ///
 /// ## Safety
-/// Please read the safety section in [`EnvGuard`].
-#[derive(Debug)]
-pub struct MultiEnvGuard(HashSet<String>);
-impl MultiEnvGuard {
-    fn expand<S: Into<String>, V: AsRef<OsStr>, I: IntoIterator<Item = (S, V)>>(vars: I) -> MultiEnvGuard {
-        let mut set = HashSet::new();
-        for (key, value) in vars.into_iter().map(|(key, value)| (key.into(), value)) {
-            set_var(key.clone(), value.as_ref());
-            set.insert(key);
-        }
+/// This is safe to call since this struct doesn't allow this guard to be [`Send`]
+/// and [`Sync`], making it impossible to be used within multi-threaded contexts
+/// but it is easy to use in threads anyway.
+///
+/// <div class="warning">
+///
+/// As of Rust edition **2024**, `{set,remove}_var` is considered unsafe and
+/// will call either way but this is a fair warning when using in a non-testing
+/// environment.
+///
+/// </div>
+pub struct MultipleEnvGuard {
+    names: HashSet<String>,
+    _p: PhantomData<Rc<i32>>,
+}
 
-        MultiEnvGuard(set)
+impl MultipleEnvGuard {
+    /// Create this guard that sets all the environment variables from the iterator
+    /// to a set value and when [dropped][Drop], each variable in the iterator
+    /// is removed.
+    ///
+    /// ## Safety
+    /// Read the **Safety** header in the [`MultipleEnvGuard`] type documentation.
+    ///
+    /// ## Example
+    /// ```
+    /// use azalia_config::env::MultipleEnvGuard;
+    /// use std::env;
+    ///
+    /// {
+    ///     let _guard = MultipleEnvGuard::enter([
+    ///         ("HELLO", "world"),
+    ///         ("WORLD", "domination")
+    ///     ]);
+    ///
+    ///     assert!(matches!(env::var("HELLO"), Ok(String::from("world"))));
+    ///     assert!(matches!(env::var("WORLD"), Ok(String::from("domination"))));
+    /// }
+    ///
+    /// // They will be dropped once the scope runs
+    /// assert!(env::var("HELLO").is_err());
+    /// assert!(env::var("WORLD").is_err());
+    /// ```
+    pub fn enter<K: Into<String>, V: Into<String>, I: IntoIterator<Item = (K, V)>>(variables: I) -> MultipleEnvGuard {
+        let set = variables
+            .into_iter()
+            .map(|(name, value)| {
+                let name = name.into();
+
+                set_var(&name, value.into());
+                name
+            })
+            .fold(HashSet::new(), |mut set, name| {
+                set.insert(name);
+                set
+            });
+
+        MultipleEnvGuard {
+            names: set,
+            _p: PhantomData,
+        }
     }
 }
 
-impl Drop for MultiEnvGuard {
+impl Drop for MultipleEnvGuard {
     fn drop(&mut self) {
-        use ::std::env::remove_var;
-
-        for item in &self.0 {
-            remove_var(item);
+        for name in &self.names {
+            remove_var(name);
         }
     }
 }
 
-/// Same as [`expand`] but will expand multiple environment variables with values set.
+/// Sets multiple environment variables with an iterator and runs the closure (`f`).
+///
+/// This is the same as <code>[`MultipleEnvGuard::enter`]\(...\)</code> but runs a closure
+/// instead of keeping track of a drop guard.
+///
+/// This method is useful for testing code that interacts with environment variables. You
+/// can use the <code>#\[expand_env\]</code> attribute-based procedural macro if the `derive` feature
+/// is enabled and it'll use this function in the expanded code.
 ///
 /// ## Safety
-/// Read the safety section in [`EnvGuard`] on why this can be unsafe.
+/// Read the **Safety** header in the [`MultipleEnvGuard`] type documentation.
 ///
 /// ## Example
 /// ```
-/// use azalia_config::expand_multi;
-/// use std::env::var;
+/// use azalia_config::env::expand_multiple;
+/// use std::env;
 ///
-/// let guard = expand_multi([
-///     ("HELLO", "world")
-/// ]);
-///
-/// assert!(var("HELLO").is_ok());
-///
-/// // drop the guard
-/// drop(guard);
-///
-/// assert!(var("HELLO").is_err());
-/// ```
-pub fn expand_multi<S: Into<String>, V: AsRef<OsStr>, I: IntoIterator<Item = (S, V)>>(vars: I) -> MultiEnvGuard {
-    MultiEnvGuard::expand(vars)
-}
-
-/// Same as [`expand_with`] but will expand multiple environment variables with values set.
-///
-/// ## Safety
-/// Read the safety section in [`EnvGuard`] on why this can be unsafe.
-///
-/// ## Example
-/// ```
-/// use azalia_config::expand_multi_with;
-/// use std::env::var;
-///
-/// expand_multi_with([
-///     ("HELLO", "world")
+/// expand_multiple([
+///     ("HELLO", "world"),
+///     ("WORLD", "domination")
 /// ], || {
-///     assert!(var("HELLO").is_ok());
+///     assert!(matches!(env::var("HELLO"), Ok(String::from("world"))));
+///     assert!(matches!(env::var("WORLD"), Ok(String::from("domination"))));
 /// });
 ///
-/// assert!(var("HELLO").is_err());
+/// // They will be dropped once the closure runs
+/// assert!(env::var("HELLO").is_err());
+/// assert!(env::var("WORLD").is_err());
 /// ```
-pub fn expand_multi_with<S: Into<String>, V: AsRef<OsStr>, I: IntoIterator<Item = (S, V)>>(vars: I, f: impl FnOnce()) {
-    let _guard = MultiEnvGuard::expand(vars);
+pub fn expand_multiple(variables: impl IntoIterator<Item = (impl Into<String>, impl Into<String>)>, f: impl FnOnce()) {
+    let _guard = MultipleEnvGuard::enter(variables);
     f()
 }
