@@ -1,4 +1,4 @@
-# 🐻‍❄️🪚 azalia: Noelware's Rust commons library.
+# 🐻‍❄️🪚 Azalia: Family of crates that implement common Rust code
 # Copyright (c) 2024-2025 Noelware, LLC. <team@noelware.org>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -45,7 +45,7 @@ chrono = { version = "0.4.38", optional = true }
 owo-colors = { version = "4.1.0", optional = true, features = [
     "supports-colors",
 ] }
-serde_json = "1.0.133"
+serde_json = "1.0.135"
 tracing = "0.1.41"
 tracing-log = { version = "0.2.0", optional = true }
 tracing-subscriber = "0.3.19"

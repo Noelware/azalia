@@ -37,6 +37,7 @@ in
       ]));
 
     buildInputs = [
+      cargo-outdated
       cargo-nextest
       cargo-machete
       cargo-expand

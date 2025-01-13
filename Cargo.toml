@@ -23,6 +23,12 @@
 resolver = "2"
 members = ["crates/*"]
 
+[workspace.dependencies]
+proc-macro2 = "1.0.93"
+quote = "1.0.38"
+serde = "1.0.217"
+syn = "2.0.96"
+
 [workspace.package]
 version = "0.1.0"
 authors = ["Noel Towa <cutie@floofy.dev>"]

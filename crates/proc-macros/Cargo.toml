@@ -34,6 +34,6 @@ rust-version.workspace = true
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(noeldoc)'] }
 
 [dependencies]
-proc-macro2 = "1.0.92"
-quote = "1.0.37"
-syn = "2.0.90"
+proc-macro2.workspace = true
+quote.workspace = true
+syn.workspace = true
