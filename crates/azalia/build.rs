@@ -19,27 +19,21 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#[test]
-#[ignore]
-fn merge() {
-    let cases = trybuild::TestCases::new();
-    cases.compile_fail("./tests/ui/merge/union.rs");
-    cases.compile_fail("./tests/ui/merge/enum.rs");
+use rustc_version::Version;
 
-    cases.pass("./tests/ui/merge/strategy_multi.rs");
-    cases.pass("./tests/ui/merge/custom_strategy.rs");
-    cases.pass("./tests/ui/merge/skip_test.rs");
-    cases.pass("./tests/ui/merge/generics.rs");
-    cases.pass("./tests/ui/merge/unnamed.rs");
-    cases.pass("./tests/ui/merge/struct.rs");
-}
+fn main() {
+    println!("cargo::rerun-if-changed=build.rs");
 
-#[cfg(feature = "unstable")]
-#[test]
-#[ignore]
-fn unstable_env_test() {
-    let cases = trybuild::TestCases::new();
+    let Version { minor, .. } = rustc_version::version().unwrap();
+    if minor >= 77 {
+        println!("cargo::rustc-check-cfg=cfg(no_lazy_lock)");
+    }
 
-    cases.compile_fail("./tests/ui/unstable/env_test/disallow_inputs.rs");
-    cases.pass("./tests/ui/unstable/env_test/should_work.rs");
+    if minor >= 80 && cfg!(feature = "lazy") {
+        println!("cargo::warning=`lazy` feature is no longer needed in Rust 1.80 or higher");
+    }
+
+    if minor < 80 {
+        println!("cargo::rustc-cfg=cfg(no_lazy_lock)");
+    }
 }

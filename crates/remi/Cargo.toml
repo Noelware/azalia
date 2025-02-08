@@ -45,6 +45,7 @@ fs = ["dep:remi-fs"]
 unstable = [
     "remi/unstable",
     "remi-gridfs?/unstable",
+    #"remi-azure?/unstable",
     "remi-s3?/unstable",
     "remi-fs?/unstable",
 ]

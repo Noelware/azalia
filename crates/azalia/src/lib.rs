@@ -66,9 +66,21 @@ use alloc::borrow::Cow;
 mod macros;
 pub mod rust;
 
-#[cfg(all(feature = "lazy", feature = "regex"))]
-pub static TRUTHY_REGEX: once_cell::sync::Lazy<regex::Regex> =
-    crate::lazy!(regex::Regex::new(r#"^(yes|true|si*|e|enable|1)$"#).unwrap());
+#[cfg(all(feature = "regex", no_lazy_lock))]
+pub static TRUTHY_REGEX: ::once_cell::sync::Lazy<::regex::Regex> =
+    crate::lazy!(::regex::Regex::new(r#"^(yes|true|si*|e|enable|1)$"#).unwrap());
+
+#[cfg(all(feature = "regex", feature = "lazy", not(no_lazy_lock)))]
+pub static TRUTHY_REGEX: ::once_cell::sync::Lazy<::regex::Regex> =
+    crate::lazy!(::regex::Regex::new(r#"^(yes|true|si*|e|enable|1)$"#).unwrap());
+
+#[cfg(all(feature = "regex", feature = "lazy", no_lazy_lock))]
+pub static TRUTHY_REGEX: ::once_cell::sync::Lazy<::regex::Regex> =
+    crate::lazy!(::regex::Regex::new(r#"^(yes|true|si*|e|enable|1)$"#).unwrap());
+
+#[cfg(all(feature = "regex", not(no_lazy_lock)))]
+pub static TRUTHY_REGEX: ::std::sync::LazyLock<::regex::Regex, _> =
+    ::std::sync::LazyLock::new(|| ::regex::Regex::new(r#"^(yes|true|si*|e|enable|1)$"#).unwrap());
 
 /// Returns a <code>[`Cow`]<'static, [`str`]></code> of a panic message, probably from [`std::panic::catch_unwind`].
 pub fn message_from_panic(error: Box<dyn Any + Send + 'static>) -> Cow<'static, str> {

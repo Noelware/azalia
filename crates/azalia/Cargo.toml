@@ -41,7 +41,7 @@ std = []
 config = ["dep:azalia-config"]
 config-url = ["azalia-config?/url"]
 config-derive = ["config", "azalia-config?/derive"]
-config-derive-unsable = ["azalia-config?/derive-unstable"]
+config-derive-unstable = ["azalia-config?/derive-unstable"]
 
 log-writers = ["azalia-log?/writers"]
 log-tracing-log = ["azalia-log?/log"]
@@ -76,8 +76,11 @@ azalia-log = { version = "=0.1.0", path = "../log", optional = true }
 azalia-proc-macros = { version = "=0.1.0", path = "../proc-macros", optional = true }
 azalia-remi = { version = "=0.1.0", path = "../remi", optional = true }
 azalia-serde = { version = "=0.1.0", path = "../serde", optional = true }
-once_cell = { version = "1.19.0", optional = true }
+once_cell = { version = "1.20.3", optional = true }
 regex = { version = "1.10.4", optional = true }
+
+[build-dependencies]
+rustc_version = "0.4.1"
 
 [package.metadata.docs.rs]
 all-features = true
