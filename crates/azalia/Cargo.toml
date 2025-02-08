@@ -106,6 +106,9 @@ syn = "2.0.100"
 # [build-dependencies]
 # rustc_version = "0.4.1"
 
+[build-dependencies]
+rustc_version = "0.4.1"
+
 [package.metadata.docs.rs]
 all-features = true
 rustdoc-args = ["--cfg", "docsrs"]

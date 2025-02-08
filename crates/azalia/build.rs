@@ -19,23 +19,21 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#[test]
-#[ignore]
-fn merge() {
-    let testcases = trybuild::TestCases::new();
+use rustc_version::Version;
 
-    testcases.pass("./tests/ui/pass/merge/*.rs");
-    testcases.compile_fail("./tests/ui/fail/merge/*.rs");
-}
+fn main() {
+    println!("cargo::rerun-if-changed=build.rs");
 
-#[cfg(feature = "unstable")]
-#[test]
-fn tryfromenv() {
-    let _ = trybuild::TestCases::new();
-}
+    let Version { minor, .. } = rustc_version::version().unwrap();
+    if minor >= 77 {
+        println!("cargo::rustc-check-cfg=cfg(no_lazy_lock)");
+    }
 
-#[cfg(feature = "unstable")]
-#[test]
-fn env() {
-    let _ = trybuild::TestCases::new();
+    if minor >= 80 && cfg!(feature = "lazy") {
+        println!("cargo::warning=`lazy` feature is no longer needed in Rust 1.80 or higher");
+    }
+
+    if minor < 80 {
+        println!("cargo::rustc-cfg=cfg(no_lazy_lock)");
+    }
 }

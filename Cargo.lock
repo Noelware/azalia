@@ -549,6 +549,7 @@ dependencies = [
  "azalia-config",
  "once_cell",
  "regex",
+ "rustc_version",
  "syn 2.0.100",
 ]
 

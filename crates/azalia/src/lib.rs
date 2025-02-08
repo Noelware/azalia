@@ -48,6 +48,7 @@ pub use util::*;
 pub use azalia_config as config;
 
 #[cfg(feature = "std")]
+<<<<<<< HEAD
 #[doc(hidden)]
 pub mod libstd {
     pub use std::{
@@ -58,6 +59,47 @@ pub mod libstd {
         rc::Rc,
         sync::Arc,
     };
+=======
+use std::any::Any;
+
+#[cfg(not(feature = "std"))]
+use core::any::Any;
+
+#[cfg(feature = "std")]
+use std::borrow::Cow;
+
+#[cfg(not(feature = "std"))]
+use alloc::borrow::Cow;
+
+mod macros;
+pub mod rust;
+
+#[cfg(all(feature = "regex", no_lazy_lock))]
+pub static TRUTHY_REGEX: ::once_cell::sync::Lazy<::regex::Regex> =
+    crate::lazy!(::regex::Regex::new(r#"^(yes|true|si*|e|enable|1)$"#).unwrap());
+
+#[cfg(all(feature = "regex", feature = "lazy", not(no_lazy_lock)))]
+pub static TRUTHY_REGEX: ::once_cell::sync::Lazy<::regex::Regex> =
+    crate::lazy!(::regex::Regex::new(r#"^(yes|true|si*|e|enable|1)$"#).unwrap());
+
+#[cfg(all(feature = "regex", feature = "lazy", no_lazy_lock))]
+pub static TRUTHY_REGEX: ::once_cell::sync::Lazy<::regex::Regex> =
+    crate::lazy!(::regex::Regex::new(r#"^(yes|true|si*|e|enable|1)$"#).unwrap());
+
+#[cfg(all(feature = "regex", not(no_lazy_lock)))]
+pub static TRUTHY_REGEX: ::std::sync::LazyLock<::regex::Regex, _> =
+    ::std::sync::LazyLock::new(|| ::regex::Regex::new(r#"^(yes|true|si*|e|enable|1)$"#).unwrap());
+
+/// Returns a <code>[`Cow`]<'static, [`str`]></code> of a panic message, probably from [`std::panic::catch_unwind`].
+pub fn message_from_panic(error: Box<dyn Any + Send + 'static>) -> Cow<'static, str> {
+    if let Some(msg) = error.downcast_ref::<String>() {
+        Cow::Owned(msg.clone())
+    } else if let Some(s) = error.downcast_ref::<&str>() {
+        Cow::Borrowed(s)
+    } else {
+        Cow::Borrowed("unknown panic message received")
+    }
+>>>>>>> 3bc5952 (Disable trybuild tests, attempt to use `LazyLock` in Rust 1.80 or higher)
 }
 
 #[cfg(not(feature = "std"))]
