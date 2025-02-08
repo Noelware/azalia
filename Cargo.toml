@@ -27,7 +27,7 @@ members = ["crates/*"]
 proc-macro2 = "1.0.93"
 quote = "1.0.38"
 serde = "1.0.217"
-syn = "2.0.96"
+syn = "2.0.98"
 
 [workspace.package]
 version = "0.1.0"
@@ -37,4 +37,4 @@ homepage = "https://cargo.noelware.cloud"
 license = "MIT"
 publish = ["noelware"]
 repository = "https://github.com/Noelware/core-rs"
-rust-version = "1.76"
+rust-version = "1.78"

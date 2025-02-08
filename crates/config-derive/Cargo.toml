@@ -49,4 +49,4 @@ syn = { workspace = true, features = ["full"] }
 
 [dev-dependencies]
 azalia-config = { path = "../config", version = "0.1.0" }
-trybuild = "1.0.93"
+trybuild = "1.0.103"

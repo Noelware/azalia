@@ -7,6 +7,7 @@
         "editor.defaultFormatter": "rust-lang.rust-analyzer"
     },
     "files.associations": {
-        ".*-version": "plaintext"
+        ".*-version": "plaintext",
+        ".noeldoc": "plaintext"
     }
 }
