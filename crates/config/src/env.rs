@@ -20,6 +20,7 @@
 // SOFTWARE.
 
 use std::{
+    borrow::Cow,
     collections::HashSet,
     env::{remove_var, set_var},
     marker::PhantomData,
@@ -41,14 +42,14 @@ use std::{
 /// environment.
 ///
 /// </div>
-pub struct EnvGuard {
-    name: String,
+pub struct EnvGuard<'a> {
+    name: Cow<'a, str>,
 
     // ensures that `EnvGuard` is `!Send` and `!Sync`
     _p: PhantomData<Rc<i32>>,
 }
 
-impl EnvGuard {
+impl<'a> EnvGuard<'a> {
     /// Enters the guard by setting an environment variable from `name` and
     /// setting its value to `1`.
     ///
@@ -69,9 +70,14 @@ impl EnvGuard {
     /// // and it'll be removed when dropped from scope
     /// assert!(env::var("HELLO").is_err());
     /// ```
-    pub fn enter<K: Into<String>>(name: K) -> EnvGuard {
+    pub fn enter<K: Into<Cow<'a, str>>>(name: K) -> EnvGuard<'a> {
         let name = name.into();
-        set_var(&name, "1");
+
+        // SAFETY: the guard is !Send & !Sync so it wont be possible
+        //         to be across thread boundaries but this guard
+        //         is mainly for single-threaded programs, so it breaks
+        //         then it isn't really our fault, is it?
+        unsafe { set_var(&*name, "1") };
 
         EnvGuard { name, _p: PhantomData }
     }
@@ -96,17 +102,20 @@ impl EnvGuard {
     /// // and it'll be removed when dropped from scope
     /// assert!(env::var("HELLO").is_err());
     /// ```
-    pub fn enter_with(name: impl Into<String>, value: impl Into<String>) -> EnvGuard {
+    pub fn enter_with(name: impl Into<Cow<'a, str>>, value: impl Into<String>) -> EnvGuard<'a> {
         let name = name.into();
-        set_var(&name, value.into());
+
+        // SAFETY: see rationale on EnvGuard#enter
+        unsafe { set_var(&*name, value.into()) };
 
         EnvGuard { name, _p: PhantomData }
     }
 }
 
-impl Drop for EnvGuard {
+impl Drop for EnvGuard<'_> {
     fn drop(&mut self) {
-        remove_var(&self.name);
+        // SAFETY: see rationale on EnvGuard#enter
+        unsafe { remove_var(&*self.name) };
     }
 }
 
@@ -137,7 +146,7 @@ impl Drop for EnvGuard {
 /// assert!(env::var("ENV").is_err());
 /// # }
 /// ```
-pub fn expand(name: impl Into<String>, f: impl FnOnce()) {
+pub fn expand<'a>(name: impl Into<Cow<'a, str>>, f: impl FnOnce() + 'a) {
     let _guard = EnvGuard::enter(name);
     f()
 }
@@ -170,14 +179,13 @@ pub fn expand(name: impl Into<String>, f: impl FnOnce()) {
 /// assert!(env::var("ENV").is_err());
 /// # }
 /// ```
-pub fn expand_with(name: impl Into<String>, value: impl Into<String>, f: impl FnOnce()) {
+pub fn expand_with<'a>(name: impl Into<Cow<'a, str>>, value: impl Into<String>, f: impl FnOnce() + 'a) {
     let _guard = EnvGuard::enter_with(name, value);
     f()
 }
 
 /// A guard type that can be used to set multiple environment variables
 /// at once and remove them when being [dropped][Drop].
-///
 ///
 /// ## Safety
 /// This is safe to call since this struct doesn't allow this guard to be [`Send`]
@@ -191,12 +199,12 @@ pub fn expand_with(name: impl Into<String>, value: impl Into<String>, f: impl Fn
 /// environment.
 ///
 /// </div>
-pub struct MultipleEnvGuard {
-    names: HashSet<String>,
+pub struct MultipleEnvGuard<'a> {
+    names: HashSet<Cow<'a, str>>,
     _p: PhantomData<Rc<i32>>,
 }
 
-impl MultipleEnvGuard {
+impl<'a> MultipleEnvGuard<'a> {
     /// Create this guard that sets all the environment variables from the iterator
     /// to a set value and when [dropped][Drop], each variable in the iterator
     /// is removed.
@@ -223,13 +231,16 @@ impl MultipleEnvGuard {
     /// assert!(env::var("HELLO").is_err());
     /// assert!(env::var("WORLD").is_err());
     /// ```
-    pub fn enter<K: Into<String>, V: Into<String>, I: IntoIterator<Item = (K, V)>>(variables: I) -> MultipleEnvGuard {
+    pub fn enter<K: Into<Cow<'a, str>>, V: Into<String>, I: IntoIterator<Item = (K, V)>>(
+        variables: I,
+    ) -> MultipleEnvGuard<'a> {
         let set = variables
             .into_iter()
             .map(|(name, value)| {
                 let name = name.into();
 
-                set_var(&name, value.into());
+                // SAFETY: see rationale on EnvGuard#enter
+                unsafe { set_var(&*name, value.into()) };
                 name
             })
             .fold(HashSet::new(), |mut set, name| {
@@ -244,10 +255,11 @@ impl MultipleEnvGuard {
     }
 }
 
-impl Drop for MultipleEnvGuard {
+impl Drop for MultipleEnvGuard<'_> {
     fn drop(&mut self) {
         for name in &self.names {
-            remove_var(name);
+            // SAFETY: see rationale on EnvGuard#enter
+            unsafe { remove_var(&**name) };
         }
     }
 }
@@ -281,7 +293,10 @@ impl Drop for MultipleEnvGuard {
 /// assert!(env::var("HELLO").is_err());
 /// assert!(env::var("WORLD").is_err());
 /// ```
-pub fn expand_multiple(variables: impl IntoIterator<Item = (impl Into<String>, impl Into<String>)>, f: impl FnOnce()) {
+pub fn expand_multiple<'a>(
+    variables: impl IntoIterator<Item = (impl Into<Cow<'a, str>>, impl Into<String>)>,
+    f: impl FnOnce() + 'a,
+) {
     let _guard = MultipleEnvGuard::enter(variables);
     f()
 }
