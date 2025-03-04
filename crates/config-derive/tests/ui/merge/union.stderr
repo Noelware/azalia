@@ -1,7 +1,7 @@
 error: unions are not supported with #[derive(Merge)]
-  --> ./tests/ui/merge/union.rs:23:10
-   |
-23 | #[derive(azalia_config_derive::Merge)]
-   |          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-   |
-   = note: this error originates in the derive macro `azalia_config_derive::Merge` (in Nightly builds, run with -Z macro-backtrace for more info)
+ --> tests/ui/merge/union.rs
+  |
+  | #[derive(azalia_config_derive::Merge)]
+  |          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: this error originates in the derive macro `azalia_config_derive::Merge` (in Nightly builds, run with -Z macro-backtrace for more info)
