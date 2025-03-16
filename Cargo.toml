@@ -21,20 +21,12 @@
 
 [workspace]
 resolver = "2"
-members = ["crates/*"]
-
-[workspace.dependencies]
-proc-macro2 = "1.0.93"
-quote = "1.0.38"
-serde = "1.0.217"
-syn = "2.0.98"
+members = []
 
 [workspace.package]
 version = "0.1.0"
 authors = ["Noel Towa <cutie@floofy.dev>"]
-edition = "2024"
-homepage = "https://crates.noelware.cloud"
+edition = "2021"
 license = "MIT"
-publish = ["noelware"]
 repository = "https://github.com/Noelware/azalia"
-rust-version = "1.85"
+rust-version = "1.83"
