@@ -1,0 +1,111 @@
+# 🐻‍❄️🪚 azalia: Noelware's Rust commons library.
+# Copyright (c) 2024-2025 Noelware, LLC. <team@noelware.org>
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+[package]
+name = "azalia"
+description = "🐻‍❄️🪚 Common utilities and extensions that Noelware uses in all Rust projects"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(noeldoc)'] }
+
+[features]
+default = ["std"]
+
+use-once-cell = ["dep:once_cell"]
+proc-macro = []
+alloc = ["once_cell?/alloc", "azalia-config?/alloc"]
+std = ["once_cell?/std", "azalia-config?/std"]
+
+# deprecated: use `use-once-cell` instead,
+lazy = ["dep:once_cell"]
+
+# "config+macros" = ["azalia-config?/macros"]
+"config+url" = ["azalia-config?/url"]
+config = ["dep:azalia-config"]
+
+[dependencies]
+azalia-config = { version = "0.1.0", path = "../config", optional = true }
+once_cell = { version = "1.21.1", optional = true, default-features = false, features = [
+    "race",
+] }
+regex = { version = "1.11.1", optional = true, default-features = false }
+
+[dev-dependencies]
+syn = "2.0.100"
+
+# [features]
+# regex = ["dep:regex"]
+# lazy = ["dep:once_cell"]
+# std = []
+
+# config = ["dep:azalia-config"]
+# config-url = ["azalia-config?/url"]
+# config-derive = ["config", "azalia-config?/derive"]
+# config-derive-unstable = ["azalia-config?/derive-unstable"]
+
+# log-writers = ["azalia-log?/writers"]
+# log-tracing-log = ["azalia-log?/log"]
+# log = ["dep:azalia-log"]
+
+# remi-export-crates = ["azalia-remi?/export-crates"]
+# remi-serde_yaml_ng = ["azalia-remi?/serde_yaml_ng"]
+# remi-serde_json = ["azalia-remi?/serde_json"]
+# remi-unstable = ["azalia-remi?/unstable"]
+# remi-tracing = ["azalia-remi?/tracing"]
+# remi-gridfs = ["azalia-remi?/gridfs"]
+# remi-serde = ["azalia-remi?/serde"]
+# remi-azure = ["azalia-remi?/azure"]
+# remi-log = ["azalia-remi?/log"]
+# remi-all = ["azalia-remi?/all"]
+# remi-s3 = ["azalia-remi?/s3"]
+# remi-fs = ["azalia-remi?/fs"]
+# remi = ["dep:azalia-remi"]
+
+# serde-tracing = ["azalia-serde?/tracing"]
+# serde-aws = ["azalia-serde?/aws"]
+# serde-s3 = ["azalia-serde?/s3"]
+# serde = ["dep:azalia-serde"]
+
+# proc-macros = ["dep:azalia-proc-macros"]
+
+# default = ["std"]
+
+# [dependencies]
+# azalia-config = { version = "=0.1.0", path = "../config", optional = true }
+# azalia-log = { version = "=0.1.0", path = "../log", optional = true }
+# azalia-proc-macros = { version = "=0.1.0", path = "../proc-macros", optional = true }
+# azalia-remi = { version = "=0.1.0", path = "../remi", optional = true }
+# azalia-serde = { version = "=0.1.0", path = "../serde", optional = true }
+# once_cell = { version = "1.20.3", optional = true }
+# regex = { version = "1.10.4", optional = true }
+
+# [build-dependencies]
+# rustc_version = "0.4.1"
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
