@@ -37,6 +37,7 @@ writers = ["dep:owo-colors", "dep:chrono"]
 default = ["writers"]
 
 [dependencies]
+cfg-if = "1.0.0"
 chrono = { version = "0.4.38", optional = true }
 owo-colors = { version = "4.1.0", optional = true, features = [
     "supports-colors",

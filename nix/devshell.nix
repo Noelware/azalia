@@ -29,7 +29,11 @@
 
   linuxNativeBuildInputs = with pkgs; [lldb];
 
-  nativeBuildInputs = with pkgs; [pkg-config] ++ (optional stdenv.isLinux linuxNativeBuildInputs) ++ (optional stdenv.isDarwin darwinNativeBuildInputs);
+  nativeBuildInputs = with pkgs;
+    [pkg-config]
+    ++ (optional stdenv.isLinux linuxNativeBuildInputs)
+    ++ (optional stdenv.isDarwin darwinNativeBuildInputs);
+
   buildInputs = with pkgs;
     [
       cargo-outdated
@@ -40,6 +44,7 @@
       cargo-deny
 
       (rust-bin.fromRustupToolchainFile ../rust-toolchain.toml)
+      openssl
       git
     ]
     ++ (optional stdenv.isLinux [glibc]);
