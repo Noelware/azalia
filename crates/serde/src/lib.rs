@@ -46,7 +46,7 @@
 //! #[derive(Serialize, Deserialize)]
 //! struct MyStruct {
 //!     #[serde(with = "azalia_serde::aws::region")]
-//!     region: aws_sdk_s3::types::Region
+//!     region: aws_types::region::Region
 //! }
 // ```
 #![doc(html_logo_url = "https://cdn.floofy.dev/images/trans.png")]

@@ -42,7 +42,7 @@ use syn::{parse_macro_input, spanned::Spanned, Data, DeriveInput};
 /// > **NOTE**: This will require the `macros` feature for `azalia_config` or `config+macros` for
 /// > the `azalia` crate.
 ///
-/// ```no_run
+/// ```ignore
 /// # mod azalia {
 /// #     mod config {
 /// #         mod merge {
@@ -99,7 +99,7 @@ pub fn Merge(input: TokenStream) -> TokenStream {
 /// [`TryFromEnv`]: trait.TryFromEnv.html
 ///
 /// ## Example
-/// ```no_run
+/// ```ignore
 /// # mod azalia {
 /// #     mod config {
 /// #         mod env {
@@ -152,12 +152,22 @@ pub fn TryFromEnv(input: TokenStream) -> TokenStream {
     //         .into(),
     // }
 
-    todo!()
+    syn::Error::new(
+        proc_macro2::Span::call_site(),
+        "`#[derive(TryFromEnv)]` is not implemented at this time",
+    )
+    .into_compile_error()
+    .into()
 }
 
 #[cfg(feature = "unstable")]
 #[cfg_attr(any(noeldoc, docsrs), doc(cfg(feature = "unstable")))]
 #[proc_macro_attribute]
 pub fn env_test(attr: TokenStream, body: TokenStream) -> TokenStream {
-    todo!()
+    syn::Error::new(
+        proc_macro2::Span::call_site(),
+        "`#[env::test]` is not implemented at this time",
+    )
+    .into_compile_error()
+    .into()
 }

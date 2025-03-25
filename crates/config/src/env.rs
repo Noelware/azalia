@@ -425,7 +425,7 @@ impl EnvGuard {
     /// // The guard lives on this scope
     /// {
     ///     let guard = EnvGuard::enter_with("HELLO", "world");
-    ///     assert!(matches!(env::var("HELLO"), Ok(String::from("world"))));
+    ///     assert_eq!(env::var("HELLO"), Ok(String::from("world")));
     /// }
     ///
     /// // and it'll be removed when dropped from scope
@@ -562,7 +562,9 @@ mod tests {
     use super::*;
     use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 
-    #[test]
+    // this is a hack since we export `test` if `--features unstable` is enabled
+    #[cfg_attr(not(feature = "unstable"), test)]
+    #[cfg_attr(feature = "unstable", core::prelude::v1::test)]
     fn drop_multiple_env_guard() {
         {
             let mut guards = HashSet::new();
@@ -581,7 +583,8 @@ mod tests {
         assert!(std::env::var("HELLO").is_err());
     }
 
-    #[test]
+    #[cfg_attr(not(feature = "unstable"), test)]
+    #[cfg_attr(feature = "unstable", core::prelude::v1::test)]
     fn map_try_from_env_value() {
         assert!(<HashMap<String, String> as TryFromEnvValue>::try_from_env_value("hello=world".into()).is_ok());
         assert!(<HashMap<String, String> as TryFromEnvValue>::try_from_env_value("helloworld".into()).is_ok());
@@ -600,7 +603,8 @@ mod tests {
         .is_ok());
     }
 
-    #[test]
+    #[cfg_attr(not(feature = "unstable"), test)]
+    #[cfg_attr(feature = "unstable", core::prelude::v1::test)]
     fn set_try_from_env_value() {
         assert!(<HashSet<String> as TryFromEnvValue>::try_from_env_value("hello,world".into()).is_ok());
         assert!(<HashSet<String> as TryFromEnvValue>::try_from_env_value("helloworld".into()).is_ok());
