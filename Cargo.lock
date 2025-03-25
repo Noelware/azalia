@@ -547,10 +547,11 @@ name = "azalia"
 version = "0.1.0"
 dependencies = [
  "azalia-config",
+ "azalia-log",
+ "azalia-remi",
+ "azalia-serde",
  "once_cell",
  "regex",
- "rustc_version",
- "syn 2.0.100",
 ]
 
 [[package]]

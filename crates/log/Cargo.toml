@@ -35,7 +35,6 @@ unexpected_cfgs = { level = "warn", check-cfg = ['cfg(noeldoc)'] }
 [features]
 writers = ["dep:owo-colors", "dep:chrono"]
 default = ["writers"]
-log = ["dep:tracing-log"]
 
 [dependencies]
 cfg-if = "1.0.0"
