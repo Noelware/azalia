@@ -23,6 +23,11 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     systems.url = "github:nix-systems/default";
+    noelware = {
+      url = "github:Noelware/nixpkgs-noelware";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     rust-overlay = {
       url = "github:oxalica/rust-overlay";
       inputs = {
@@ -36,14 +41,29 @@
     };
   };
 
+  nixConfig = {
+    extra-substituters = [
+      # TODO: switch to https://nix.noelware.org
+      "https://noelware.cachix.org"
+    ];
+
+    extra-trusted-public-keys = [
+      "noelware.cachix.org-1:22A8ELRjkqEycSHz+R5A5ReX2jyjU3rftsBmlD6thn0="
+    ];
+  };
+
   outputs = {
     nixpkgs,
     rust-overlay,
     systems,
+    noelware,
     ...
   }: let
     eachSystem = nixpkgs.lib.genAttrs (import systems);
-    overlays = [(import rust-overlay)];
+    overlays = [
+      (import rust-overlay)
+      (import noelware)
+    ];
 
     nixpkgsFor = system:
       import nixpkgs {

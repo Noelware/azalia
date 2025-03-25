@@ -19,4 +19,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-mod macros;
+#[repr(C)]
+#[derive(azalia_config_macros::Merge)]
+union MyUnion {
+    f1: u32,
+    f2: f32,
+}
+
+fn main() {}

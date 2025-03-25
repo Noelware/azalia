@@ -18,37 +18,40 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-{pkgs}:
-with pkgs; let
-  toolchain = pkgs.rust-bin.fromRustupToolchainFile ../rust-toolchain.toml;
-  flags =
-    if stdenv.isLinux
-    then ''-C link-arg=-fuse-ld=mold -C target-cpu=native''
-    else "";
-in
-  mkShell {
-    LD_LIBRARY_PATH = lib.makeLibraryPath [openssl];
-    nativeBuildInputs =
-      [pkg-config]
-      ++ (lib.optional stdenv.isLinux [mold lldb])
-      ++ (lib.optional stdenv.isDarwin (with darwin.apple_sdk.frameworks; [
-        CoreFoundation
-        Security
-      ]));
+{pkgs}: let
+  inherit (pkgs) rust-bin mkShell stdenv lib darwin;
+  inherit (lib) makeLibraryPath optional;
 
-    buildInputs = [
+  darwinNativeBuildInputs = with darwin.apple_sdk.frameworks; [
+    CoreFoundation
+    Security
+  ];
+
+  linuxNativeBuildInputs = with pkgs; [lldb];
+
+  nativeBuildInputs = with pkgs;
+    [pkg-config]
+    ++ (optional stdenv.isLinux linuxNativeBuildInputs)
+    ++ (optional stdenv.isDarwin darwinNativeBuildInputs);
+
+  buildInputs = with pkgs;
+    [
       cargo-outdated
+      cargo-upgrades
       cargo-nextest
       cargo-machete
       cargo-expand
       cargo-deny
 
-      toolchain
+      (rust-bin.fromRustupToolchainFile ../rust-toolchain.toml)
       openssl
       git
-    ];
+    ]
+    ++ (optional stdenv.isLinux [glibc]);
+in
+  mkShell {
+    inherit nativeBuildInputs buildInputs;
 
-    shellHook = ''
-      export RUSTFLAGS="${flags} $RUSTFLAGS"
-    '';
+    LD_LIBRARY_PATH = makeLibraryPath (with pkgs; [openssl]);
+    name = "azalia-dev";
   }

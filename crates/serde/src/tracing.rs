@@ -31,7 +31,7 @@ use tracing::Level;
 /// [`Serializer`] implementation for [`Level`].
 ///
 /// ## Example
-/// ```no_run
+/// ```
 /// # use serde::Serialize;
 /// # use tracing::Level;
 /// #
@@ -54,7 +54,7 @@ pub fn serialize<S: Serializer>(filter: &Level, serializer: S) -> Result<S::Ok, 
 /// [`Deserializer`] implementation for [`Level`].
 ///
 /// ## Example
-/// ```no_run
+/// ```
 /// # use serde::Deserialize;
 /// # use tracing::Level;
 /// #

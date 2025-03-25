@@ -19,70 +19,302 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-//! Module to provide extensions for the [`Any`] trait.
-// This code was ported from charted-server: https://github.com/charted-dev/charted/blob/5f7903ca6c4771d3c6a15681751f773e99483174/src/common/as_any.rs
+//! Defines common types when dealing with the [**any** module](crate::libstd::any).
 
-use std::any::Any;
+use crate::libstd::{self, any};
 
-#[cfg(feature = "std")]
-use std::sync::Arc;
+/// Allows converting a `&self` into a `&dyn Any` or `&mut dyn Any`.
+pub trait AsAny: private::Sealed + any::Any {
+    /// Transform `self` into `&dyn Any`.
+    fn as_any(&self) -> &dyn any::Any;
 
-#[cfg(not(feature = "std"))]
-use alloc::sync::Arc;
-
-/// Trait that is implemented for [`Any`] implementators. It'll *safely* translate `self` into
-/// a reference to `dyn Any`.
-pub trait AsAny: __private::Sealed + Any {
-    /// Transform `self` into `dyn Any` easily.
-    fn as_any(&self) -> &dyn Any;
+    /// Transform a mutable `self` into `&mut dyn Any`.
+    fn as_mut_any(&mut self) -> &mut dyn any::Any;
 }
 
-impl<T: Any> AsAny for T {
-    fn as_any(&self) -> &dyn Any {
+impl<T: any::Any> AsAny for T {
+    fn as_any(&self) -> &dyn any::Any {
+        self
+    }
+
+    fn as_mut_any(&mut self) -> &mut dyn any::Any {
         self
     }
 }
 
-/// Allows downcasting from `self` into `T`, which will need to implement [`AsAny`]. This uses
-/// the word "cast" to make it easier for Noel's brain.
-pub trait Cast: __private::Sealed + AsAny {
-    /// Downcasts `self` into an option of a reference to `T`.
-    fn cast<T: AsAny>(&self) -> Option<&T> {
-        self.as_any().downcast_ref()
-    }
-}
-
-impl<T: ?Sized + AsAny> Cast for T {}
-
-/// Allows upcasting `Arc<dyn T>` ~> `Arc<dyn Any>` easily. You can implement this into your traits:
+/// Allows upcasting from a <code>[`Arc`](libstd::Arc)\<T\></code> -> <code>[`Arc`](libstd::Arc)\<dyn [`Any`](any::Any)\></code>.
 ///
-/// ```rust
-/// # use azalia::rust::AsArcAny;
-/// # use std::sync::Arc;
-/// #
-/// pub trait Trait: AsArcAny {}
-/// pub struct Test;
+/// **Note**: This requires either the `std` or `alloc` feature to be enabled.
 ///
-/// impl Trait for Test {}
-///
-/// let a: Arc<dyn Trait> = Arc::new(Test);
-/// a.as_arc_any();
+/// ## Example
 /// ```
-pub trait AsArcAny: Any {
-    /// Upcasts `Arc<dyn T>` ~> `Arc<dyn Any>`.
-    fn as_arc_any(self: Arc<Self>) -> Arc<dyn Any>;
+/// use azalia::rust::AsArcAny;
+/// use std::{any::Any, sync::Arc};
+///
+/// pub trait A: AsArcAny {}
+///
+/// pub struct B;
+/// impl A for B {}
+///
+/// let b: Arc<dyn A> = Arc::new(B);
+/// let _: Arc<dyn Any> = b.as_arc_any();
+/// ```
+#[cfg(any(feature = "std", feature = "alloc"))]
+#[cfg_attr(any(noeldoc, docsrs), doc(cfg(any(feature = "std", feature = "alloc"))))]
+pub trait AsArcAny: any::Any {
+    /// Upcasts <code>[`Arc`](libstd::Arc)\<Self\></code> -> <code>[`Arc`](libstd::Arc)\<dyn [`Any`](any::Any)\></code> easily.
+    fn as_arc_any(self: libstd::Arc<Self>) -> libstd::Arc<dyn any::Any>;
 }
 
-impl<T: Any> AsArcAny for T {
-    fn as_arc_any(self: Arc<Self>) -> Arc<dyn Any> {
+#[cfg(any(feature = "std", feature = "alloc"))]
+#[cfg_attr(any(noeldoc, docsrs), doc(cfg(any(feature = "std", feature = "alloc"))))]
+impl<T: any::Any> AsArcAny for T {
+    fn as_arc_any(self: libstd::Arc<Self>) -> libstd::Arc<dyn any::Any> {
         self
     }
 }
 
-mod __private {
-    use super::AsAny;
+/// Analogous of [`AsArcAny`] but uses the [`Rc`](libstd::Rc) smart pointer instead.
+///
+/// **Note**: This requires either the `std` or `alloc` feature to be enabled.
+///
+/// ## Example
+/// ```
+/// use azalia::rust::AsRcAny;
+/// use std::{any::Any, rc::Rc};
+///
+/// pub trait A: AsRcAny {}
+///
+/// pub struct B;
+/// impl A for B {}
+///
+/// let b: Rc<dyn A> = Rc::new(B);
+/// let _: Rc<dyn Any> = b.as_rc_any();
+/// ```
+#[cfg(any(feature = "std", feature = "alloc"))]
+#[cfg_attr(any(noeldoc, docsrs), doc(cfg(any(feature = "std", feature = "alloc"))))]
+pub trait AsRcAny: any::Any {
+    /// Upcasts <code>[`Rc`](libstd::Rc)\<Self\></code> -> <code>[`Rc`](libstd::Rc)\<dyn [`Any`](any::Any)\></code> easily.
+    fn as_rc_any(self: libstd::Rc<Self>) -> libstd::Rc<dyn any::Any>;
+}
 
+#[cfg(any(feature = "std", feature = "alloc"))]
+#[cfg_attr(any(noeldoc, docsrs), doc(cfg(any(feature = "std", feature = "alloc"))))]
+impl<T: any::Any> AsRcAny for T {
+    fn as_rc_any(self: libstd::Rc<Self>) -> libstd::Rc<dyn any::Any> {
+        self
+    }
+}
+
+/// Allows upcasting from a <code>[`Box`]\<T\></code> -> <code>[`Box`]\<dyn [`Any`](any::Any)\></code>.
+///
+/// **Note**: This requires either the `std` or `alloc` feature to be enabled.
+///
+/// ## Example
+/// ```
+/// use azalia::rust::AsBoxAny;
+/// use std::any::Any;
+///
+/// pub trait A: AsBoxAny {}
+///
+/// pub struct B;
+/// impl A for B {}
+///
+/// let b: Box<dyn A> = Box::new(B);
+/// let _: Box<dyn Any> = b.as_box_any();
+/// ```
+#[cfg(any(feature = "std", feature = "alloc"))]
+#[cfg_attr(any(noeldoc, docsrs), doc(cfg(any(feature = "std", feature = "alloc"))))]
+pub trait AsBoxAny: any::Any {
+    /// Upcasts <code>[`Box`]\<Self\></code> -> <code>[`Box`]\<dyn [`Any`](any::Any)\></code> easily.
+    fn as_box_any(self: libstd::Box<Self>) -> libstd::Box<dyn any::Any>;
+}
+
+#[cfg(any(feature = "std", feature = "alloc"))]
+#[cfg_attr(any(noeldoc, docsrs), doc(cfg(any(feature = "std", feature = "alloc"))))]
+impl<T: any::Any> AsBoxAny for T {
+    fn as_box_any(self: libstd::Box<Self>) -> libstd::Box<dyn any::Any> {
+        self
+    }
+}
+
+/// A declarative macro to implement for `dyn <Type>`:
+///
+/// - [`<dyn Type>::is`][`\<dyn Type\>::is`]: Checks if `self` is of type `T`.
+/// - [`<dyn Type>::downcast`][`\<dyn Type\>::downcast`]: Downcasts `self` to <code>[`Option`]\<[`&`]T\></code>.
+/// - [`<dyn Type>::downcast_mut`][`\<dyn Type\>::downcast_mut`]: Downcasts `self` to <code>[`Option`]\<[`&mut`] T\></code>.
+/// - [`<dyn Type>::downcast_unchecked`][`\<dyn Type\>::downcast_unchecked`]: Downcasts `self` to <code>[`&`]T</code> unsafely.
+/// - [`<dyn Type>::downcast_unchecked_mut`][`\<dyn Type\>::downcast_unchecked_mut`]: Downcasts `self` to <code>[`&mut`] T</code> unsafely.
+///
+/// [`\<dyn Type\>::downcast_unchecked_mut`]: https://doc.rust-lang.org/std/any/trait.Any.html#method.downcast_mut_unchecked
+/// [`\<dyn Type\>::downcast_unchecked`]: https://doc.rust-lang.org/std/any/trait.Any.html#method.downcast_ref_unchecked
+/// [`\<dyn Type\>::downcast_mut`]: https://doc.rust-lang.org/std/any/trait.Any.html#method.downcast_mut
+/// [`\<dyn Type\>::downcast`]: https://doc.rust-lang.org/std/any/trait.Any.html#method.downcast_ref
+/// [`\<dyn Type\>::is`]: https://doc.rust-lang.org/std/any/trait.Any.html#method.is
+#[macro_export]
+macro_rules! impl_dyn_any {
+    ($Ty:ident) => {
+        const _: () = {
+            impl dyn $Ty + 'static {
+                /// Compare if `self` is of type `T`, similar to [`<dyn Any>::is`][`\<dyn Any\>::is`].
+                ///
+                /// [`\<dyn Any\>::is`]: https://doc.rust-lang.org/std/any/trait.Any.html#method.is
+                pub fn is<T: ::core::any::Any>(&self) -> bool {
+                    ::core::any::Any::type_id(self) == ::core::any::TypeId::of::<T>()
+                }
+
+                /// Downcasts `self` to `T` by comparing the type. Otherwise,
+                /// returns [`None`].
+                ///
+                /// This method is similar to [`<dyn Any>::downcast_ref`][`\<dyn Any\>::downcast_ref`].
+                ///
+                /// [`\<dyn Any\>::downcast_ref`]: https://doc.rust-lang.org/std/any/trait.Any.html#method.downcast_ref
+                pub fn downcast<T: ::core::any::Any>(&self) -> ::core::option::Option<&T> {
+                    if self.is::<T>() {
+                        // Safety: we checked if `self` is `T`.
+                        Some(unsafe { self.downcast_unchecked() })
+                    } else {
+                        None
+                    }
+                }
+
+                /// Downcasts `mut self` to `&mut T` by comparing the type. Otherwise,
+                /// returns [`None`].
+                ///
+                /// This method is similar to [`<dyn Any>::downcast_mut`][`\<dyn Any\>::downcast_mut`].
+                ///
+                /// [`\<dyn Any\>::downcast_mut`]: https://doc.rust-lang.org/std/any/trait.Any.html#method.downcast_mut
+                pub fn downcast_mut<T: ::core::any::Any>(&mut self) -> ::core::option::Option<&mut T> {
+                    if self.is::<T>() {
+                        // Safety: we checked if `self` is `T`.
+                        Some(unsafe { self.downcast_mut_unchecked() })
+                    } else {
+                        None
+                    }
+                }
+
+                /// Unsafely downcasts `&mut self` into `&mut T`.
+                ///
+                /// This method is similar to [`dyn Any::downcast_ref_unchecked`][`\<dyn Any\>::downcast_ref_unchecked`]
+                /// and can be used in a stable Rust compiler.
+                ///
+                /// ## Safety
+                /// The caller ensures that `self` is of type `T`. *calling this method
+                /// is undefined behaviour! bad bad!...*
+                ///
+                /// [`\<dyn Any\>::downcast_ref_unchecked`]: https://doc.rust-lang.org/std/any/trait.Any.html#method.downcast_ref_unchecked
+                pub unsafe fn downcast_unchecked<T: ::core::any::Any>(&self) -> &T {
+                    ::core::debug_assert!(self.is::<T>());
+                    unsafe { &*(self as *const dyn $Ty as *const T) }
+                }
+
+                /// Unsafely downcasts `&mut self` into `&mut T`.
+                ///
+                /// This method is similar to [`dyn Any::downcast_mut_unchecked`][`\<dyn Any\>::downcast_mut_unchecked`]
+                /// and can be used in a stable Rust compiler.
+                ///
+                /// ## Safety
+                /// The caller ensures that `self` is of type `T`. *calling this method
+                /// is undefined behaviour! bad bad!...*
+                ///
+                /// [`\<dyn Any\>::downcast_mut_unchecked`]: https://doc.rust-lang.org/std/any/trait.Any.html#method.downcast_mut_unchecked
+                pub unsafe fn downcast_mut_unchecked<T: ::core::any::Any>(&mut self) -> &mut T {
+                    ::core::debug_assert!(self.is::<T>());
+                    unsafe { &mut *(self as *mut dyn $Ty as *mut T) }
+                }
+            }
+
+            impl dyn $Ty + Send + 'static {
+                #[doc = concat!("Forwards to [`<dyn ", stringify!($Ty), ">::is`].")]
+                ///
+                #[doc = concat!("[`<dyn ", stringify!($Ty), ">::is`]: trait.", stringify!($Ty), ".html#method.is")]
+                pub fn is<T: ::core::any::Any>(&self) -> bool {
+                    <dyn $Ty>::is::<T>(self)
+                }
+
+                #[doc = concat!("Forwards to [`<dyn ", stringify!($Ty), ">::downcast`].")]
+                ///
+                #[doc = concat!("[`<dyn ", stringify!($Ty), ">::downcast`]: trait.", stringify!($Ty), ".html#method.downcast")]
+                pub fn downcast<T: ::core::any::Any>(&self) -> Option<&T> {
+                    <dyn $Ty>::downcast::<T>(self)
+                }
+
+                #[doc = concat!("Forwards to [`<dyn ", stringify!($Ty), ">::downcast_mut`].")]
+                ///
+                #[doc = concat!("[`<dyn ", stringify!($Ty), ">::downcast_mut`]: trait.", stringify!($Ty), ".html#method.downcast_mut")]
+                pub fn downcast_mut<T: ::core::any::Any>(&mut self) -> Option<&mut T> {
+                    <dyn $Ty>::downcast_mut::<T>(self)
+                }
+
+                #[doc = concat!("Forwards to [`<dyn ", stringify!($Ty), ">::downcast_unchecked`].")]
+                ///
+                /// ## Safety
+                #[doc = concat!("Review the `Safety` section of [`<dyn ", stringify!($Ty), ">::downcast_unchecked`].")]
+                ///
+                #[doc = concat!("[`<dyn ", stringify!($Ty), ">::downcast_unchecked`]: trait.", stringify!($Ty), ".html#method.downcast_unchecked")]
+                pub unsafe fn downcast_unchecked<T: ::core::any::Any>(&self) -> &T {
+                    <dyn $Ty>::downcast_unchecked::<T>(self)
+                }
+
+                #[doc = concat!("Forwards to [`<dyn ", stringify!($Ty), ">::downcast_mut_unchecked`].")]
+                ///
+                /// ## Safety
+                #[doc = concat!("Review the `Safety` section of [`<dyn ", stringify!($Ty), ">::downcast_mut_unchecked`].")]
+                ///
+                #[doc = concat!("[`<dyn ", stringify!($Ty), ">::downcast_mut_unchecked`]: trait.", stringify!($Ty), ".html#method.downcast_mut_unchecked")]
+                pub unsafe fn downcast_mut_unchecked<T: ::core::any::Any>(&mut self) -> &mut T {
+                    <dyn $Ty>::downcast_mut_unchecked::<T>(self)
+                }
+            }
+
+            impl dyn $Ty + Send + Sync + 'static {
+                #[doc = concat!("Forwards to [`<dyn ", stringify!($Ty), ">::is`].")]
+                ///
+                #[doc = concat!("[`<dyn ", stringify!($Ty), ">::is`]: trait.", stringify!($Ty), ".html#method.is")]
+                pub fn is<T: ::core::any::Any>(&self) -> bool {
+                    <dyn $Ty>::is::<T>(self)
+                }
+
+                #[doc = concat!("Forwards to [`<dyn ", stringify!($Ty), ">::downcast`].")]
+                ///
+                #[doc = concat!("[`<dyn ", stringify!($Ty), ">::downcast`]: trait.", stringify!($Ty), ".html#method.downcast")]
+                pub fn downcast<T: ::core::any::Any>(&self) -> Option<&T> {
+                    <dyn $Ty>::downcast::<T>(self)
+                }
+
+                #[doc = concat!("Forwards to [`<dyn ", stringify!($Ty), ">::downcast_mut`].")]
+                ///
+                #[doc = concat!("[`<dyn ", stringify!($Ty), ">::downcast_mut`]: trait.", stringify!($Ty), ".html#method.downcast_mut")]
+                pub fn downcast_mut<T: ::core::any::Any>(&mut self) -> Option<&mut T> {
+                    <dyn $Ty>::downcast_mut::<T>(self)
+                }
+
+                #[doc = concat!("Forwards to [`<dyn ", stringify!($Ty), ">::downcast_unchecked`].")]
+                ///
+                /// ## Safety
+                #[doc = concat!("Review the `Safety` section of [`<dyn ", stringify!($Ty), ">::downcast_unchecked`].")]
+                ///
+                #[doc = concat!("[`<dyn ", stringify!($Ty), ">::downcast_unchecked`]: trait.", stringify!($Ty), ".html#method.downcast_unchecked")]
+                pub unsafe fn downcast_unchecked<T: ::core::any::Any>(&self) -> &T {
+                    <dyn $Ty>::downcast_unchecked::<T>(self)
+                }
+
+                #[doc = concat!("Forwards to [`<dyn ", stringify!($Ty), ">::downcast_mut_unchecked`].")]
+                ///
+                /// ## Safety
+                #[doc = concat!("Review the `Safety` section of [`<dyn ", stringify!($Ty), ">::downcast_mut_unchecked`].")]
+                ///
+                #[doc = concat!("[`<dyn ", stringify!($Ty), ">::downcast_mut_unchecked`]: trait.", stringify!($Ty), ".html#method.downcast_mut_unchecked")]
+                pub unsafe fn downcast_mut_unchecked<T: ::core::any::Any>(&mut self) -> &mut T {
+                    <dyn $Ty>::downcast_mut_unchecked::<T>(self)
+                }
+            }
+        };
+    };
+}
+
+mod private {
     pub trait Sealed {}
 
-    impl<T: ?Sized + AsAny> Sealed for T {}
+    impl<T: ?Sized + super::AsAny> Sealed for T {}
 }

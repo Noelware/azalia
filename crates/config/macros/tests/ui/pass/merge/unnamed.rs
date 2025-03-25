@@ -19,9 +19,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-use azalia_config_derive::env_test;
+#[derive(azalia_config_macros::Merge)]
+#[merge(crate = ::azalia_config)]
+struct MyStruct1;
 
-#[env_test]
-fn heck(a: String) {}
+#[derive(azalia_config_macros::Merge)]
+#[merge(crate = ::azalia_config)]
+struct MyStruct2(usize);
 
 fn main() {}

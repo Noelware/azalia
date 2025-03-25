@@ -18,25 +18,3 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-
-use azalia_config::merge::Merge;
-
-#[derive(Debug, azalia_config_derive::Merge)]
-#[merge(crate = ::azalia_config)]
-struct Something {
-    #[merge(strategy = azalia_config::merge::strategy::strings::append)]
-    a: String,
-}
-
-fn main() {
-    let mut a = Something {
-        a: String::from("weow"),
-    };
-
-    let b = Something {
-        a: String::from("heck"),
-    };
-
-    a.merge(b);
-    assert_eq!(a.a, "weowheck");
-}

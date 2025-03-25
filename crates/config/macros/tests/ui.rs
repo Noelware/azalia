@@ -19,8 +19,23 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-mod args;
-pub use args::*;
+#[test]
+#[ignore]
+fn merge() {
+    let testcases = trybuild::TestCases::new();
 
-mod expand;
-pub use expand::*;
+    testcases.pass("./tests/ui/pass/merge/*.rs");
+    testcases.compile_fail("./tests/ui/fail/merge/*.rs");
+}
+
+#[cfg(feature = "unstable")]
+#[test]
+fn tryfromenv() {
+    let _ = trybuild::TestCases::new();
+}
+
+#[cfg(feature = "unstable")]
+#[test]
+fn env() {
+    let _ = trybuild::TestCases::new();
+}

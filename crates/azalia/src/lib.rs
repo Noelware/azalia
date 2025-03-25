@@ -19,17 +19,29 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+//! # 🐻‍❄️🪚 `azalia`
+//! Azalia is a family of crated maintained and used by [Noelware, LLC.] that implement common functionality
+//! between all of Noelware's Rust codebases.
+//!
+//! This crate is a centeralised and easily consumable crate that can cherry-pick Azalia crates that you
+//! need under a common module (i.e, `azalia-remi` -> `azalia::remi`) via Cargo's crate features feature.
+//!
+//! [Noelware, LLC.]: https://noelware.org
+
 #![doc(html_logo_url = "https://cdn.floofy.dev/images/trans.png")]
-#![doc = include_str!("../README.md")]
+#![doc(html_favicon_url = "https://cdn.floofy.dev/images/trans.png")]
 #![cfg_attr(any(noeldoc, docsrs), feature(doc_cfg))]
 #![cfg_attr(not(feature = "std"), no_std)]
-#![allow(rustdoc::broken_intra_doc_links)] // we use GitHub's alerts and rustdoc doesn't like them
 
-#[cfg(not(feature = "std"))]
-extern crate core as std;
-
-#[cfg(not(feature = "std"))]
+#[cfg(all(not(feature = "std"), feature = "alloc"))]
 extern crate alloc;
+
+pub mod rust;
+
+mod macros;
+mod util;
+
+pub use util::*;
 
 #[cfg(feature = "config")]
 #[cfg_attr(any(noeldoc, docsrs), doc(cfg(feature = "config")))]
@@ -38,10 +50,6 @@ pub use azalia_config as config;
 #[cfg(feature = "log")]
 #[cfg_attr(any(noeldoc, docsrs), doc(cfg(feature = "log")))]
 pub use azalia_log as log;
-
-#[cfg(feature = "proc-macros")]
-#[cfg_attr(any(noeldoc, docsrs), doc(cfg(feature = "proc-macros")))]
-pub use azalia_proc_macros as proc_macros;
 
 #[cfg(feature = "remi")]
 #[cfg_attr(any(noeldoc, docsrs), doc(cfg(feature = "remi")))]
@@ -52,105 +60,29 @@ pub use azalia_remi as remi;
 pub use azalia_serde as serde;
 
 #[cfg(feature = "std")]
-use std::any::Any;
-
-#[cfg(not(feature = "std"))]
-use core::any::Any;
-
-#[cfg(feature = "std")]
-use std::borrow::Cow;
-
-#[cfg(not(feature = "std"))]
-use alloc::borrow::Cow;
-
-mod macros;
-pub mod rust;
-
-#[cfg(all(feature = "lazy", feature = "regex"))]
-pub static TRUTHY_REGEX: once_cell::sync::Lazy<regex::Regex> =
-    crate::lazy!(regex::Regex::new(r#"^(yes|true|si*|e|enable|1)$"#).unwrap());
-
-/// Returns a <code>[`Cow`]<'static, [`str`]></code> of a panic message, probably from [`std::panic::catch_unwind`].
-pub fn message_from_panic(error: Box<dyn Any + Send + 'static>) -> Cow<'static, str> {
-    if let Some(msg) = error.downcast_ref::<String>() {
-        Cow::Owned(msg.clone())
-    } else if let Some(s) = error.downcast_ref::<&str>() {
-        Cow::Borrowed(s)
-    } else {
-        Cow::Borrowed("unknown panic message received")
-    }
+#[doc(hidden)]
+pub mod libstd {
+    pub use std::{
+        any,
+        borrow::Cow,
+        boxed::Box,
+        collections::{BTreeMap, BTreeSet},
+        rc::Rc,
+        sync::Arc,
+    };
 }
 
-#[cfg(test)]
-mod tests {
-    use super::{hashmap, hashset};
+#[cfg(not(feature = "std"))]
+#[doc(hidden)]
+pub mod libstd {
+    pub use core::any;
 
-    #[cfg(feature = "lazy")]
-    #[test]
-    fn test_lazy_exprs() {
-        let weow = crate::lazy!("weow");
-        assert_eq!(*weow, "weow");
-    }
-
-    #[cfg(all(feature = "lazy", feature = "regex"))]
-    #[test]
-    fn test_truthy_values() {
-        // force-init lazy value
-        let regex: &regex::Regex = &*crate::TRUTHY_REGEX;
-
-        assert!(regex.is_match("true"));
-        assert!(regex.is_match("yes"));
-        assert!(regex.is_match("si"));
-        assert!(regex.is_match("siiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii"));
-        assert!(regex.is_match("enable"));
-        assert!(regex.is_match("1"));
-    }
-
-    #[test]
-    fn test_hashmap_variants() {
-        #[cfg(feature = "std")]
-        use std::collections::HashMap;
-
-        #[cfg(not(feature = "std"))]
-        use alloc::collections::HashMap;
-
-        let _map = hashmap!(String, String);
-        let _map: HashMap<String, String> = hashmap! {
-            "key" => "value"
-        };
-
-        let _map = hashmap!(String, String, {
-            "hello" => "world",
-            "weow" => "true"
-        });
-    }
-
-    #[test]
-    fn test_hashset_variants() {
-        #[cfg(feature = "std")]
-        use std::collections::HashSet;
-
-        #[cfg(not(feature = "std"))]
-        use alloc::collections::HashSet;
-
-        let _set: HashSet<u32> = hashset!();
-        let _set: HashSet<i32> = hashset!(1, 2, 3);
-        let _set = hashset!(i32);
-    }
-
-    #[cfg(feature = "std")]
-    #[test]
-    fn test_message_from_panic() {
-        use super::message_from_panic;
-        use std::panic::catch_unwind;
-
-        fn __should_panic() {
-            todo!()
-        }
-
-        assert_eq!(
-            message_from_panic(catch_unwind(__should_panic).unwrap_err()),
-            "not yet implemented"
-        );
-    }
+    #[cfg(feature = "alloc")]
+    pub use alloc::{
+        borrow::Cow,
+        boxed::Box,
+        collections::{BTreeMap, BTreeSet},
+        rc::Rc,
+        sync::Arc,
+    };
 }

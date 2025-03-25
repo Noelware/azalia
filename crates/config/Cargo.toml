@@ -21,13 +21,11 @@
 
 [package]
 name = "azalia-config"
-description = "🐻‍❄️🪚 Provides useful Rust types to make configurations more easier."
+description = "🐻‍❄️🪚 Defines traits, types, and utilities for dealing with application configuration"
 version.workspace = true
 authors.workspace = true
 edition.workspace = true
-homepage.workspace = true
 license.workspace = true
-publish.workspace = true
 repository.workspace = true
 rust-version.workspace = true
 
@@ -35,15 +33,16 @@ rust-version.workspace = true
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(noeldoc)'] }
 
 [features]
-default = []
+default = ["std"]
 
-derive-unstable = ["azalia-config-derive?/unstable"]
-derive = ["dep:azalia-config-derive"]
-no-std = []
-url = ["dep:url"]
+unstable = ["azalia-config-macros?/unstable"]
+macros = ["dep:azalia-config-macros"]
+
+alloc = []
+std = []
 
 [dependencies]
-azalia-config-derive = { version = "0.1.0", path = "../config-derive", optional = true }
+azalia-config-macros = { version = "=0.1.0", path = "./macros", optional = true }
 url = { version = "2.5.4", optional = true }
 
 [package.metadata.docs.rs]

@@ -19,30 +19,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-use azalia_config::merge::Merge;
-
-#[derive(Debug, azalia_config_derive::Merge)]
+#[derive(Debug, azalia_config_macros::Merge)]
 #[merge(crate = ::azalia_config)]
-struct Something {
-    #[merge(strategy = azalia_config::merge::strategy::strings::append)]
-    a: String,
-
-    #[merge(strategy = azalia_config::merge::strategy::strings::overwrite_empty)]
-    b: String,
+struct Generic<'a, T> {
+    #[merge(skip)]
+    _marker: std::marker::PhantomData<&'a T>,
 }
 
-fn main() {
-    let mut a = Something {
-        a: String::from("weow"),
-        b: String::new(),
-    };
-
-    let b = Something {
-        a: String::from("heck"),
-        b: String::from("weow"),
-    };
-
-    a.merge(b);
-    assert_eq!(a.a, "weowheck");
-    assert_eq!(a.b, "weow");
-}
+fn main() {}

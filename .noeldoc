@@ -19,11 +19,23 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#[repr(C)]
-#[derive(azalia_config_derive::Merge)]
-union MyUnion {
-    f1: u32,
-    f2: f32,
-}
+import { parse, safeGet }: "@std/toml";
+import { Experiment }: "@noeldoc/types";
+import { omit }: "@std/util";
 
-fn main() {}
+val cargoTOML = parse("${noeldoc.wd}/Cargo.toml").unwrap();
+val workspace = defineWorkspace("azalia", { ws ->
+    ws.description = "🐻‍❄️🪚 Noelware's Rust commons library.";
+    ws.version = safeGet(cargoTOML, "workspace/package/version").unwrap();
+    ws.experiments = [
+        Experiment::DockerRunner
+    ];
+});
+
+val rustdoc = workspace.extensions.get("noeldoc/rustdoc");
+rustdoc.configure({
+    inherit cargoTOML;
+
+    .crates = omit(cargoTOML.workspace.members, ["azalia-serde"]);
+    .all-features = true;
+});

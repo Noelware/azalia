@@ -19,9 +19,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+//! # 🐻‍❄️🪚 `azalia-log`
+//! The **log** Rust crate provides a JSON-compat writer that mimics the output of Logstash
+//! and a beautiful prettified logger that is used in all Noelware products and services.
+
 #![doc(html_logo_url = "https://cdn.floofy.dev/images/trans.png")]
-#![doc = include_str!("../README.md")]
-#![cfg_attr(any(docsrs, noeldoc), feature(doc_cfg))]
+#![doc(html_favicon_url = "https://cdn.floofy.dev/images/trans.png")]
+#![cfg_attr(any(noeldoc, docsrs), feature(doc_cfg))]
 
 #[cfg(feature = "writers")]
 #[cfg_attr(any(docsrs, noeldoc), doc(cfg(feature = "writers")))]
@@ -113,7 +117,7 @@ impl<S: Subscriber + for<'l> LookupSpan<'l>> Layer<S> for WriteLayer<S> {
         let mut writer = self.writer.write().unwrap();
         if let Some(ref fn_) = self.write_fn {
             cfg_if::cfg_if! {
-                if #[cfg(feature = "log")] {
+                if #[cfg(feature = "tracing-log")] {
                     use tracing_log::NormalizeEvent;
 
                     let metadata = event.normalized_metadata();

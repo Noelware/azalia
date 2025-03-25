@@ -3,12 +3,6 @@ The **azalia-serde** crate provides blanket `serde` implementations for crates t
 
 We only provide implementations to Rust types that are most used by us, so we will probably reject most requests to add more types other than the ones listed.
 
-> [!NOTE]
-> This crate is apart of the [Azalia](https://github.com/Noelware/azalia) family of crates by [Noelware, LLC.](https://noelware.org)
->
-> This is the only crate that is available on [`crates.io`](https://crates.io/crates/azalia-serde) instead of Noelware's public
-> Cargo registry where most Azalia crates live in.
-
 ## Usage
 ### `tracing::Level` (requires `tracing` feature)
 ```rust,ignore

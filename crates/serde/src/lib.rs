@@ -19,10 +19,39 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+//! # 🐻‍❄️🪚 `azalia-serde`
+//! The **azalia-serde** crate provides blanket `serde` implementations for crates that don't expose any. This
+//! uses Cargo's crate features to explicitly enable which implementations you need, rather than adding them all
+//! at once.
+//!
+//! We only provide implementations to Rust types that are most used by us, so we will probably reject most
+//! requests to add more types other than the ones listed.
+//!
+//! ## Usage
+//! ### `tracing::Level` (requires `tracing` feature)
+//! ```
+//! use serde::{Serialize, Deserialize};
+//!
+//! #[derive(Serialize, Deserialize)]
+//! struct MyStruct {
+//!     #[serde(with = "azalia_serde::tracing")]
+//!     level: tracing::Level,
+//! }
+//! ```
+//!
+//! ### `aws_types::types::Region` (requires `aws` feature)
+//! ```
+//! use serde::{Serialize, Deserialize};
+//!
+//! #[derive(Serialize, Deserialize)]
+//! struct MyStruct {
+//!     #[serde(with = "azalia_serde::aws::region")]
+//!     region: aws_types::region::Region
+//! }
+// ```
 #![doc(html_logo_url = "https://cdn.floofy.dev/images/trans.png")]
-#![doc = include_str!("../README.md")]
-#![cfg_attr(docsrs, feature(doc_cfg))]
-#![allow(rustdoc::broken_intra_doc_links)] // we use GitHub's alerts and rustdoc doesn't like them
+#![doc(html_favicon_url = "https://cdn.floofy.dev/images/trans.png")]
+#![cfg_attr(any(noeldoc, docsrs), feature(doc_cfg))]
 
 #[cfg(feature = "tracing")]
 #[cfg_attr(any(docsrs, noeldoc), doc(cfg(feature = "tracing")))]

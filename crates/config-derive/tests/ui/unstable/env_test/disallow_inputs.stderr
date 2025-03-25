@@ -1,5 +1,0 @@
-error: expected no inputs
- --> tests/ui/unstable/env_test/disallow_inputs.rs
-  |
-  | fn heck(a: String) {}
-  |         ^

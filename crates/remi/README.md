@@ -14,10 +14,7 @@ This uses Cargo's crate features to implicitilly allow you to pick out which Rem
 //
 // [dependencies]
 // tokio = { version = "*", features = ["full"] }
-//
-// azalia-remi = { version = "^0", features = ["fs"], registry = "noelware" }
-// # OR
-// azalia-remi = { version = "^0", features = ["fs"], git = "https://github.com/Noelware/azalia" }
+// azalia-remi = { version = "^0", features = ["fs"] }
 
 use azalia_remi::{
     StorageService,

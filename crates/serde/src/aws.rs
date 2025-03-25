@@ -32,7 +32,7 @@ pub mod region {
     /// your own serializers as well.
     ///
     /// ## Example
-    /// ```no_run
+    /// ```
     /// # use aws_types::region::Region;
     /// # use serde::Serialize;
     /// #
@@ -54,7 +54,7 @@ pub mod region {
     /// your own serializers as well.
     ///
     /// ## Example
-    /// ```no_run
+    /// ```
     /// # use aws_types::region::Region;
     /// # use serde::Deserialize;
     /// #

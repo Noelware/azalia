@@ -21,9 +21,10 @@
 
 use azalia_config::merge::Merge;
 
-#[derive(Debug, azalia_config_derive::Merge)]
+#[derive(Debug, azalia_config_macros::Merge)]
 #[merge(crate = ::azalia_config)]
 struct Something {
+    #[merge(strategy = azalia_config::merge::strategy::strings::append)]
     a: String,
 }
 
@@ -37,5 +38,5 @@ fn main() {
     };
 
     a.merge(b);
-    assert_eq!(a.a, "heck");
+    assert_eq!(a.a, "weowheck");
 }

@@ -19,12 +19,24 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#[derive(azalia_config_derive::Merge)]
-#[merge(crate = ::azalia_config)]
-struct MyStruct1;
+use azalia_config::merge::Merge;
 
-#[derive(azalia_config_derive::Merge)]
+#[derive(Debug, azalia_config_macros::Merge)]
 #[merge(crate = ::azalia_config)]
-struct MyStruct2(usize);
+struct Something {
+    #[merge(skip)]
+    a: String,
+}
 
-fn main() {}
+fn main() {
+    let mut a = Something {
+        a: String::from("weow"),
+    };
+
+    let b = Something {
+        a: String::from("heck"),
+    };
+
+    a.merge(b);
+    assert_eq!(a.a, "weow");
+}

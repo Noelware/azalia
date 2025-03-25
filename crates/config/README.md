@@ -1,14 +1,7 @@
-# 🐻‍❄️🪚 `azalia-config`
-The **azalia-config** crate provides useful Rust macros and traits to make configurations more easier.
-
-## `libstd` compatibility
-This crate works without `libstd` present and can be useful for the merge feature of this crate. To disable `libstd` usage in this crate, use `default-features = false` in your **Cargo.toml**.
+# 🐻‍❄️🪚 `azalia::config`
+The **azalia_config** Rust crate defines types and utilities dealing with application configuration.
 
 > [!NOTE]
-> This crate requires [`liballoc`](https://doc.rust-lang.org/stable/alloc) to be available.
-
-```toml
-# Cargo.toml:
-[dependencies]
-azalia-config = { version = "*", registry = "noelware", default-features = false }
-```
+> This crate supports **no-std** environments and **no-alloc** environments with features being disabled if either
+> the `std` or `alloc` crate features are excluded. Documentation in [`docs.rs`](https://docs.rs/azalia-config) will
+> give you information if a trait, function, or module requires either the **std** or **alloc** features.

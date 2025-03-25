@@ -31,7 +31,7 @@ macro_rules! impl_methods {
             /// be used with your own serializer.
             ///
             /// ## Example
-            /// ```no_run
+            /// ```
             #[doc = concat!(" # use aws_sdk_s3::types::", stringify!($name), ";")]
             /// # use serde::Serialize;
             /// #
@@ -53,7 +53,7 @@ macro_rules! impl_methods {
             /// be used with your own serializer.
             ///
             /// ## Example
-            /// ```no_run
+            /// ```
             #[doc = concat!(" # use aws_sdk_s3::types::", stringify!($name), ";")]
             /// # use serde::Deserialize;
             /// #
