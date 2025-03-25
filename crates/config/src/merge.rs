@@ -32,31 +32,38 @@ use crate::libstd::{
     String,
 };
 
-// #[cfg(feature = "macros")]
-// pub use azalia_config_macros::Merge;
+#[cfg(feature = "macros")]
+pub use azalia_config_macros::Merge;
 
 /// Trait that allows deep merging between the same **type** but possibly different values.
 ///
-/// ***This is also a derive macro when the `macros` feature is avaliable: [`#[derive(Merge)]`](merge)***
+/// ***This is also a derive macro when the `macros` feature is avaliable:
+/// <code>#[derive([`Merge`][derive-redirect])]</code>***
 ///
 /// ## Notes
 /// When using the derive macro, the crate path will always be **azalia::config**. You can
-/// set `crate = <path>` when [`#[derive(Merge)]`](merge):
+/// set `crate = <path>` when <code>#[derive([`Merge`][derive-redirect])]</code>:
 ///
 /// ```ignore
 /// #[merge(crate = some::other::crate)]
 /// ```
 ///
+/// If you're using the standalone crate (`azalia-config`), this is unfortunately required
+/// as the proc-macro doesn't understand the dependency tree of the project and since is mainly
+/// for Noelware's use case, we use the centeralised crate approach.
+///
 /// ## Example
 /// ```
+/// # const _: &str = stringify! {
 /// use azalia_config::merge::Merge;
 ///
 /// #[derive(Merge)]
 /// # #[merge(crate = azalia_config)]
 /// pub struct Wrapper(u64);
+/// # };
 /// ```
 ///
-/// [merge]: #
+/// [derive-redirect]: ../merge/derive.Merge.html
 pub trait Merge: Sized {
     fn merge(&mut self, other: Self);
 }

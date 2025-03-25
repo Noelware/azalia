@@ -35,15 +35,14 @@ unexpected_cfgs = { level = "warn", check-cfg = ['cfg(noeldoc)'] }
 [features]
 default = ["std"]
 
-# macros = ["dep:azalia-config-macros"]
-macros = []
+unstable = ["azalia-config-macros?/unstable"]
+macros = ["dep:azalia-config-macros"]
 
-# unstable = ["azalia-config-macros?/unstable"]
-unstable = []
 alloc = []
 std = []
 
 [dependencies]
+azalia-config-macros = { version = "=0.1.0", path = "./macros", optional = true }
 url = { version = "2.5.4", optional = true }
 
 [package.metadata.docs.rs]

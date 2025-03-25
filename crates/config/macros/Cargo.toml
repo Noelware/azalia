@@ -19,14 +19,38 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-[workspace]
-resolver = "2"
-members = ["crates/azalia", "crates/config", "crates/config/macros"]
+[package]
+name = "azalia-config-macros"
+description = "🐻‍❄️🪚 Procedural macros for the `azalia-config` crate, this shouldn't be used directly."
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
 
-[workspace.package]
-version = "0.1.0"
-authors = ["Noel Towa <cutie@floofy.dev>"]
-edition = "2021"
-license = "MIT"
-repository = "https://github.com/Noelware/azalia"
-rust-version = "1.83"
+[lib]
+proc-macro = true
+
+[features]
+default = []
+
+unstable = []
+
+[lints.rust.unexpected_cfgs]
+level = "warn"
+check-cfg = ['cfg(noeldoc)']
+
+[dependencies]
+heck = "0.5.0"
+proc-macro2 = "1.0.94"
+quote = "1.0.40"
+syn = { version = "2.0.100", features = ["full", "extra-traits"] }
+
+[dev-dependencies]
+azalia-config = { path = "..", version = "0.1.0" }
+trybuild = "1.0.104"
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]

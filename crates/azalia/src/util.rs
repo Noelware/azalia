@@ -24,6 +24,14 @@
     any(feature = "lazy", feature = "use-once-cell"),
     any(feature = "std", feature = "alloc")
 ))]
+/// A thread-safe lazily evaluated [`Regex`](regex::Regex) that is used
+/// for truthy values in system environment variables.
+///
+/// Depending on what crate features you enable, it can be either:
+/// - [`once_cell::sync::Lazy`] if either `use-once-cell` or `lazy` is enabled
+/// - [`std::sync::LazyLock`] if `std` is enabled and `use-once-cell` or `lazy` isn't enabled.
+///
+/// [`once_cell::sync::Lazy`]: https://docs.rs/once_cell/latest/once_cell/sync/struct.Lazy.html
 pub static TRUTHY_REGEX: crate::macros::LazySync<regex::Regex> =
     crate::lazy!(crate::regex!(r#"^(yes|true|si*|e|enable|1)$"#));
 

@@ -1,0 +1,5 @@
+error: merge trait for unions will never be supported
+  --> tests/ui/fail/merge/union.rs:24:1
+   |
+24 | union MyUnion {
+   | ^^^^^

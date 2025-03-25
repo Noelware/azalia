@@ -19,40 +19,24 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-//! # 🐻‍❄️🪚 `azalia-config`
-//! The **azalia_config** Rust crate defines types and utilities dealing with application configuration.
-#![doc(html_logo_url = "https://cdn.floofy.dev/images/trans.png")]
-#![doc(html_favicon_url = "https://cdn.floofy.dev/images/trans.png")]
-#![cfg_attr(any(noeldoc, docsrs), feature(doc_cfg))]
-#![cfg_attr(not(feature = "std"), no_std)]
+use azalia_config::merge::Merge;
 
-#[cfg(all(not(feature = "std"), feature = "alloc"))]
-extern crate alloc;
-
-#[cfg(feature = "std")]
-#[cfg_attr(any(noeldoc, docsrs), doc(cfg(feature = "std")))]
-pub mod env;
-pub mod merge;
-
-#[cfg(feature = "std")]
-pub(crate) mod libstd {
-    pub use std::{
-        collections::{BTreeMap, BTreeSet, HashMap, HashSet},
-        hash::Hash,
-        num,
-        string::String,
-        vec::Vec,
-    };
+#[derive(Debug, azalia_config_macros::Merge)]
+#[merge(crate = ::azalia_config)]
+struct Something {
+    #[merge(skip)]
+    a: String,
 }
 
-#[cfg(not(feature = "std"))]
-pub(crate) mod libstd {
-    pub use core::num;
-
-    #[cfg(feature = "alloc")]
-    pub use alloc::{
-        collections::{BTreeMap, BTreeSet},
-        string::String,
-        vec::Vec,
+fn main() {
+    let mut a = Something {
+        a: String::from("weow"),
     };
+
+    let b = Something {
+        a: String::from("heck"),
+    };
+
+    a.merge(b);
+    assert_eq!(a.a, "weow");
 }

@@ -21,11 +21,11 @@
 
 //! Traits, types, and utilities when dealing with system environment variables.
 
-// #[cfg(feature = "macros")]
-// pub use azalia_config_macros::{FromEnv, TryFromEnv};
+#[cfg(all(feature = "macros", feature = "unstable"))]
+pub use azalia_config_macros::TryFromEnv;
 
-// #[cfg(all(feature = "macros", feature = "unstable"))]
-// pub use azalia_config_macros::env_test as test;
+#[cfg(all(feature = "macros", feature = "unstable"))]
+pub use azalia_config_macros::env_test as test;
 
 use std::{
     char::ParseCharError,
@@ -283,28 +283,27 @@ where
 /// Represents a trait that allows conversion of a collection of system environment
 /// variables for structs or enumerations.
 ///
-/// ***This is also a derive macro: [#\[derive(FromEnv)\]]***
-///
-/// [#\[derive(FromEnv)\]]: #
-///
-/// ## Notes
-/// The derive macro for this trait doesn't support falliable conversions between
-/// environment variables, switch to [`TryFromEnv`] instead.
-///
 /// ## Example
 /// ```ignore
 /// use azalia_config::env::FromEnv;
 ///
-/// #[derive(FromEnv)]
-/// #[env(prefix = "APP_")]
 /// pub struct Config {
-///     #[env("A", default)]
 ///     pub a: String,
+/// }
+///
+/// impl FromEnv for Config {
+///     fn from_env() -> Self {
+///         Config { a: Default::default() }
+///     }
 /// }
 ///
 /// let config = Config::from_env();
 /// // => Config { a: "" }
 /// ```
+#[deprecated(
+    since = "0.1.0",
+    note = "trait is no longer needed as of azalia v0.1.0 (preparation of crates.io ver)"
+)]
 pub trait FromEnv: Sized {
     /// Implicit conversion to return `Self`.
     fn from_env() -> Self;
@@ -312,11 +311,13 @@ pub trait FromEnv: Sized {
 
 /// Analogous to [`FromEnv`] but falliable.
 ///
-/// ***This is also a derive macro: [#\[derive(TryFromEnv)\]]***
-///
-/// [#\[derive(TryFromEnv)\]]: #
+/// ***This is also a derive macro when the `macros` feature is enabled:
+/// <code>#[derive([`TryFromEnv`][derive-redirect])</code>***
 ///
 /// ## Notes
+/// The **#[derive([`TryFromEnv`][derive-redirect])]** macro is unstable! Add
+/// the `unstable` crate feature to use it.
+///
 /// For the derive macro, specifying the error type is required:
 ///
 /// ```ignore
@@ -341,6 +342,8 @@ pub trait FromEnv: Sized {
 /// let config = Config::try_from_env();
 /// assert!(config.is_ok());
 /// ```
+///
+/// [derive-redirect]: derive.TryFromEnv.html
 pub trait TryFromEnv: Sized {
     /// Error type
     type Error;
@@ -349,6 +352,7 @@ pub trait TryFromEnv: Sized {
     fn try_from_env() -> Result<Self, Self::Error>;
 }
 
+#[allow(deprecated)]
 impl<T: FromEnv> TryFromEnv for T {
     type Error = Infallible;
 

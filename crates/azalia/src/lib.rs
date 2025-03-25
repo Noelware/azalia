@@ -39,7 +39,6 @@ extern crate alloc;
 pub mod rust;
 
 mod macros;
-mod proc_macro;
 mod util;
 
 pub use util::*;

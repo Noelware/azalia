@@ -19,40 +19,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-//! # 🐻‍❄️🪚 `azalia-config`
-//! The **azalia_config** Rust crate defines types and utilities dealing with application configuration.
-#![doc(html_logo_url = "https://cdn.floofy.dev/images/trans.png")]
-#![doc(html_favicon_url = "https://cdn.floofy.dev/images/trans.png")]
-#![cfg_attr(any(noeldoc, docsrs), feature(doc_cfg))]
-#![cfg_attr(not(feature = "std"), no_std)]
+#[test]
+fn merge() {
+    let testcases = trybuild::TestCases::new();
 
-#[cfg(all(not(feature = "std"), feature = "alloc"))]
-extern crate alloc;
-
-#[cfg(feature = "std")]
-#[cfg_attr(any(noeldoc, docsrs), doc(cfg(feature = "std")))]
-pub mod env;
-pub mod merge;
-
-#[cfg(feature = "std")]
-pub(crate) mod libstd {
-    pub use std::{
-        collections::{BTreeMap, BTreeSet, HashMap, HashSet},
-        hash::Hash,
-        num,
-        string::String,
-        vec::Vec,
-    };
+    testcases.pass("./tests/ui/pass/merge/*.rs");
+    testcases.compile_fail("./tests/ui/fail/merge/*.rs");
 }
 
-#[cfg(not(feature = "std"))]
-pub(crate) mod libstd {
-    pub use core::num;
+#[cfg(feature = "unstable")]
+#[test]
+fn tryfromenv() {
+    let _ = trybuild::TestCases::new();
+}
 
-    #[cfg(feature = "alloc")]
-    pub use alloc::{
-        collections::{BTreeMap, BTreeSet},
-        string::String,
-        vec::Vec,
-    };
+#[cfg(feature = "unstable")]
+#[test]
+fn env() {
+    let _ = trybuild::TestCases::new();
 }

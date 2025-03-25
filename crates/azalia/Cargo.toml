@@ -36,7 +36,7 @@ unexpected_cfgs = { level = "warn", check-cfg = ['cfg(noeldoc)'] }
 default = ["std"]
 
 use-once-cell = ["dep:once_cell"]
-proc-macro = []
+unstable = []
 alloc = ["once_cell?/alloc", "azalia-config?/alloc"]
 std = ["once_cell?/std", "azalia-config?/std"]
 
