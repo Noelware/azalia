@@ -513,5 +513,4 @@ FodyWeavers.xsd
 
 !crates/log
 !Cargo.lock
-$crates/
 .direnv/

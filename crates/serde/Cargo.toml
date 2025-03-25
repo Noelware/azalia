@@ -19,24 +19,31 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-[workspace]
-resolver = "2"
-members = [
-    "crates/azalia",
-    "crates/config",
-    "crates/config/macros",
-    "crates/log",
-    "crates/remi",
-    "crates/serde",
-]
+[package]
+name = "azalia-serde"
+description = "🐻‍❄️🪚 Provides useful (de)serialization implementations for common types within external libraries"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
 
-[workspace.package]
-version = "0.1.0"
-authors = ["Noel Towa <cutie@floofy.dev>"]
-edition = "2021"
-license = "MIT"
-repository = "https://github.com/Noelware/azalia"
-rust-version = "1.83"
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(noeldoc)'] }
 
-[workspace.dependencies]
-serde = "1.0.219"
+[features]
+default = []
+tracing = ["dep:tracing"]
+aws = ["dep:aws-types"]
+s3 = ["dep:aws-sdk-s3"]
+
+[dependencies]
+aws-sdk-s3 = { version = "1.64.0", optional = true }
+aws-types = { version = "1.2.0", optional = true }
+serde.workspace = true
+tracing = { version = "0.1.41", optional = true }
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]

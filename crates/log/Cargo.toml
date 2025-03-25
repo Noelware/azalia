@@ -1,4 +1,4 @@
-# 🐻‍❄️🪚 azalia: Noelware's Rust commons library.
+# 🐻‍❄️🪚 Azalia: Family of crates that implement common Rust code
 # Copyright (c) 2024-2025 Noelware, LLC. <team@noelware.org>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -19,24 +19,35 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-[workspace]
-resolver = "2"
-members = [
-    "crates/azalia",
-    "crates/config",
-    "crates/config/macros",
-    "crates/log",
-    "crates/remi",
-    "crates/serde",
-]
+[package]
+name = "azalia-log"
+description = "🐻‍❄️🪚 Provides a beautiful `tracing_subscriber::Layer` formatter and a JSON-compat formatter"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
 
-[workspace.package]
-version = "0.1.0"
-authors = ["Noel Towa <cutie@floofy.dev>"]
-edition = "2021"
-license = "MIT"
-repository = "https://github.com/Noelware/azalia"
-rust-version = "1.83"
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(noeldoc)'] }
 
-[workspace.dependencies]
-serde = "1.0.219"
+[features]
+writers = ["dep:owo-colors", "dep:chrono"]
+default = ["writers"]
+log = ["dep:tracing-log"]
+
+[dependencies]
+cfg-if = "1.0.0"
+chrono = { version = "0.4.38", optional = true }
+owo-colors = { version = "4.1.0", optional = true, features = [
+    "supports-colors",
+] }
+serde_json = "1.0.138"
+tracing = "0.1.41"
+tracing-log = { version = "0.2.0", optional = true }
+tracing-subscriber = "0.3.19"
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
