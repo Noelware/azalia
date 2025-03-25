@@ -578,7 +578,6 @@ dependencies = [
 name = "azalia-log"
 version = "0.1.0"
 dependencies = [
- "cfg-if",
  "chrono",
  "owo-colors",
  "serde_json",
