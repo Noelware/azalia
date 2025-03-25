@@ -47,6 +47,18 @@ pub use util::*;
 #[cfg_attr(any(noeldoc, docsrs), doc(cfg(feature = "config")))]
 pub use azalia_config as config;
 
+#[cfg(feature = "log")]
+#[cfg_attr(any(noeldoc, docsrs), doc(cfg(feature = "log")))]
+pub use azalia_log as log;
+
+#[cfg(feature = "remi")]
+#[cfg_attr(any(noeldoc, docsrs), doc(cfg(feature = "remi")))]
+pub use azalia_remi as remi;
+
+#[cfg(feature = "serde")]
+#[cfg_attr(any(noeldoc, docsrs), doc(cfg(feature = "serde")))]
+pub use azalia_serde as serde;
+
 #[cfg(feature = "std")]
 #[doc(hidden)]
 pub mod libstd {
