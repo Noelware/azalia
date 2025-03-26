@@ -40,13 +40,7 @@ macro_rules! regex {
     };
 }
 
-#[cfg(any(feature = "lazy", feature = "use-once-cell"))]
-pub(crate) use once_cell::{sync::Lazy as LazySync, unsync::Lazy as UnsyncLazy};
-
-#[cfg(all(
-    not(any(feature = "lazy", feature = "use-once-cell")),
-    any(feature = "std", feature = "alloc")
-))]
+#[cfg(any(feature = "std", feature = "alloc"))]
 #[allow(unused)]
 pub(crate) use std::{cell::LazyCell as UnsyncLazy, sync::LazyLock as LazySync};
 
@@ -57,17 +51,8 @@ pub(crate) use std::{cell::LazyCell as UnsyncLazy, sync::LazyLock as LazySync};
 /// - [`std::sync::LazyLock`] if `std` is enabled and `use-once-cell` or `lazy` isn't enabled.
 ///
 /// [`once_cell::sync::Lazy`]: https://docs.rs/once_cell/latest/once_cell/sync/struct.Lazy.html
-#[cfg(all(
-    any(feature = "lazy", feature = "use-once-cell"),
-    any(feature = "std", feature = "alloc")
-))]
-#[cfg_attr(
-    any(noeldoc, docsrs),
-    doc(cfg(all(
-        any(feature = "lazy", feature = "use-once-cell"),
-        any(feature = "std", feature = "alloc")
-    )))
-)]
+#[cfg(any(feature = "std", feature = "alloc"))]
+#[cfg_attr(any(noeldoc, docsrs), doc(cfg(any(feature = "std", feature = "alloc"))))]
 #[macro_export]
 macro_rules! lazy {
     ($code:expr) => {

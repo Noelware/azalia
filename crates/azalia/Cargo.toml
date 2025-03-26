@@ -35,13 +35,9 @@ unexpected_cfgs = { level = "warn", check-cfg = ['cfg(noeldoc)'] }
 [features]
 default = ["std"]
 
-use-once-cell = ["dep:once_cell"]
 unstable = []
 alloc = ["once_cell?/alloc", "azalia-config?/alloc"]
 std = ["once_cell?/std", "azalia-config?/std"]
-
-# deprecated: use `use-once-cell` instead,
-lazy = ["dep:once_cell"]
 
 "config+macros" = ["azalia-config?/macros"]
 "config+url" = ["azalia-config?/url"]

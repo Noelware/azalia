@@ -11,7 +11,6 @@
 | [`azalia`]             | Easily consumable and centralised Rust crate to toggle other Azalia crates via Cargo's crates features feature.        |
 | [`azalia-config`]      | Useful types and utilities when dealing with application configuration.                                                |
 | [`azalia-log`]         | Provides a fancy **tracing** formatter to the alternative (`tracing-subscriber`) and JSON logger that mimics Logstash. |
-| [`azalia-proc-macros`] | Useful types and utilities when dealing and building Rust procedural macros.                                           |
 | [`azalia-remi`]        | A unified **StorageService** structure when dealing with official **remi-rs** crates.                                  |
 | [`azalia-serde`]       | Provides **serialization** and **deserialization** for other Rust crates that don't have a concrete impl.              |
 

@@ -19,11 +19,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#[cfg(all(
-    feature = "regex",
-    any(feature = "lazy", feature = "use-once-cell"),
-    any(feature = "std", feature = "alloc")
-))]
+#[cfg(all(feature = "regex", any(feature = "std", feature = "alloc")))]
 /// A thread-safe lazily evaluated [`Regex`](regex::Regex) that is used
 /// for truthy values in system environment variables.
 ///
