@@ -23,15 +23,15 @@ use proc_macro2::{Span, TokenStream};
 use quote::{quote, ToTokens};
 use std::collections::HashMap;
 use syn::{
-    parse::{Parse, ParseStream},
+    ext::IdentExt,
+    parse::{discouraged::Speculative, Parse, ParseStream},
     spanned::Spanned,
     Attribute, Expr, ExprCall, Ident, ItemFn, Lit, LitStr, Path, PathSegment, Token,
 };
 
 #[derive(PartialEq, Eq, Hash)]
 enum Key {
-    Literal(LitStr),
-    Call(ExprCall),
+    Literal(String),
     Path(Path),
 }
 
@@ -39,23 +39,23 @@ impl Parse for Key {
     fn parse(input: ParseStream) -> syn::Result<Self> {
         let p = input.span();
         if input.peek(Lit) {
-            let s: LitStr = input.parse()?;
-            Ok(Key::Literal(s))
-        } else if let Ok(call) = input.parse::<ExprCall>() {
-            Ok(Self::Call(call))
-        } else if let Ok(path) = input.parse::<Path>() {
-            Ok(Self::Path(path))
-        } else if let Ok(ident) = input.parse::<Ident>() {
-            Ok(Self::Path(Path {
-                leading_colon: None,
-                segments: [PathSegment::from(ident)].into_iter().collect(),
-            }))
-        } else {
-            Err(syn::Error::new(
-                p,
-                "expected either literal string, a path, or a function call expression",
-            ))
+            return Ok(Key::Literal(input.parse::<LitStr>()?.value()));
+        } else if input.peek(Ident::peek_any) {
+            let ident: Ident = input.parse()?;
+            return Ok(Key::Literal(ident.to_string()));
         }
+
+        let fork = input.fork();
+
+        if let Ok(path) = fork.parse::<Path>() {
+            input.advance_to(&fork);
+            return Ok(Key::Path(path));
+        }
+
+        Err(syn::Error::new(
+            p,
+            "expected literal string, path, identifier, or fn call expression",
+        ))
     }
 }
 
@@ -63,7 +63,6 @@ impl ToTokens for Key {
     fn to_tokens(&self, tokens: &mut TokenStream) {
         match self {
             Self::Literal(s) => s.to_tokens(tokens),
-            Self::Call(c) => c.to_tokens(tokens),
             Self::Path(p) => p.to_tokens(tokens),
         }
     }
@@ -215,7 +214,7 @@ pub fn expand(
         .iter()
         .map(|(key, value)| match key {
             Key::Literal(s) => {
-                let var = s.value().to_ascii_uppercase();
+                let var = s.to_ascii_uppercase();
                 quote!((#var, #value))
             }
 
