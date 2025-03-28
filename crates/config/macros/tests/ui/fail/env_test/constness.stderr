@@ -1,0 +1,5 @@
+error: `const` is not allowed in test code
+  --> tests/ui/fail/env_test/constness.rs:25:5
+   |
+25 | pub const fn hewo() {}
+   |     ^^^^^

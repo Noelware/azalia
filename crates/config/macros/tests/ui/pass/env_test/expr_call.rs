@@ -19,26 +19,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#[test]
-#[ignore]
-fn merge() {
-    let testcases = trybuild::TestCases::new();
+use azalia_config_macros::env_test;
 
-    testcases.pass("./tests/ui/pass/merge/*.rs");
-    testcases.compile_fail("./tests/ui/fail/merge/*.rs");
-}
+#[env_test(crate = ::azalia_config, var() = "world")]
+pub fn hewo() {}
 
-#[cfg(feature = "unstable")]
-#[test]
-fn tryfromenv() {
-    let _ = trybuild::TestCases::new();
-}
+fn main() {}
 
-#[cfg(feature = "unstable")]
-#[test]
-fn envtest() {
-    let cases = trybuild::TestCases::new();
-
-    cases.pass("./tests/ui/pass/env_test/*.rs");
-    cases.compile_fail("./tests/ui/fail/env_test/*.rs");
+fn var() -> &'static str {
+    "HELLO"
 }

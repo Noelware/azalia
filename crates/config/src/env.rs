@@ -249,6 +249,15 @@ pub fn try_parse<K: Into<String>, V: TryFromEnvValue>(key: K) -> Result<V, TryPa
     }
 }
 
+/// Analogous to [`try_parse`] but uses a default value if the environment variable was not found.
+pub fn try_parse_or_else<K: Into<String>, V: TryFromEnvValue>(key: K, default: V) -> Result<V, TryParseError<V>> {
+    match std::env::var(key.into()) {
+        Ok(value) => V::try_from_env_value(value).map_err(TryParseError::Parse),
+        Err(VarError::NotPresent) => Ok(default),
+        Err(e) => Err(TryParseError::System(e)),
+    }
+}
+
 /// Error variant for [`try_parse`].
 #[derive(Debug)]
 pub enum TryParseError<V: TryFromEnvValue> {
