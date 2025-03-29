@@ -249,11 +249,34 @@ pub fn try_parse<K: Into<String>, V: TryFromEnvValue>(key: K) -> Result<V, TryPa
     }
 }
 
+/// Analogous to [`try_parse`] but uses a closure to compute the default value.
+pub fn try_parse_or<K: Into<String>, V: TryFromEnvValue>(
+    key: K,
+    default: impl FnOnce() -> V,
+) -> Result<V, TryParseError<V>> {
+    match try_parse(key) {
+        Ok(value) => Ok(value),
+        Err(TryParseError::System(std::env::VarError::NotPresent)) => Ok(default()),
+        Err(e) => Err(e),
+    }
+}
+
 /// Analogous to [`try_parse`] but uses a default value if the environment variable was not found.
 pub fn try_parse_or_else<K: Into<String>, V: TryFromEnvValue>(key: K, default: V) -> Result<V, TryParseError<V>> {
     match std::env::var(key.into()) {
         Ok(value) => V::try_from_env_value(value).map_err(TryParseError::Parse),
         Err(VarError::NotPresent) => Ok(default),
+        Err(e) => Err(TryParseError::System(e)),
+    }
+}
+
+/// Anlogous to [`try_parse`] but returns a <code>[`Option`]\<V\></code> instead.
+///
+/// When the environment variable by the name of `key` doesn't exist, it'll return `None`.
+pub fn try_parse_optional<K: Into<String>, V: TryFromEnvValue>(key: K) -> Result<Option<V>, TryParseError<V>> {
+    match std::env::var(key.into()) {
+        Ok(value) => V::try_from_env_value(value).map(Some).map_err(TryParseError::Parse),
+        Err(VarError::NotPresent) => Ok(None),
         Err(e) => Err(TryParseError::System(e)),
     }
 }
