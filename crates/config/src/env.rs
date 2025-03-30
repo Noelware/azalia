@@ -223,6 +223,8 @@ impl_try_from_env!(
     u128: ParseIntError;
     usize: ParseIntError;
 
+    std::path::PathBuf: Infallible;
+
     #[cfg(feature = "url")]
     #[cfg_attr(any(noeldoc, docsrs), doc(cfg(feature = "url")))]
     url::Url: url::ParseError;
