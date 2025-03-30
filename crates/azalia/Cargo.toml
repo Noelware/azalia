@@ -41,6 +41,7 @@ std = ["once_cell?/std", "azalia-config?/std"]
 
 "config+unstable" = ["azalia-config?/unstable"]
 "config+macros" = ["azalia-config?/macros"]
+"config+sentry" = ["azalia-config?/sentry"]
 "config+url" = ["azalia-config?/url"]
 config = ["dep:azalia-config"]
 
@@ -68,10 +69,10 @@ remi = ["dep:azalia-remi"]
 serde = ["dep:azalia-serde"]
 
 [dependencies]
-azalia-config = { version = "=0.1.0", path = "../config", optional = true }
-azalia-log = { version = "=0.1.0", path = "../log", optional = true }
-azalia-remi = { version = "=0.1.0", path = "../remi", optional = true }
-azalia-serde = { version = "=0.1.0", path = "../serde", optional = true }
+azalia-config = { version = "=0.1.1", path = "../config", optional = true }
+azalia-log = { version = "=0.1.1", path = "../log", optional = true }
+azalia-remi = { version = "=0.1.1", path = "../remi", optional = true }
+azalia-serde = { version = "=0.1.1", path = "../serde", optional = true }
 once_cell = { version = "1.21.1", optional = true, default-features = false, features = [
     "race",
 ] }

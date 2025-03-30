@@ -59,13 +59,16 @@ pub trait TryFromEnvValue: Sized {
     /// Error type.
     type Error;
 
+    // TODO(@auguwu):
+    // add `type Output = Self` once GAT defaults are stablised (probably never)
+
     /// Implicit conversion between a environment variable's value to `Ok(Self::Output)`
     /// if successful.
     fn try_from_env_value(value: String) -> Result<Self, Self::Error>;
 }
 
 impl<K: TryFromEnvValue + Eq + Hash, V: TryFromEnvValue> TryFromEnvValue for std::collections::HashMap<K, V> {
-    type Error = MapTryFromEnvError<K, V>;
+    type Error = MapTryFromEnvError<K::Error, V::Error>;
 
     fn try_from_env_value(value: String) -> Result<Self, Self::Error> {
         let elements = value.split(',');
@@ -90,7 +93,7 @@ impl<K: TryFromEnvValue + Eq + Hash, V: TryFromEnvValue> TryFromEnvValue for std
 }
 
 impl<K: TryFromEnvValue + Ord, V: TryFromEnvValue> TryFromEnvValue for BTreeMap<K, V> {
-    type Error = MapTryFromEnvError<K, V>;
+    type Error = MapTryFromEnvError<K::Error, V::Error>;
 
     fn try_from_env_value(value: String) -> Result<Self, Self::Error> {
         let elements = value.split(',');
@@ -116,16 +119,12 @@ impl<K: TryFromEnvValue + Ord, V: TryFromEnvValue> TryFromEnvValue for BTreeMap<
 /// Error variant for <code>impl [`TryFromEnvValue`] for [`std::collections::HashMap`]<K, V></code>
 /// and <code>impl [`TryFromEnvValue`] for [`std::collections::BTreeMap`]<K, V></code>.
 #[derive(Debug)]
-pub enum MapTryFromEnvError<K: TryFromEnvValue, V: TryFromEnvValue> {
-    Key(K::Error),
-    Value(V::Error),
+pub enum MapTryFromEnvError<K, V> {
+    Key(K),
+    Value(V),
 }
 
-impl<K: TryFromEnvValue, V: TryFromEnvValue> Display for MapTryFromEnvError<K, V>
-where
-    K::Error: Display,
-    V::Error: Display,
-{
+impl<K: Display, V: Display> Display for MapTryFromEnvError<K, V> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Key(s) => Display::fmt(s, f),
@@ -134,12 +133,7 @@ where
     }
 }
 
-impl<K: TryFromEnvValue + Debug + Display, V: TryFromEnvValue + Debug + Display> std::error::Error
-    for MapTryFromEnvError<K, V>
-where
-    K::Error: std::error::Error + 'static,
-    V::Error: std::error::Error + 'static,
-{
+impl<K: std::error::Error + 'static, V: std::error::Error + 'static> std::error::Error for MapTryFromEnvError<K, V> {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
             Self::Key(k) => Some(k),
@@ -174,6 +168,8 @@ macro_rules! impl_try_from_env {
     ($($(#[$meta:meta])* $Ty:ty: $Error:ty;)*) => {
         $(
             $(#[$meta])*
+            /// This implementation will forward to the [`FromStr`] implementation
+            /// of the concrete type.
             impl $crate::env::TryFromEnvValue for $Ty {
                 type Error = $Error;
 
@@ -222,6 +218,10 @@ impl_try_from_env!(
 
     std::path::PathBuf: Infallible;
 
+    #[cfg(feature = "sentry")]
+    #[cfg_attr(any(noeldoc, docsrs), doc(cfg(feature = "sentry")))]
+    sentry_types::Dsn: sentry_types::ParseDsnError;
+
     #[cfg(feature = "url")]
     #[cfg_attr(any(noeldoc, docsrs), doc(cfg(feature = "url")))]
     url::Url: url::ParseError;
@@ -241,7 +241,7 @@ pub fn parse<K: Into<String>, V: FromEnvValue>(key: K) -> Result<V, VarError> {
 }
 
 /// Parses an environment variable from a [`TryFromEnvValue`] implementation.
-pub fn try_parse<K: Into<String>, V: TryFromEnvValue>(key: K) -> Result<V, TryParseError<V>> {
+pub fn try_parse<K: Into<String>, V: TryFromEnvValue>(key: K) -> Result<V, TryParseError<V::Error>> {
     match std::env::var(key.into()) {
         Ok(value) => V::try_from_env_value(value).map_err(TryParseError::Parse),
         Err(e) => Err(TryParseError::System(e)),
@@ -252,7 +252,7 @@ pub fn try_parse<K: Into<String>, V: TryFromEnvValue>(key: K) -> Result<V, TryPa
 pub fn try_parse_or<K: Into<String>, V: TryFromEnvValue>(
     key: K,
     default: impl FnOnce() -> V,
-) -> Result<V, TryParseError<V>> {
+) -> Result<V, TryParseError<V::Error>> {
     match try_parse(key) {
         Ok(value) => Ok(value),
         Err(TryParseError::System(std::env::VarError::NotPresent)) => Ok(default()),
@@ -261,7 +261,10 @@ pub fn try_parse_or<K: Into<String>, V: TryFromEnvValue>(
 }
 
 /// Analogous to [`try_parse`] but uses a default value if the environment variable was not found.
-pub fn try_parse_or_else<K: Into<String>, V: TryFromEnvValue>(key: K, default: V) -> Result<V, TryParseError<V>> {
+pub fn try_parse_or_else<K: Into<String>, V: TryFromEnvValue>(
+    key: K,
+    default: V,
+) -> Result<V, TryParseError<V::Error>> {
     match std::env::var(key.into()) {
         Ok(value) => V::try_from_env_value(value).map_err(TryParseError::Parse),
         Err(VarError::NotPresent) => Ok(default),
@@ -272,7 +275,7 @@ pub fn try_parse_or_else<K: Into<String>, V: TryFromEnvValue>(key: K, default: V
 /// Anlogous to [`try_parse`] but returns a <code>[`Option`]\<V\></code> instead.
 ///
 /// When the environment variable by the name of `key` doesn't exist, it'll return `None`.
-pub fn try_parse_optional<K: Into<String>, V: TryFromEnvValue>(key: K) -> Result<Option<V>, TryParseError<V>> {
+pub fn try_parse_optional<K: Into<String>, V: TryFromEnvValue>(key: K) -> Result<Option<V>, TryParseError<V::Error>> {
     match std::env::var(key.into()) {
         Ok(value) => V::try_from_env_value(value).map(Some).map_err(TryParseError::Parse),
         Err(VarError::NotPresent) => Ok(None),
@@ -282,15 +285,12 @@ pub fn try_parse_optional<K: Into<String>, V: TryFromEnvValue>(key: K) -> Result
 
 /// Error variant for [`try_parse`].
 #[derive(Debug)]
-pub enum TryParseError<V: TryFromEnvValue> {
+pub enum TryParseError<V> {
     System(VarError),
-    Parse(V::Error),
+    Parse(V),
 }
 
-impl<V: TryFromEnvValue> Display for TryParseError<V>
-where
-    V::Error: Display,
-{
+impl<V: Display> Display for TryParseError<V> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             TryParseError::System(s) => Display::fmt(s, f),
@@ -299,10 +299,7 @@ where
     }
 }
 
-impl<V: TryFromEnvValue + Display + Debug> std::error::Error for TryParseError<V>
-where
-    V::Error: std::error::Error + 'static,
-{
+impl<V: std::error::Error + 'static> std::error::Error for TryParseError<V> {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
             Self::System(v) => Some(v),

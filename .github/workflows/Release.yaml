@@ -30,12 +30,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: 'true'
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-            components: clippy, rustfmt
+      - uses: dtolnay/rust-toolchain@nightly
       - uses: Swatinem/rust-cache@v2
-      - run: cargo publish
+      - run: cargo -Zpackage-workspace publish
         env:
             CARGO_REGISTRY_TOKEN: ${{env.CARGO_REGISTRY_TOKEN}}

@@ -555,7 +555,7 @@ dependencies = [
 
 [[package]]
 name = "azalia"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "azalia-config",
  "azalia-log",
@@ -567,15 +567,16 @@ dependencies = [
 
 [[package]]
 name = "azalia-config"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "azalia-config-macros",
+ "sentry-types",
  "url",
 ]
 
 [[package]]
 name = "azalia-config-macros"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "heck",
  "proc-macro2",
@@ -585,7 +586,7 @@ dependencies = [
 
 [[package]]
 name = "azalia-log"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "cfg-if",
  "chrono",
@@ -598,7 +599,7 @@ dependencies = [
 
 [[package]]
 name = "azalia-remi"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "remi",
  "remi-azure",
@@ -611,7 +612,7 @@ dependencies = [
 
 [[package]]
 name = "azalia-serde"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "aws-sdk-s3",
  "aws-types",
@@ -1124,6 +1125,16 @@ name = "data-encoding"
 version = "2.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "575f75dfd25738df5b91b8e43e14d44bda14637a58fae779fd2b064f8bf3e010"
+
+[[package]]
+name = "debugid"
+version = "0.8.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bef552e6f588e446098f6ba40d89ac146c8c7b64aade83c051ee00bb5d2bc18d"
+dependencies = [
+ "serde",
+ "uuid",
+]
 
 [[package]]
 name = "der"
@@ -3306,6 +3317,23 @@ name = "semver"
 version = "1.0.26"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "56e6fa9c48d24d85fb3de5ad847117517440f6beceb7798af16b4a87d616b8d0"
+
+[[package]]
+name = "sentry-types"
+version = "0.36.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2d4203359e60724aa05cf2385aaf5d4f147e837185d7dd2b9ccf1ee77f4420c8"
+dependencies = [
+ "debugid",
+ "hex",
+ "rand 0.8.5",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "time",
+ "url",
+ "uuid",
+]
 
 [[package]]
 name = "serde"
