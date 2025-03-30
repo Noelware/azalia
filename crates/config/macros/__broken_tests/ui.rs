@@ -20,7 +20,6 @@
 // SOFTWARE.
 
 #[test]
-#[ignore]
 fn merge() {
     let testcases = trybuild::TestCases::new();
 
