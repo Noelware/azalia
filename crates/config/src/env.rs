@@ -22,9 +22,6 @@
 //! Traits, types, and utilities when dealing with system environment variables.
 
 #[cfg(all(feature = "macros", feature = "unstable"))]
-pub use azalia_config_macros::TryFromEnv;
-
-#[cfg(all(feature = "macros", feature = "unstable"))]
 pub use azalia_config_macros::env_test as test;
 
 use std::{
