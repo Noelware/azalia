@@ -69,14 +69,17 @@ remi = ["dep:azalia-remi"]
 serde = ["dep:azalia-serde"]
 
 [dependencies]
-azalia-config = { version = "=0.1.1", path = "../config", optional = true }
-azalia-log = { version = "=0.1.1", path = "../log", optional = true }
-azalia-remi = { version = "=0.1.1", path = "../remi", optional = true }
-azalia-serde = { version = "=0.1.1", path = "../serde", optional = true }
+azalia-config = { version = "=0.1.2", path = "../config", optional = true }
+azalia-log = { version = "=0.1.2", path = "../log", optional = true }
+azalia-remi = { version = "=0.1.2", path = "../remi", optional = true }
+azalia-serde = { version = "=0.1.2", path = "../serde", optional = true }
 once_cell = { version = "1.21.1", optional = true, default-features = false, features = [
     "race",
 ] }
 regex = { version = "1.11.1", optional = true, default-features = false }
+
+[build-dependencies]
+rustc_version = "0.4.1"
 
 [package.metadata.docs.rs]
 all-features = true
