@@ -1,0 +1,11 @@
+error: merge trait for unions will never be supported
+  --> tests/ui/merge/union.rs:26:5
+   |
+26 | pub union Heck1 {
+   |     ^^^^^
+
+error: merge trait for unions will never be supported
+  --> tests/ui/merge/union.rs:32:5
+   |
+32 | pub union Heck2 {
+   |     ^^^^^

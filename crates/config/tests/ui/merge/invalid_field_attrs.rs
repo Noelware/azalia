@@ -19,24 +19,42 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-use azalia_config::merge::Merge;
-
-#[derive(Debug, azalia_config_macros::Merge)]
-#[merge(crate = ::azalia_config)]
-struct Something {
-    #[merge(strategy = azalia_config::merge::strategy::strings::append)]
-    a: String,
+#[derive(azalia_config::merge::Merge)]
+pub struct A {
+    #[merge(skip)]
+    #[merge(skip)]
+    a: bool,
 }
 
-fn main() {
-    let mut a = Something {
-        a: String::from("weow"),
-    };
-
-    let b = Something {
-        a: String::from("heck"),
-    };
-
-    a.merge(b);
-    assert_eq!(a.a, "weowheck");
+#[derive(azalia_config::merge::Merge)]
+pub struct B {
+    #[merge(strategy = "x + 1")]
+    b: u32,
 }
+
+#[derive(azalia_config::merge::Merge)]
+pub struct C {
+    #[merge(strategy = 1234)]
+    c: String,
+}
+
+#[derive(azalia_config::merge::Merge)]
+pub struct D {
+    #[merge(strategy = azalia_config::merge::strategy::f32::with_negatives)]
+    #[merge(strategy = azalia_config::merge::strategy::f32::with_negatives)]
+    d: f32,
+}
+
+#[derive(azalia_config::merge::Merge)]
+pub struct E {
+    #[merge(skip = "data")]
+    e: usize,
+}
+
+#[derive(azalia_config::merge::Merge)]
+pub struct F {
+    #[merge(unknown_field)]
+    f: f64,
+}
+
+fn main() {}

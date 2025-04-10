@@ -19,7 +19,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#[derive(azalia_config_macros::Merge)]
-enum Heck {}
+#[cfg(feature = "macros")]
+#[test]
+fn merge() {
+    let testcases = trybuild::TestCases::new();
+    testcases.compile_fail("./tests/ui/merge/*.rs");
+}
 
-fn main() {}
+#[cfg(all(feature = "macros", feature = "unstable"))]
+#[test]
+#[ignore = "not implemented (yet)"]
+fn tryfromenv() {
+    let testcases = trybuild::TestCases::new();
+    testcases.compile_fail("./tests/ui/tryfromenv/*.rs");
+}

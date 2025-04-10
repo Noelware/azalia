@@ -19,12 +19,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#[derive(azalia_config_macros::Merge)]
-#[merge(crate = ::azalia_config)]
-struct MyStruct1;
+use azalia_config::merge::Merge;
 
-#[derive(azalia_config_macros::Merge)]
-#[merge(crate = ::azalia_config)]
-struct MyStruct2(usize);
+#[derive(Merge)]
+#[merge(crate = "azalia_config")]
+pub enum Heck1 {}
+
+#[derive(Merge)]
+#[merge(crate = azalia_config)]
+pub enum Heck2 {}
 
 fn main() {}

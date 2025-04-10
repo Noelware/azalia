@@ -1,0 +1,11 @@
+error: merge trait for enumerations are not supported
+  --> tests/ui/merge/enumeration.rs:26:5
+   |
+26 | pub enum Heck1 {}
+   |     ^^^^
+
+error: merge trait for enumerations are not supported
+  --> tests/ui/merge/enumeration.rs:30:5
+   |
+30 | pub enum Heck2 {}
+   |     ^^^^

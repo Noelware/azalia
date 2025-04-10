@@ -1,5 +1,0 @@
-error: merge trait for enumerations are not supported
-  --> tests/ui/fail/merge/enum.rs:23:1
-   |
-23 | enum Heck {}
-   | ^^^^

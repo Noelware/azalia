@@ -1,0 +1,35 @@
+error: field already has `#[merge(skip)]`
+  --> tests/ui/merge/invalid_field_attrs.rs:25:13
+   |
+25 |     #[merge(skip)]
+   |             ^^^^
+
+error: unexpected token
+  --> tests/ui/merge/invalid_field_attrs.rs:31:24
+   |
+31 |     #[merge(strategy = "x + 1")]
+   |                        ^^^^^^^
+
+error: expected either a qualified path (i.e, `std::mem::replace`) or a literal string that can be a qualified path
+  --> tests/ui/merge/invalid_field_attrs.rs:37:24
+   |
+37 |     #[merge(strategy = 1234)]
+   |                        ^^^^
+
+error: field already has `#[merge(strategy)]`
+  --> tests/ui/merge/invalid_field_attrs.rs:44:13
+   |
+44 |     #[merge(strategy = azalia_config::merge::strategy::f32::with_negatives)]
+   |             ^^^^^^^^
+
+error: expected `,`
+  --> tests/ui/merge/invalid_field_attrs.rs:50:18
+   |
+50 |     #[merge(skip = "data")]
+   |                  ^
+
+error: unknown field, expected either `skip`, `strategy`
+  --> tests/ui/merge/invalid_field_attrs.rs:56:13
+   |
+56 |     #[merge(unknown_field)]
+   |             ^^^^^^^^^^^^^

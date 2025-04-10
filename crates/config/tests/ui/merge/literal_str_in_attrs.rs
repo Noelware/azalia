@@ -19,9 +19,20 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-use azalia_config_macros::env_test;
+#[derive(azalia_config::merge::Merge)]
+#[merge(crate = 123)]
+pub struct UsingAnyOtherLiteral {}
 
-#[env_test(crate = ::azalia_config, HELLO = "world")]
-pub const fn hewo() {}
+#[derive(azalia_config::merge::Merge)]
+#[merge(crate = "x + y")]
+pub struct UsingUnaryExpr {}
+
+#[derive(azalia_config::merge::Merge)]
+#[merge(crate = azalia_config)]
+pub struct ValidLiteralString {}
+
+#[derive(azalia_config::merge::Merge)]
+#[merge(crate = azalia_config)]
+pub struct ValidPath {}
 
 fn main() {}

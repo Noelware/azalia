@@ -19,9 +19,18 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-use azalia_config_macros::env_test;
+use azalia_config::merge::Merge;
 
-#[env_test(crate = ::azalia_config, HELLO = "world")]
-pub extern "C" fn hewo() {}
+#[derive(Merge)]
+#[merge(crate = "azalia_config")]
+pub union Heck1 {
+    a: u32,
+}
+
+#[derive(Merge)]
+#[merge(crate = azalia_config)]
+pub union Heck2 {
+    b: u16,
+}
 
 fn main() {}

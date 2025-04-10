@@ -184,7 +184,7 @@ pub fn expand_struct(
             if let Err(e) = attr.parse_nested_meta(|meta| {
                 if meta.path.is_ident("skip") {
                     if field.skipped {
-                        return Err(syn::Error::new(meta.input.span(), "field already has `#[merge(skip)]`"));
+                        return Err(syn::Error::new(meta.path.span(), "field already has `#[merge(skip)]`"));
                     }
 
                     field.skipped = true;
@@ -194,13 +194,17 @@ pub fn expand_struct(
                 if meta.path.is_ident("strategy") {
                     let input = meta.value()?;
                     if field.strategy.is_some() {
-                        return Err(syn::Error::new(input.span(), "field already has `#[merge(strategy)]`"));
+                        return Err(syn::Error::new(
+                            meta.path.span(),
+                            "field already has `#[merge(strategy)]`",
+                        ));
                     }
 
                     field.strategy = Some(input.parse()?);
+                    return Ok(());
                 }
 
-                Ok(())
+                Err(meta.error("unknown field, expected either `skip`, `strategy`"))
             }) {
                 return e.into_compile_error();
             }

@@ -29,8 +29,8 @@ license.workspace = true
 repository.workspace = true
 rust-version.workspace = true
 
-[lints.rust]
-unexpected_cfgs = { level = "warn", check-cfg = ['cfg(noeldoc)'] }
+[lints]
+workspace = true
 
 [features]
 default = ["std"]
@@ -69,10 +69,10 @@ remi = ["dep:azalia-remi"]
 serde = ["dep:azalia-serde"]
 
 [dependencies]
-azalia-config = { version = "=0.1.2", path = "../config", optional = true }
-azalia-log = { version = "=0.1.2", path = "../log", optional = true }
-azalia-remi = { version = "=0.1.2", path = "../remi", optional = true }
-azalia-serde = { version = "=0.1.2", path = "../serde", optional = true }
+azalia-config = { version = "=0.1.3", path = "../config", optional = true }
+azalia-log = { version = "=0.1.3", path = "../log", optional = true }
+azalia-remi = { version = "=0.1.3", path = "../remi", optional = true }
+azalia-serde = { version = "=0.1.3", path = "../serde", optional = true }
 once_cell = { version = "1.21.1", optional = true, default-features = false, features = [
     "race",
 ] }

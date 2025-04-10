@@ -1,0 +1,11 @@
+error: expected either a qualified path (i.e, `std::mem::replace`) or a literal string that can be a qualified path
+  --> tests/ui/merge/literal_str_in_attrs.rs:23:17
+   |
+23 | #[merge(crate = 123)]
+   |                 ^^^
+
+error: unexpected token
+  --> tests/ui/merge/literal_str_in_attrs.rs:27:17
+   |
+27 | #[merge(crate = "x + y")]
+   |                 ^^^^^^^
