@@ -257,4 +257,7 @@ impl_partialeq!(
 
     #[cfg(feature = "url")]
     url::Url
+
+    #[cfg(feature = "tracing")]
+    tracing::Level
 );

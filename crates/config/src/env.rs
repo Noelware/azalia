@@ -164,6 +164,42 @@ impl<T: TryFromEnvValue + Ord> TryFromEnvValue for BTreeSet<T> {
     }
 }
 
+#[cfg(feature = "tracing")]
+#[cfg_attr(any(noeldoc, docsrs), doc(cfg(feature = "tracing")))]
+impl TryFromEnvValue for tracing::Level {
+    type Error = InvalidLevel;
+
+    fn try_from_env_value(value: String) -> Result<Self, Self::Error> {
+        match &*value.to_ascii_lowercase() {
+            "trace" => Ok(tracing::Level::TRACE),
+            "info" | "information" => Ok(tracing::Level::INFO),
+            "debug" => Ok(tracing::Level::DEBUG),
+            "warn" | "warning" => Ok(tracing::Level::WARN),
+            "error" => Ok(tracing::Level::ERROR),
+            level => Err(InvalidLevel(level.to_owned())),
+        }
+    }
+}
+
+#[cfg(feature = "tracing")]
+#[cfg_attr(any(noeldoc, docsrs), doc(cfg(feature = "tracing")))]
+#[derive(Debug)]
+/// A invalid level was given from the [`TryFromEnvValue`] implementation
+/// for [`tracing::Level`]
+pub struct InvalidLevel(String);
+
+#[cfg(feature = "tracing")]
+#[cfg_attr(any(noeldoc, docsrs), doc(cfg(feature = "tracing")))]
+impl std::fmt::Display for InvalidLevel {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "invalid log level: '{}'", self.0)
+    }
+}
+
+#[cfg(feature = "tracing")]
+#[cfg_attr(any(noeldoc, docsrs), doc(cfg(feature = "tracing")))]
+impl std::error::Error for InvalidLevel {}
+
 macro_rules! impl_try_from_env {
     ($($(#[$meta:meta])* $Ty:ty: $Error:ty;)*) => {
         $(

@@ -575,6 +575,7 @@ version = "0.1.2"
 dependencies = [
  "azalia-config-macros",
  "sentry-types",
+ "tracing",
  "url",
 ]
 
