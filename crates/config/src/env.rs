@@ -161,6 +161,17 @@ impl<T: TryFromEnvValue + Ord> TryFromEnvValue for BTreeSet<T> {
     }
 }
 
+impl<T: TryFromEnvValue> TryFromEnvValue for Vec<T> {
+    type Error = T::Error;
+
+    fn try_from_env_value(value: String) -> Result<Self, Self::Error> {
+        value
+            .split(',')
+            .map(|v| T::try_from_env_value(v.to_owned()))
+            .collect::<Result<Vec<_>, T::Error>>()
+    }
+}
+
 #[cfg(feature = "tracing")]
 #[cfg_attr(any(noeldoc, docsrs), doc(cfg(feature = "tracing")))]
 impl TryFromEnvValue for tracing::Level {
