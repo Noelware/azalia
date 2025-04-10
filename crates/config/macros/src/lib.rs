@@ -26,9 +26,6 @@
 mod merge;
 
 #[cfg(feature = "unstable")]
-mod env_test;
-
-#[cfg(feature = "unstable")]
 mod tryfromenv;
 
 use proc_macro::TokenStream;
@@ -158,16 +155,4 @@ pub fn TryFromEnv(input: TokenStream) -> TokenStream {
     )
     .into_compile_error()
     .into()
-}
-
-#[cfg(feature = "unstable")]
-#[cfg_attr(any(noeldoc, docsrs), doc(cfg(feature = "unstable")))]
-#[proc_macro_attribute]
-pub fn env_test(attr: TokenStream, body: TokenStream) -> TokenStream {
-    let attrs = parse_macro_input!(attr as env_test::Attributes);
-    let item = parse_macro_input!(body as syn::ItemFn);
-
-    env_test::expand(&attrs, item)
-        .unwrap_or_else(syn::Error::into_compile_error)
-        .into()
 }

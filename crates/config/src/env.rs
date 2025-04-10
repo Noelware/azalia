@@ -21,9 +21,6 @@
 
 //! Traits, types, and utilities when dealing with system environment variables.
 
-#[cfg(all(feature = "macros", feature = "unstable"))]
-pub use azalia_config_macros::env_test as test;
-
 use std::{
     char::ParseCharError,
     collections::{BTreeMap, BTreeSet, HashSet},
@@ -627,8 +624,7 @@ mod tests {
     use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 
     // this is a hack since we export `test` if `--features unstable` is enabled
-    #[cfg_attr(not(feature = "unstable"), test)]
-    #[cfg_attr(feature = "unstable", core::prelude::v1::test)]
+    #[test]
     fn drop_multiple_env_guard() {
         {
             let mut guards = HashSet::new();
@@ -647,8 +643,7 @@ mod tests {
         assert!(std::env::var("HELLO").is_err());
     }
 
-    #[cfg_attr(not(feature = "unstable"), test)]
-    #[cfg_attr(feature = "unstable", core::prelude::v1::test)]
+    #[test]
     fn map_try_from_env_value() {
         assert!(<HashMap<String, String> as TryFromEnvValue>::try_from_env_value("hello=world".into()).is_ok());
         assert!(<HashMap<String, String> as TryFromEnvValue>::try_from_env_value("helloworld".into()).is_ok());
@@ -667,8 +662,7 @@ mod tests {
         .is_ok());
     }
 
-    #[cfg_attr(not(feature = "unstable"), test)]
-    #[cfg_attr(feature = "unstable", core::prelude::v1::test)]
+    #[test]
     fn set_try_from_env_value() {
         assert!(<HashSet<String> as TryFromEnvValue>::try_from_env_value("hello,world".into()).is_ok());
         assert!(<HashSet<String> as TryFromEnvValue>::try_from_env_value("helloworld".into()).is_ok());

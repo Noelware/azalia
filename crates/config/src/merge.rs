@@ -58,7 +58,6 @@ pub use azalia_config_macros::Merge;
 /// use azalia_config::merge::Merge;
 ///
 /// #[derive(Merge)]
-/// # #[merge(crate = azalia_config)]
 /// pub struct Wrapper(u64);
 /// # };
 /// ```
@@ -253,11 +252,14 @@ impl_partialeq!(
     String
 
     #[cfg(feature = "std")]
+    #[cfg_attr(any(noeldoc, docsrs), doc(cfg(feature = "std")))]
     std::path::PathBuf
 
     #[cfg(feature = "url")]
+    #[cfg_attr(any(noeldoc, docsrs), doc(cfg(feature = "url")))]
     url::Url
 
     #[cfg(feature = "tracing")]
+    #[cfg_attr(any(noeldoc, docsrs), doc(cfg(feature = "tracing")))]
     tracing::Level
 );
