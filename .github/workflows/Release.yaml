@@ -34,4 +34,4 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - run: cargo +nightly -Zpackage-workspace publish
         env:
-            CARGO_REGISTRY_TOKEN: ${{env.CARGO_REGISTRY_TOKEN}}
+            CARGO_REGISTRY_TOKEN: ${{secrets.CARGO_REGISTRY_TOKEN}}
