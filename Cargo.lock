@@ -559,7 +559,6 @@ dependencies = [
  "azalia-log",
  "azalia-remi",
  "azalia-serde",
- "once_cell",
  "regex",
  "rustc_version",
 ]
@@ -579,7 +578,6 @@ dependencies = [
 name = "azalia-config-macros"
 version = "0.1.6"
 dependencies = [
- "heck",
  "proc-macro2",
  "quote",
  "syn 2.0.101",

@@ -36,8 +36,8 @@ workspace = true
 default = ["std"]
 
 unstable = []
-alloc = ["once_cell?/alloc", "azalia-config?/alloc"]
-std = ["once_cell?/std", "azalia-config?/std"]
+alloc = ["azalia-config?/alloc"]
+std = ["azalia-config?/std"]
 
 "config+unstable" = ["azalia-config?/unstable"]
 "config+tracing" = ["azalia-config?/tracing"]
@@ -74,9 +74,6 @@ azalia-config = { version = "=0.1.6", path = "../config", optional = true }
 azalia-log = { version = "=0.1.6", path = "../log", optional = true }
 azalia-remi = { version = "=0.1.6", path = "../remi", optional = true }
 azalia-serde = { version = "=0.1.6", path = "../serde", optional = true }
-once_cell = { version = "1.21.1", optional = true, default-features = false, features = [
-    "race",
-] }
 regex = { version = "1.11.1", optional = true, default-features = false }
 
 [build-dependencies]
