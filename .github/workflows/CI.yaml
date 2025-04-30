@@ -73,6 +73,26 @@ jobs:
 
             - run: cargo build --all-features --workspace
             - run: cargo test --all-features --workspace
+    cargo-deny:
+        name: 'Rust / `cargo deny`'
+        runs-on: ubuntu-24.04
+        steps:
+            - uses: actions/checkout@v4
+            - uses: taiki-e/cache-cargo-install-action@v2
+              with:
+                  tool: cargo-deny
+
+            - run: cargo deny check all
+
+    report-missing-dependencies:
+        name: 'Rust / Report Missing Dependencies'
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: taiki-e/cache-cargo-install-action@v2
+              with:
+                  tool: cargo-machete
+            - run: cargo machete
     clippy:
         name: Clippy
         runs-on: ubuntu-latest
