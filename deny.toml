@@ -29,6 +29,11 @@ all-features = true
 #
 # See also: https://github.com/EmbarkStudios/cargo-deny/pull/611
 version = 2
+ignore = [
+    # for azure_core and remi-rs can't upgrade to it yet.
+    "RUSTSEC-2024-0436",
+    "RUSTSEC-2024-0384",
+]
 
 [licenses]
 # Similar to advisories, opt in to version 2.
@@ -42,6 +47,7 @@ allow = [
     "MPL-2.0",
     "BSD-3-Clause",
     "ISC",
+    "Unicode-3.0",
 ]
 
 exceptions = [
@@ -50,6 +56,8 @@ exceptions = [
     # See https://github.com/dtolnay/unicode-ident/pull/4
     { name = "unicode-ident", allow = ["Unicode-DFS-2016"] },
     { name = "ring", allow = ["OpenSSL"] },
+    { name = "foldhash", allow = ["Zlib"] },
+    { name = "tiny-keccak", allow = ["CC0-1.0"] },
 ]
 
 # Sigh
