@@ -68,7 +68,7 @@
 #![allow(non_camel_case_types)]
 
 use remi::{ListBlobsRequest, UploadRequest};
-use std::path::Path;
+use std::{borrow::Cow, path::Path};
 
 pub use remi as core;
 
@@ -239,13 +239,75 @@ mk_storage_service_impl! {
     }
 }
 
+impl StorageService {
+    #[cfg(feature = "fs")]
+    #[cfg_attr(any(noeldoc, docsrs), doc(cfg(feature = "fs")))]
+    /// Returns a reference to [`remi_fs::StorageService`] if we are in the [`StorageService::Filesystem`]
+    /// variant, returns `None` otherwise.
+    pub fn as_filesystem(&self) -> Option<&remi_fs::StorageService> {
+        match *self {
+            Self::Filesystem(ref fs) => Some(fs),
+            _ => None,
+        }
+    }
+
+    #[cfg(feature = "s3")]
+    #[cfg_attr(any(noeldoc, docsrs), doc(cfg(feature = "s3")))]
+    /// Returns a reference to [`remi_s3::StorageService`] if we are in the [`StorageService::S3`]
+    /// variant, returns `None` otherwise.
+    pub fn as_s3(&self) -> Option<&remi_s3::StorageService> {
+        match *self {
+            Self::S3(ref s3) => Some(s3),
+            _ => None,
+        }
+    }
+
+    #[cfg(feature = "azure")]
+    #[cfg_attr(any(noeldoc, docsrs), doc(cfg(feature = "azure")))]
+    /// Returns a reference to [`remi_azure::StorageService`] if we are in the [`StorageService::Azure`]
+    /// variant, returns `None` otherwise.
+    pub fn as_azure(&self) -> Option<&remi_azure::StorageService> {
+        match *self {
+            Self::Azure(ref azure) => Some(azure),
+            _ => None,
+        }
+    }
+
+    #[cfg(feature = "gridfs")]
+    #[cfg_attr(any(noeldoc, docsrs), doc(cfg(feature = "gridfs")))]
+    /// Returns a reference to [`remi_gridfs::StorageService`] if we are in the [`StorageService::Gridfs`]
+    /// variant, returns `None` otherwise.
+    pub fn as_gridfs(&self) -> Option<&remi_gridfs::StorageService> {
+        match *self {
+            Self::Gridfs(ref gridfs) => Some(gridfs),
+            _ => None,
+        }
+    }
+}
+
 #[remi::async_trait]
 #[allow(unused)]
 impl remi::StorageService for StorageService {
     type Error = Error;
 
     fn name(&self) -> ::std::borrow::Cow<'static, str> {
-        ::std::borrow::Cow::Borrowed("azalia:remi")
+        let name = match self {
+            #[cfg(feature = "fs")]
+            StorageService::Filesystem(service) => service.name(),
+
+            #[cfg(feature = "s3")]
+            StorageService::S3(service) => service.name(),
+
+            #[cfg(feature = "azure")]
+            StorageService::Azure(service) => service.name(),
+
+            #[cfg(feature = "gridfs")]
+            StorageService::Gridfs(service) => service.name(),
+
+            _ => unreachable!(),
+        };
+
+        Cow::Owned(format!("azalia:remi[{}]", name))
     }
 
     async fn init(&self) -> Result<(), Self::Error> {

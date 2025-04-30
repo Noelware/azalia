@@ -29,13 +29,6 @@ all-features = true
 #
 # See also: https://github.com/EmbarkStudios/cargo-deny/pull/611
 version = 2
-ignore = [
-    # We do not use remi-gridfs, yet mongodb is pulled in via it.
-    # We need to either rework how Remi in pulled in,
-    # or wait for a new version of mongodb upstream:
-    # https://github.com/mongodb/mongo-rust-driver/pull/1245
-    "RUSTSEC-2024-0388",
-]
 
 [licenses]
 # Similar to advisories, opt in to version 2.
@@ -50,6 +43,7 @@ allow = [
     "BSD-3-Clause",
     "ISC",
 ]
+
 exceptions = [
     # unicode-ident includes data generated from Unicode Character Database
     # which is licensed under Unicode-DFS-2016.
