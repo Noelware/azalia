@@ -290,7 +290,7 @@ impl StorageService {
 impl remi::StorageService for StorageService {
     type Error = Error;
 
-    fn name(&self) -> ::std::borrow::Cow<'static, str> {
+    fn name(&self) -> Cow<'static, str> {
         let name = match self {
             #[cfg(feature = "fs")]
             StorageService::Filesystem(service) => service.name(),
@@ -304,7 +304,7 @@ impl remi::StorageService for StorageService {
             #[cfg(feature = "gridfs")]
             StorageService::Gridfs(service) => service.name(),
 
-            _ => unreachable!(),
+            _ => Cow::Borrowed("<unknown>"),
         };
 
         Cow::Owned(format!("azalia:remi[{}]", name))
