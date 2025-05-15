@@ -254,7 +254,7 @@ macro_rules! impl_dyn_any {
                 ///
                 #[doc = concat!("[`<dyn ", stringify!($Ty), ">::downcast_unchecked`]: trait.", stringify!($Ty), ".html#method.downcast_unchecked")]
                 pub unsafe fn downcast_unchecked<T: ::core::any::Any>(&self) -> &T {
-                    <dyn $Ty>::downcast_unchecked::<T>(self)
+                    unsafe { <dyn $Ty>::downcast_unchecked::<T>(self) }
                 }
 
                 #[doc = concat!("Forwards to [`<dyn ", stringify!($Ty), ">::downcast_mut_unchecked`].")]
@@ -264,7 +264,7 @@ macro_rules! impl_dyn_any {
                 ///
                 #[doc = concat!("[`<dyn ", stringify!($Ty), ">::downcast_mut_unchecked`]: trait.", stringify!($Ty), ".html#method.downcast_mut_unchecked")]
                 pub unsafe fn downcast_mut_unchecked<T: ::core::any::Any>(&mut self) -> &mut T {
-                    <dyn $Ty>::downcast_mut_unchecked::<T>(self)
+                    unsafe { <dyn $Ty>::downcast_mut_unchecked::<T>(self) }
                 }
             }
 
@@ -297,7 +297,7 @@ macro_rules! impl_dyn_any {
                 ///
                 #[doc = concat!("[`<dyn ", stringify!($Ty), ">::downcast_unchecked`]: trait.", stringify!($Ty), ".html#method.downcast_unchecked")]
                 pub unsafe fn downcast_unchecked<T: ::core::any::Any>(&self) -> &T {
-                    <dyn $Ty>::downcast_unchecked::<T>(self)
+                    unsafe { <dyn $Ty>::downcast_unchecked::<T>(self) }
                 }
 
                 #[doc = concat!("Forwards to [`<dyn ", stringify!($Ty), ">::downcast_mut_unchecked`].")]
@@ -307,7 +307,7 @@ macro_rules! impl_dyn_any {
                 ///
                 #[doc = concat!("[`<dyn ", stringify!($Ty), ">::downcast_mut_unchecked`]: trait.", stringify!($Ty), ".html#method.downcast_mut_unchecked")]
                 pub unsafe fn downcast_mut_unchecked<T: ::core::any::Any>(&mut self) -> &mut T {
-                    <dyn $Ty>::downcast_mut_unchecked::<T>(self)
+                    unsafe { <dyn $Ty>::downcast_mut_unchecked::<T>(self) }
                 }
             }
         };
@@ -424,7 +424,7 @@ macro_rules! impl_dyn_any {
                 ///
                 #[doc = concat!("[`<dyn ", stringify!($Ty), ">::downcast_unchecked`]: trait.", stringify!($Ty), ".html#method.downcast_unchecked")]
                 pub unsafe fn downcast_unchecked<T: ::core::any::Any>(&self) -> &T {
-                    <dyn $Ty>::downcast_unchecked::<T>(self)
+                    unsafe { <dyn $Ty>::downcast_unchecked::<T>(self) }
                 }
 
                 #[doc = concat!("Forwards to [`<dyn ", stringify!($Ty), ">::downcast_mut_unchecked`].")]
@@ -434,7 +434,7 @@ macro_rules! impl_dyn_any {
                 ///
                 #[doc = concat!("[`<dyn ", stringify!($Ty), ">::downcast_mut_unchecked`]: trait.", stringify!($Ty), ".html#method.downcast_mut_unchecked")]
                 pub unsafe fn downcast_mut_unchecked<T: ::core::any::Any>(&mut self) -> &mut T {
-                    <dyn $Ty>::downcast_mut_unchecked::<T>(self)
+                    unsafe { <dyn $Ty>::downcast_mut_unchecked::<T>(self) }
                 }
             }
 
@@ -467,7 +467,7 @@ macro_rules! impl_dyn_any {
                 ///
                 #[doc = concat!("[`<dyn ", stringify!($Ty), ">::downcast_unchecked`]: trait.", stringify!($Ty), ".html#method.downcast_unchecked")]
                 pub unsafe fn downcast_unchecked<T: ::core::any::Any>(&self) -> &T {
-                    <dyn $Ty>::downcast_unchecked::<T>(self)
+                    unsafe { <dyn $Ty>::downcast_unchecked::<T>(self) }
                 }
 
                 #[doc = concat!("Forwards to [`<dyn ", stringify!($Ty), ">::downcast_mut_unchecked`].")]
@@ -477,7 +477,7 @@ macro_rules! impl_dyn_any {
                 ///
                 #[doc = concat!("[`<dyn ", stringify!($Ty), ">::downcast_mut_unchecked`]: trait.", stringify!($Ty), ".html#method.downcast_mut_unchecked")]
                 pub unsafe fn downcast_mut_unchecked<T: ::core::any::Any>(&mut self) -> &mut T {
-                    <dyn $Ty>::downcast_mut_unchecked::<T>(self)
+                    unsafe { <dyn $Ty>::downcast_mut_unchecked::<T>(self) }
                 }
             }
         };

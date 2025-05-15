@@ -22,12 +22,6 @@
   description = "Collection of Rust crates that are used by and built for Noelware's projects";
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    systems.url = "github:nix-systems/default";
-    noelware = {
-      url = "github:Noelware/nixpkgs-noelware";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     rust-overlay = {
       url = "github:oxalica/rust-overlay";
       inputs = {
@@ -55,14 +49,11 @@
   outputs = {
     nixpkgs,
     rust-overlay,
-    systems,
-    noelware,
     ...
   }: let
-    eachSystem = nixpkgs.lib.genAttrs (import systems);
+    eachSystem = nixpkgs.lib.genAttrs nixpkgs.lib.systems.flakeExposed;
     overlays = [
       (import rust-overlay)
-      (import noelware)
     ];
 
     nixpkgsFor = system:

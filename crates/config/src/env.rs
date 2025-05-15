@@ -25,14 +25,14 @@ use std::{
     char::ParseCharError,
     collections::{BTreeMap, BTreeSet, HashSet},
     convert::Infallible,
-    env::{remove_var, VarError},
+    env::{VarError, remove_var},
     ffi::OsStr,
     fmt::{Debug, Display},
     hash::{Hash, Hasher},
     marker::PhantomData,
     num::{
-        NonZeroI128, NonZeroI16, NonZeroI32, NonZeroI64, NonZeroI8, NonZeroIsize, NonZeroU128, NonZeroU16, NonZeroU32,
-        NonZeroU64, NonZeroU8, NonZeroUsize, ParseFloatError, ParseIntError,
+        NonZeroI8, NonZeroI16, NonZeroI32, NonZeroI64, NonZeroI128, NonZeroIsize, NonZeroU8, NonZeroU16, NonZeroU32,
+        NonZeroU64, NonZeroU128, NonZeroUsize, ParseFloatError, ParseIntError,
     },
     rc::Rc,
     str::ParseBoolError,
@@ -507,9 +507,7 @@ impl EnvGuard {
         let name = name.into();
 
         // Safety: rationale in Safety section of the struct
-        // TODO(@auguwu): add `unsafe` block once in 2024 edition
-        std::env::set_var(&name, value);
-
+        unsafe { std::env::set_var(&name, value) };
         EnvGuard {
             name,
             _non_send_and_sync: PhantomData,
@@ -533,8 +531,7 @@ impl Hash for EnvGuard {
 
 impl Drop for EnvGuard {
     fn drop(&mut self) {
-        // TODO(@auguwu): add `unsafe` block once in 2024 edition
-        remove_var(&self.name);
+        unsafe { remove_var(&self.name) }
     }
 }
 
@@ -659,18 +656,22 @@ mod tests {
         assert!(<HashMap<String, String> as TryFromEnvValue>::try_from_env_value("hello=world".into()).is_ok());
         assert!(<HashMap<String, String> as TryFromEnvValue>::try_from_env_value("helloworld".into()).is_ok());
         assert!(<HashMap<String, String> as TryFromEnvValue>::try_from_env_value("".into()).is_ok());
-        assert!(<HashMap<String, String> as TryFromEnvValue>::try_from_env_value(
-            "hello=world,weow=fluff;wwww,s=true".into()
-        )
-        .is_ok());
+        assert!(
+            <HashMap<String, String> as TryFromEnvValue>::try_from_env_value(
+                "hello=world,weow=fluff;wwww,s=true".into()
+            )
+            .is_ok()
+        );
 
         assert!(<BTreeMap<String, String> as TryFromEnvValue>::try_from_env_value("hello=world".into()).is_ok());
         assert!(<BTreeMap<String, String> as TryFromEnvValue>::try_from_env_value("helloworld".into()).is_ok());
         assert!(<BTreeMap<String, String> as TryFromEnvValue>::try_from_env_value("".into()).is_ok());
-        assert!(<BTreeMap<String, String> as TryFromEnvValue>::try_from_env_value(
-            "hello=world,weow=fluff;wwww,s=true".into()
-        )
-        .is_ok());
+        assert!(
+            <BTreeMap<String, String> as TryFromEnvValue>::try_from_env_value(
+                "hello=world,weow=fluff;wwww,s=true".into()
+            )
+            .is_ok()
+        );
     }
 
     #[test]

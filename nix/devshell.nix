@@ -28,7 +28,6 @@
   ];
 
   linuxNativeBuildInputs = with pkgs; [lldb];
-
   nativeBuildInputs = with pkgs;
     [pkg-config]
     ++ (optional stdenv.isLinux linuxNativeBuildInputs)
@@ -37,7 +36,6 @@
   buildInputs = with pkgs;
     [
       cargo-outdated
-      cargo-upgrades
       cargo-nextest
       cargo-machete
       cargo-expand

@@ -44,8 +44,8 @@ alloc = []
 std = []
 
 [dependencies]
-azalia-config-macros = { version = "=0.1.6", path = "./macros", optional = true }
-sentry-types = { version = "0.38.0", optional = true }
+azalia-config-macros = { version = "=0.1.7", path = "./macros", optional = true }
+sentry-types = { version = "0.38.1", optional = true }
 tracing = { version = "0.1.41", optional = true }
 url = { version = "2.5.4", optional = true }
 
