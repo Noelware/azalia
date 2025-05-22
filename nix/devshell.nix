@@ -22,16 +22,10 @@
   inherit (pkgs) rust-bin mkShell stdenv lib darwin;
   inherit (lib) makeLibraryPath optional;
 
-  darwinNativeBuildInputs = with darwin.apple_sdk.frameworks; [
-    CoreFoundation
-    Security
-  ];
-
   linuxNativeBuildInputs = with pkgs; [lldb];
   nativeBuildInputs = with pkgs;
     [pkg-config]
-    ++ (optional stdenv.isLinux linuxNativeBuildInputs)
-    ++ (optional stdenv.isDarwin darwinNativeBuildInputs);
+    ++ (optional stdenv.isLinux linuxNativeBuildInputs);
 
   buildInputs = with pkgs;
     [
