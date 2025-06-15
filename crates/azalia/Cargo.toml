@@ -70,10 +70,10 @@ remi = ["dep:azalia-remi"]
 serde = ["dep:azalia-serde"]
 
 [dependencies]
-azalia-config = { version = "=0.1.7", path = "../config", optional = true }
-azalia-log = { version = "=0.1.7", path = "../log", optional = true }
-azalia-remi = { version = "=0.1.7", path = "../remi", optional = true }
-azalia-serde = { version = "=0.1.7", path = "../serde", optional = true }
+azalia-config = { version = "=0.1.8", path = "../config", optional = true }
+azalia-log = { version = "=0.1.8", path = "../log", optional = true }
+azalia-remi = { version = "=0.1.8", path = "../remi", optional = true }
+azalia-serde = { version = "=0.1.8", path = "../serde", optional = true }
 regex = { version = "1.11.1", optional = true, default-features = false }
 
 [build-dependencies]
