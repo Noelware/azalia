@@ -307,7 +307,7 @@ impl remi::StorageService for StorageService {
             _ => Cow::Borrowed("<unknown>"),
         };
 
-        Cow::Owned(format!("azalia:remi[{}]", name))
+        Cow::Owned(format!("azalia:remi[{name}]"))
     }
 
     async fn init(&self) -> Result<(), Self::Error> {
