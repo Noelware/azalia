@@ -29,7 +29,7 @@ jobs:
     name: Release crate on crates.io
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: dtolnay/rust-toolchain@nightly
       - uses: Swatinem/rust-cache@v2
       - run: cargo +nightly -Zpackage-workspace publish
