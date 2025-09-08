@@ -549,7 +549,7 @@ dependencies = [
 
 [[package]]
 name = "azalia"
-version = "0.1.10"
+version = "0.1.11"
 dependencies = [
  "azalia-config",
  "azalia-log",
@@ -561,7 +561,7 @@ dependencies = [
 
 [[package]]
 name = "azalia-config"
-version = "0.1.10"
+version = "0.1.11"
 dependencies = [
  "azalia-config-macros",
  "sentry-types",
@@ -572,7 +572,7 @@ dependencies = [
 
 [[package]]
 name = "azalia-config-macros"
-version = "0.1.10"
+version = "0.1.11"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -582,7 +582,7 @@ dependencies = [
 
 [[package]]
 name = "azalia-log"
-version = "0.1.10"
+version = "0.1.11"
 dependencies = [
  "cfg-if",
  "chrono",
@@ -595,7 +595,7 @@ dependencies = [
 
 [[package]]
 name = "azalia-remi"
-version = "0.1.10"
+version = "0.1.11"
 dependencies = [
  "remi",
  "remi-azure",
@@ -608,7 +608,7 @@ dependencies = [
 
 [[package]]
 name = "azalia-serde"
-version = "0.1.10"
+version = "0.1.11"
 dependencies = [
  "aws-sdk-s3",
  "aws-types",
