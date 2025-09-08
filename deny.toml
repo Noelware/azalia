@@ -58,6 +58,7 @@ exceptions = [
     { name = "ring", allow = ["OpenSSL"] },
     { name = "foldhash", allow = ["Zlib"] },
     { name = "tiny-keccak", allow = ["CC0-1.0"] },
+    { name = "webpki-roots", allow = ["CDLA-Permissive-2.0"] },
 ]
 
 # Sigh
