@@ -87,7 +87,7 @@ serde = { workspace = true, optional = true }
 
 # used for README doctest
 [dev-dependencies]
-tokio = { version = "1.41.1", features = ["rt", "macros"] }
+tokio = { version = "1.47.1", features = ["rt", "macros"] }
 
 [package.metadata.docs.rs]
 all-features = true

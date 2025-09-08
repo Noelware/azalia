@@ -74,7 +74,7 @@ azalia-config = { version = "=0.1.10", path = "../config", optional = true }
 azalia-log = { version = "=0.1.10", path = "../log", optional = true }
 azalia-remi = { version = "=0.1.10", path = "../remi", optional = true }
 azalia-serde = { version = "=0.1.10", path = "../serde", optional = true }
-regex = { version = "1.11.1", optional = true, default-features = false }
+regex = { version = "1.11.2", optional = true, default-features = false }
 
 [build-dependencies]
 rustc_version = "0.4.1"
