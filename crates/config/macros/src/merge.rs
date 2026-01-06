@@ -132,11 +132,10 @@ pub fn expand_struct(
             continue;
         }
 
-        if let Meta::List(list) = &attr.meta {
-            if list.tokens.is_empty() {
+        if let Meta::List(list) = &attr.meta
+            && list.tokens.is_empty() {
                 continue;
             }
-        }
 
         if let Err(e) = attr.parse_nested_meta(|meta| {
             if meta.path.is_ident("crate") {
@@ -175,11 +174,10 @@ pub fn expand_struct(
                 continue;
             }
 
-            if let Meta::List(list) = &attr.meta {
-                if list.tokens.is_empty() {
+            if let Meta::List(list) = &attr.meta
+                && list.tokens.is_empty() {
                     continue;
                 }
-            }
 
             if let Err(e) = attr.parse_nested_meta(|meta| {
                 if meta.path.is_ident("skip") {

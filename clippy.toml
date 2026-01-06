@@ -20,4 +20,4 @@
 # SOFTWARE.
 
 # Keep both this and `rust-version` in `Cargo.toml` in sync.
-msrv = "1.83"
+msrv = "1.92"
