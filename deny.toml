@@ -33,6 +33,10 @@ ignore = [
     # for azure_core and remi-rs can't upgrade to it yet.
     "RUSTSEC-2024-0436",
     "RUSTSEC-2024-0384",
+
+    # remi-s3 is unaffected by CRL usage within this advisory.
+    # It should be patched, but Azalia appears to be pulling the legacy S3 HTTPS client.
+    "RUSTSEC-2026-0104",
 ]
 
 [licenses]
