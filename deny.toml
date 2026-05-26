@@ -36,6 +36,8 @@ ignore = [
 
     # remi-s3 is unaffected by CRL usage within this advisory.
     # It should be patched, but Azalia appears to be pulling the legacy S3 HTTPS client.
+    "RUSTSEC-2026-0098",
+    "RUSTSEC-2026-0099",
     "RUSTSEC-2026-0104",
 ]
 
@@ -47,6 +49,7 @@ confidence-threshold = 0.93
 allow = [
     "Apache-2.0",
     "Apache-2.0 WITH LLVM-exception",
+    "CDLA-Permissive-2.0",
     "MIT",
     "MPL-2.0",
     "BSD-3-Clause",
