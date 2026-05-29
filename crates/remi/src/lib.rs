@@ -219,7 +219,7 @@ mk_storage_service_impl! {
 
     "azure" => Azure as ::remi_azure::StorageService {
         /// Error variant that can happen when using [`remi_azure::StorageService`].
-        Error: ::remi_azure::core::error::Error;
+        Error: ::remi_azure::core::storage::Error;
         Config: ::remi_azure::StorageConfig;
         Display: |f, err| ::std::fmt::Display::fmt(err, f);
     }
