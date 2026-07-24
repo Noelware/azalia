@@ -33,6 +33,18 @@ ignore = [
     # for azure_core and remi-rs can't upgrade to it yet.
     "RUSTSEC-2024-0436",
     "RUSTSEC-2024-0384",
+    # quick-xml's denial-of-service should only occur
+    # with untrusted XML, and we assume that Azure is safe.
+    "RUSTSEC-2026-0194",
+    "RUSTSEC-2026-0195",
+    # This issue (via Azure) does not affect us.
+    "RUSTSEC-2026-0174",
+    # ...further Azure issues.
+    "RUSTSEC-2026-0097",
+    "RUSTSEC-2026-0098",
+    "RUSTSEC-2026-0099",
+    "RUSTSEC-2026-0104",
+    "RUSTSEC-2026-0204",
 ]
 
 [licenses]
@@ -60,6 +72,7 @@ exceptions = [
     { name = "foldhash", allow = ["Zlib"] },
     { name = "tiny-keccak", allow = ["CC0-1.0"] },
     { name = "webpki-roots", allow = ["CDLA-Permissive-2.0"] },
+    { name = "webpki-root-certs", allow = ["CDLA-Permissive-2.0"] },
 ]
 
 # Sigh
