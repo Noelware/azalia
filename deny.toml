@@ -39,12 +39,6 @@ ignore = [
     "RUSTSEC-2026-0195",
     # This issue (via Azure) does not affect us.
     "RUSTSEC-2026-0174",
-    # ...further Azure issues.
-    "RUSTSEC-2026-0097",
-    "RUSTSEC-2026-0098",
-    "RUSTSEC-2026-0099",
-    "RUSTSEC-2026-0104",
-    "RUSTSEC-2026-0204",
 ]
 
 [licenses]
@@ -55,20 +49,13 @@ confidence-threshold = 0.93
 allow = [
     "Apache-2.0",
     "Apache-2.0 WITH LLVM-exception",
-    "CDLA-Permissive-2.0",
     "MIT",
-    "MPL-2.0",
     "BSD-3-Clause",
     "ISC",
     "Unicode-3.0",
 ]
 
 exceptions = [
-    # unicode-ident includes data generated from Unicode Character Database
-    # which is licensed under Unicode-DFS-2016.
-    # See https://github.com/dtolnay/unicode-ident/pull/4
-    { name = "unicode-ident", allow = ["Unicode-DFS-2016"] },
-    { name = "ring", allow = ["OpenSSL"] },
     { name = "foldhash", allow = ["Zlib"] },
     { name = "tiny-keccak", allow = ["CC0-1.0"] },
     { name = "webpki-roots", allow = ["CDLA-Permissive-2.0"] },
