@@ -75,7 +75,7 @@ jobs:
             - run: cargo test --all-features --workspace
     cargo-deny:
         name: 'Rust / `cargo deny`'
-        runs-on: ubuntu-24.04
+        runs-on: ubuntu-26.04
         steps:
             - uses: actions/checkout@v7
             - uses: taiki-e/cache-cargo-install-action@v3
